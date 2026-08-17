@@ -510,7 +510,7 @@ const resetForm = () => {
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          Clear
+          {{ t('clearTemplate') }}
         </button>
       </div>
     </div>
@@ -574,7 +574,7 @@ const resetForm = () => {
       <!-- App Idea -->
       <div class="space-y-2">
         <label for="idea" class="block text-sm font-medium text-gray-700">
-          App Idea <span class="text-red-500">*</span>
+          {{ t('appIdeaLabel') }} <span class="text-red-500">*</span>
         </label>
         <textarea
           id="idea"
@@ -584,19 +584,19 @@ const resetForm = () => {
             'border-gray-300': !errors.idea
           }"
           rows="4"
-          placeholder="Describe your app idea (e.g., 'A Nigerian fintech app for savings groups', 'A Kenyan agri-tech platform connecting farmers to markets')"
+          :placeholder="t('appIdeaPlaceholder')"
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
         />
         <p v-if="errors.idea" class="text-red-500 text-sm">{{ errors.idea }}</p>
         <p class="text-gray-500 text-sm">
-          Be specific about your app's purpose and target audience in Africa.
+          {{ t('appIdeaHint') }}
         </p>
       </div>
 
       <!-- Target Countries -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">
-          Target Countries
+          {{ t('targetCountriesLabel') }}
         </label>
         <div class="relative">
           <button
@@ -606,7 +606,7 @@ const resetForm = () => {
           >
             <div class="flex items-center justify-between">
               <span v-if="selectedCountriesCount === 0" class="text-gray-500">
-                Select countries...
+                {{ t('targetCountriesPlaceholder') }}
               </span>
               <span v-else class="text-gray-700">
                 {{ selectedCountriesCount }} country{{ selectedCountriesCount > 1 ? 'ies' : '' }} selected
@@ -642,7 +642,7 @@ const resetForm = () => {
       <!-- Primary User Types -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">
-          Primary User Types
+          {{ t('userTypesLabel') }}
         </label>
         <div class="relative">
           <button
@@ -652,7 +652,7 @@ const resetForm = () => {
           >
             <div class="flex items-center justify-between">
               <span v-if="selectedUserTypesCount === 0" class="text-gray-500">
-                Select user types...
+                {{ t('userTypesPlaceholder') }}
               </span>
               <span v-else class="text-gray-700">
                 {{ selectedUserTypesCount }} user type{{ selectedUserTypesCount > 1 ? 's' : '' }} selected
@@ -688,7 +688,7 @@ const resetForm = () => {
       <!-- Offline Access -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">
-          Offline Access
+          {{ t('offlineAccessLabel') }}
         </label>
         <div class="flex space-x-6">
           <label class="flex items-center cursor-pointer">
@@ -698,7 +698,7 @@ const resetForm = () => {
               :value="true"
               class="mr-3 h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
             />
-            <span class="text-sm text-gray-700">Yes</span>
+            <span class="text-sm text-gray-700">{{ t('yes') }}</span>
           </label>
           <label class="flex items-center cursor-pointer">
             <input
@@ -707,18 +707,18 @@ const resetForm = () => {
               :value="false"
               class="mr-3 h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
             />
-            <span class="text-sm text-gray-700">No</span>
+            <span class="text-sm text-gray-700">{{ t('no') }}</span>
           </label>
         </div>
         <p class="text-gray-500 text-sm">
-          Will your app need to work without internet connectivity?
+          {{ t('offlineAccessHint') }}
         </p>
       </div>
 
       <!-- Core Features -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">
-          Core Features
+          {{ t('coreFeaturesLabel') }}
         </label>
         <div class="relative">
           <button
@@ -728,7 +728,7 @@ const resetForm = () => {
           >
             <div class="flex items-center justify-between">
               <span v-if="selectedFeaturesCount === 0" class="text-gray-500">
-                Select features...
+                {{ t('coreFeaturesPlaceholder') }}
               </span>
               <span v-else class="text-gray-700">
                 {{ selectedFeaturesCount }} feature{{ selectedFeaturesCount > 1 ? 's' : '' }} selected
@@ -764,7 +764,7 @@ const resetForm = () => {
       <!-- AI Features -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">
-          AI Features
+          {{ t('aiFeaturesLabel') }}
         </label>
         <div class="relative">
           <button
@@ -774,7 +774,7 @@ const resetForm = () => {
           >
             <div class="flex items-center justify-between">
               <span v-if="selectedAiFeaturesCount === 0" class="text-gray-500">
-                Select AI features...
+                {{ t('aiFeaturesPlaceholder') }}
               </span>
               <span v-else class="text-gray-700">
                 {{ selectedAiFeaturesCount }} AI feature{{ selectedAiFeaturesCount > 1 ? 's' : '' }} selected
@@ -807,7 +807,7 @@ const resetForm = () => {
         </div>
       </div>
 
-      <!-- Submit and {{ t('reset') }} Buttons -->
+      <!-- Submit and Reset Buttons -->
       <div class="flex space-x-4 pt-4">
         <button
           type="submit"
@@ -819,7 +819,7 @@ const resetForm = () => {
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
           <span v-if="!isSubmitting">{{ t('generatePrompts') }}</span>
-          <span v-else>Generating...</span>
+          <span v-else>{{ t('generating') }}</span>
         </button>
         
         <button
