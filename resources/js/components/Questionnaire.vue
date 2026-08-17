@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
+import TemplateSelector from './TemplateSelector.vue'
 
 // African countries list
 const africanCountries = [
@@ -61,6 +62,10 @@ const isSuccess = ref(false)
 const generatedData = ref(null)
 const showResults = ref(false)
 
+// Template selector state
+const showTemplateSelector = ref(false)
+const selectedTemplate = ref(null)
+
 // Error state
 const errorMessage = ref(null)
 
@@ -76,6 +81,46 @@ const validateForm = () => {
   }
   
   return isValid
+}
+
+// Handle template selection
+const handleTemplateSelected = async (template) => {
+  selectedTemplate.value = template
+  
+  // Show loading state
+  isSubmitting.value = true
+  errorMessage.value = null
+  
+  try {
+    // Fetch the full template data including questionnaire_data
+    const response = await axios.get(`/api/templates/${template.id}/apply`)
+    
+    if (response.data.status === 'success' && response.data.data) {
+      const templateData = response.data.data
+      
+      // Pre-fill the form with template questionnaire data
+      if (templateData.questionnaire_data) {
+        const data = templateData.questionnaire_data
+        
+        form.value = {
+          idea: data.idea || form.value.idea,
+          countries: data.countries || form.value.countries,
+          userTypes: data.userTypes || form.value.userTypes,
+          offlineAccess: data.offlineAccess ?? form.value.offlineAccess,
+          features: data.features || form.value.features,
+          aiFeatures: data.aiFeatures || form.value.aiFeatures
+        }
+      }
+      
+      // Scroll to the form
+      document.getElementById('questionnaire-form')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  } catch (err) {
+    console.error('Failed to apply template:', err)
+    errorMessage.value = 'Failed to apply template. Please try again.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // Country selection helpers
@@ -226,6 +271,20 @@ const handleSubmit = async () => {
   }
 }
 
+// Helper to get icon for template category
+const categoryIcons = {
+  AgriTech: '🚜',
+  FinTech: '💳',
+  EdTech: '🎓',
+  HealthTech: '⚕️',
+  Logistics: '🚚',
+  general: '📄'
+}
+
+const getTemplateIcon = (category) => {
+  return categoryIcons[category] || categoryIcons.general
+}
+
 // Reset form
 const resetForm = () => {
   form.value = {
@@ -241,6 +300,7 @@ const resetForm = () => {
   generatedData.value = null
   errorMessage.value = null
   showResults.value = false
+  selectedTemplate.value = null
 }
 </script>
 
@@ -257,7 +317,35 @@ const resetForm = () => {
       </p>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <!-- Template Selector -->
+    <div class="mb-6 flex justify-start">
+      <TemplateSelector v-model="showTemplateSelector" @templateSelected="handleTemplateSelected" />
+    </div>
+
+    <!-- Selected Template Info -->
+    <div v-if="selectedTemplate" class="mb-6 p-4 bg-purple-50 border border-purple-100 rounded-lg">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center mb-1">
+            <span class="text-xl mr-2">{{ getTemplateIcon(selectedTemplate.category) }}</span>
+            <h4 class="font-semibold text-purple-800">{{ selectedTemplate.name }}</h4>
+            <span class="ml-2 text-xs px-2 py-0.5 bg-purple-200 text-purple-700 rounded-full">{{ selectedTemplate.category }}</span>
+          </div>
+          <p class="text-sm text-purple-600">{{ selectedTemplate.description }}</p>
+        </div>
+        <button
+          @click="resetForm"
+          class="px-3 py-1.5 text-xs text-purple-600 hover:bg-purple-100 rounded-lg transition-colors flex items-center"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-6">
       <!-- App Idea -->
       <div class="space-y-2">
         <label for="idea" class="block text-sm font-medium text-gray-700">
