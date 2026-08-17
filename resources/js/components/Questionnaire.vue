@@ -642,6 +642,7 @@ const resetForm = () => {
         </button>
       </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
