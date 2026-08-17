@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import ResultsDisplay from './ResultsDisplay.vue'
 
 // African countries list
 const africanCountries = [
@@ -58,6 +59,7 @@ const isSubmitting = ref(false)
 // Success state
 const isSuccess = ref(false)
 const generatedData = ref(null)
+const showResults = ref(false)
 
 // Error state
 const errorMessage = ref(null)
@@ -205,6 +207,7 @@ const handleSubmit = async () => {
     generatedData.value = response.data
     
     isSuccess.value = true
+    showResults.value = true
   } catch (error) {
     console.error('API Error:', error)
     
@@ -237,6 +240,7 @@ const resetForm = () => {
   isSuccess.value = false
   generatedData.value = null
   errorMessage.value = null
+  showResults.value = false
 }
 </script>
 
@@ -530,157 +534,26 @@ const resetForm = () => {
       </div>
     </div>
 
-    <!-- Success Display -->
-    <div v-if="isSuccess && generatedData" class="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-green-800">
-          {{ generatedData.status === 'success' ? 'Prompts Generated Successfully!' : 'Response Received' }}
-        </h3>
-        <span v-if="generatedData.status === 'success'" class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-          SUCCESS
-        </span>
+    <!-- Results Display -->
+    <ResultsDisplay 
+      v-if="showResults" 
+      :generatedData="generatedData" 
+      :isVisible="showResults" 
+      @close="showResults = false"
+    />
+    
+    <!-- Success Message (falls back to old display if needed) -->
+    <div v-if="isSuccess && !showResults && generatedData" class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <p class="text-green-700">{{ generatedData.message || 'Prompts generated successfully!' }}</p>
+        <button @click="showResults = true" class="ml-auto px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700">
+          Show Results
+        </button>
       </div>
-      
-      <div class="space-y-4">
-        <!-- Display API message if available -->
-        <div v-if="generatedData.message" class="p-3 bg-green-100 rounded-lg">
-          <p class="text-green-700">{{ generatedData.message }}</p>
-        </div>
-        
-        <!-- Display note if available -->
-        <div v-if="generatedData.note" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p class="text-yellow-700 text-sm">{{ generatedData.note }}</p>
-        </div>
-        
-        <!-- Display roles if available -->
-        <div v-if="generatedData.roles" class="p-3 bg-blue-50 rounded-lg">
-          <h4 class="font-medium text-blue-700 text-sm uppercase tracking-wider mb-2">
-            Generated Roles
-          </h4>
-          <pre class="text-sm text-blue-800 overflow-x-auto">{{ generatedData.roles }}</pre>
-        </div>
-        
-        <!-- Display agents if available -->
-        <div v-if="generatedData.agents" class="p-3 bg-purple-50 rounded-lg">
-          <h4 class="font-medium text-purple-700 text-sm uppercase tracking-wider mb-2">
-            Generated Agents
-          </h4>
-          <pre class="text-sm text-purple-800 overflow-x-auto">{{ generatedData.agents }}</pre>
-        </div>
-        
-        <!-- Display the data from the response -->
-        <template v-if="generatedData.data">
-          <div>
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              App Idea
-            </h4>
-            <p class="text-gray-700">{{ generatedData.data.idea }}</p>
-          </div>
-          
-          <div v-if="generatedData.data.countries && generatedData.data.countries.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Target Countries
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="country in generatedData.data.countries" :key="country" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ country }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.data.userTypes && generatedData.data.userTypes.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              User Types
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="userType in generatedData.data.userTypes" :key="userType" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ userType }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.data.offlineAccess !== undefined">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Offline Access
-            </h4>
-            <p class="text-gray-700">{{ generatedData.data.offlineAccess ? 'Yes' : 'No' }}</p>
-          </div>
-          
-          <div v-if="generatedData.data.features && generatedData.data.features.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Core Features
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="feature in generatedData.data.features" :key="feature" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ feature }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.data.aiFeatures && generatedData.data.aiFeatures.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              AI Features
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="feature in generatedData.data.aiFeatures" :key="feature" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ feature }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.data.generated_at">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Generated At
-            </h4>
-            <p class="text-gray-700 text-sm">{{ new Date(generatedData.data.generated_at).toLocaleString() }}</p>
-          </div>
-        </template>
-        
-        <!-- Fallback for direct form data (Iteration 1 compatibility) -->
-        <template v-else>
-          <div>
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              App Idea
-            </h4>
-            <p class="text-gray-700">{{ generatedData.idea }}</p>
-          </div>
-          
-          <div v-if="generatedData.countries && generatedData.countries.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Target Countries
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="country in generatedData.countries" :key="country" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ country }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.userTypes && generatedData.userTypes.length > 0">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              User Types
-            </h4>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="userType in generatedData.userTypes" :key="userType" class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                {{ userType }}
-              </span>
-            </div>
-          </div>
-          
-          <div v-if="generatedData.offlineAccess !== undefined">
-            <h4 class="font-medium text-green-700 text-sm uppercase tracking-wider mb-2">
-              Offline Access
-            </h4>
-            <p class="text-gray-700">{{ generatedData.offlineAccess ? 'Yes' : 'No' }}</p>
-          </div>
-        </template>
-      </div>
-      
-      <p class="mt-4 text-sm text-green-600">
-        <strong>Note:</strong> This data has been logged to the console. Open your browser's developer tools (F12) to see it.
-      </p>
     </div>
-  </div>
 </template>
 
 <style scoped>
