@@ -22,3 +22,11 @@ Route::prefix('templates')->group(function () {
     Route::get('/{id}', [\App\Http\Controllers\TemplateController::class, 'show']);
     Route::get('/{id}/apply', [\App\Http\Controllers\TemplateController::class, 'apply']);
 });
+
+// Session endpoints
+Route::prefix('sessions')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SessionController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\SessionController::class, 'store']);
+    Route::get('/{sessionId}', [\App\Http\Controllers\SessionController::class, 'show']);
+    Route::delete('/{sessionId}', [\App\Http\Controllers\SessionController::class, 'destroy']);
+});

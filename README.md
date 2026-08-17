@@ -79,6 +79,21 @@ This is a **single unified project** with:
 - Pre-fill questionnaire from selected template
 - Selected template display with clear option
 
+### Iteration 7: Save & Load User Sessions
+- Database migration for user_sessions table with JSON fields
+- Session model with query scopes (forUser, anonymous, recent)
+- SessionController with RESTful endpoints:
+  - POST /api/sessions - Save a session
+  - GET /api/sessions - List user sessions
+  - GET /api/sessions/{id} - Load a specific session
+  - DELETE /api/sessions/{id} - Delete a session
+- SessionManager Vue component with modal interface
+- Save Progress button with Quick Save functionality
+- Load Previous Session dropdown
+- Resume Session button for active sessions
+- Session persistence for anonymous users via unique session IDs
+- Automatic session name generation from questionnaire data
+
 ## Project Setup
 
 ### Prerequisites
@@ -167,6 +182,10 @@ Then visit: **http://localhost:8000**
 | POST | `/api/generate-prompts` | Generate prompts from questionnaire data |
 | GET | `/api/mistral/status` | Check Mistral AI configuration |
 | GET | `/health` | Health check endpoint |
+| POST | `/api/sessions` | Save a user session |
+| GET | `/api/sessions` | List user sessions |
+| GET | `/api/sessions/{id}` | Load a specific session |
+| DELETE | `/api/sessions/{id}` | Delete a session |
 
 ## Configuration Options
 
@@ -213,7 +232,7 @@ curl http://localhost:8000/api/mistral/status
 - [x] Iteration 4: Integrate Mistral AI for prompt generation
 - [x] Iteration 5: Display generated output in UI (enhanced)
 - [x] Iteration 6: Add Africa-specific templates
-- [ ] Iteration 7: Save & Load User Sessions
+- [x] Iteration 7: Save & Load User Sessions
 - [ ] Iteration 8: Export & Share Prompts
 - [ ] Iteration 9: Add Offline Support (PWA)
 - [ ] Iteration 10: Deploy to Production

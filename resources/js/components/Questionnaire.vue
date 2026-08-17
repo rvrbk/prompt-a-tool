@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
 import TemplateSelector from './TemplateSelector.vue'
+import SessionManager from './SessionManager.vue'
 
 // African countries list
 const africanCountries = [
@@ -66,8 +67,47 @@ const showResults = ref(false)
 const showTemplateSelector = ref(false)
 const selectedTemplate = ref(null)
 
+// Session management state
+const showSessionManager = ref(false)
+const currentSessionId = ref(null)
+const sessionSuccessMessage = ref(null)
+
 // Error state
 const errorMessage = ref(null)
+
+// Session management methods
+const handleSessionSave = (sessionData) => {
+  currentSessionId.value = sessionData.session_id
+  sessionSuccessMessage.value = 'Session saved successfully! You can resume later.'
+  setTimeout(() => {
+    sessionSuccessMessage.value = null
+  }, 3000)
+}
+
+const handleSessionLoad = (sessionData) => {
+  // Populate form with session data
+  form.value = {
+    idea: sessionData.questionnaire_data?.idea || '',
+    countries: sessionData.questionnaire_data?.countries || [],
+    userTypes: sessionData.questionnaire_data?.userTypes || [],
+    offlineAccess: sessionData.questionnaire_data?.offlineAccess || false,
+    features: sessionData.questionnaire_data?.features || [],
+    aiFeatures: sessionData.questionnaire_data?.aiFeatures || []
+  }
+  
+  // Load generated data if available
+  if (sessionData.generated_data) {
+    generatedData.value = sessionData.generated_data
+    showResults.value = true
+  }
+  
+  currentSessionId.value = sessionData.session_id
+  sessionSuccessMessage.value = `Session "${sessionData.name}" loaded successfully!`
+  
+  setTimeout(() => {
+    sessionSuccessMessage.value = null
+  }, 3000)
+}
 
 // Validation
 const validateForm = () => {
@@ -171,6 +211,50 @@ const selectedCountriesCount = computed(() => form.value.countries.length)
 const selectedUserTypesCount = computed(() => form.value.userTypes.length)
 const selectedFeaturesCount = computed(() => form.value.features.length)
 const selectedAiFeaturesCount = computed(() => form.value.aiFeatures.length)
+
+// Check if form has data for quick save
+const hasFormData = computed(() => {
+  return form.value.idea?.trim()?.length > 0 ||
+         form.value.countries?.length > 0 ||
+         form.value.userTypes?.length > 0
+})
+
+// Quick save method
+const quickSave = async () => {
+  if (!hasFormData.value) return
+  
+  isSubmitting.value = true
+  errorMessage.value = null
+  
+  try {
+    const payload = {
+      questionnaire_data: {
+        idea: form.value.idea,
+        countries: form.value.countries,
+        userTypes: form.value.userTypes,
+        offlineAccess: form.value.offlineAccess,
+        features: form.value.features,
+        aiFeatures: form.value.aiFeatures
+      },
+      generated_data: generatedData.value || null,
+      session_id: currentSessionId.value || null
+    }
+    
+    const response = await axios.post('/api/sessions', payload)
+    if (response.data.status === 'success') {
+      currentSessionId.value = response.data.data.session_id
+      sessionSuccessMessage.value = 'Progress saved! You can resume later.'
+      setTimeout(() => {
+        sessionSuccessMessage.value = null
+      }, 3000)
+    }
+  } catch (error) {
+    console.error('Quick save failed:', error)
+    errorMessage.value = 'Failed to save progress. Please try again.'
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 // Show/hide dropdowns
 const showCountriesDropdown = ref(false)
@@ -301,6 +385,7 @@ const resetForm = () => {
   errorMessage.value = null
   showResults.value = false
   selectedTemplate.value = null
+  currentSessionId.value = null
 }
 </script>
 
@@ -341,6 +426,61 @@ const resetForm = () => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
           Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Session Controls -->
+    <div class="mb-6 flex flex-wrap gap-4">
+      <button
+        @click="showSessionManager = true"
+        class="px-4 py-2 border border-blue-300 text-blue-700 font-medium rounded-lg hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Save & Load
+      </button>
+      
+      <button
+        v-if="currentSessionId"
+        @click="showSessionManager = true"
+        class="px-4 py-2 bg-blue-100 text-blue-700 font-medium rounded-lg hover:bg-blue-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all flex items-center text-sm"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
+        </svg>
+        Resume Session
+      </button>
+
+      <button
+        v-if="hasFormData"
+        @click="quickSave"
+        :disabled="isSubmitting"
+        class="px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg hover:bg-green-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all flex items-center text-sm"
+      >
+        <svg v-if="!isSubmitting" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>
+        <svg v-else class="animate-spin -ml-1 mr-2 h-4 w-4 text-green-700" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+        Quick Save
+      </button>
+    </div>
+
+    <!-- Session Success Message -->
+    <div v-if="sessionSuccessMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center text-green-700 text-sm">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        {{ sessionSuccessMessage }}
+        <button @click="sessionSuccessMessage = null" class="ml-auto text-green-500 hover:text-green-700">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </div>
@@ -642,6 +782,18 @@ const resetForm = () => {
         </button>
       </div>
     </div>
+
+    <!-- Session Manager Modal -->
+    <SessionManager
+      v-model="showSessionManager"
+      :currentSession="{
+        form: form.value,
+        generatedData: generatedData.value,
+        sessionId: currentSessionId.value
+      }"
+      @loadSession="handleSessionLoad"
+      @sessionSaved="handleSessionSave"
+    />
   </div>
 </template>
 
