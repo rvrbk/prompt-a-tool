@@ -203,7 +203,15 @@ const translations = {
     progressSaved: 'تم حفظ التقدم! يمكنك استئنافه لاحقا.',
     na: 'غير متوفر',
     yes: 'نعم',
-    no: 'لا'
+    no: 'لا',
+    
+    // Templates
+    templates: 'القوالب',
+    selectTemplate: 'حدد قالباً للبدء بسرعة',
+    clearTemplate: 'مسح',
+    allCategories: 'الكل',
+    noTemplates: 'لا توجد قوالب في هذه الفئة.',
+    loadingTemplates: 'جاري تحميل القوالب...'
   },
   
   fr: {
@@ -245,7 +253,15 @@ const translations = {
     progressSaved: 'Progression sauvegardée ! Vous pouvez reprendre plus tard.',
     na: 'N/D',
     yes: 'Oui',
-    no: 'Non'
+    no: 'Non',
+    
+    // Templates
+    templates: 'Modèles',
+    selectTemplate: 'Sélectionnez un modèle pour commencer rapidement',
+    clearTemplate: 'Effacer',
+    allCategories: 'Tout',
+    noTemplates: 'Aucun modèle trouvé pour cette catégorie.',
+    loadingTemplates: 'Chargement des modèles...'
   },
   
   pt: {
@@ -287,7 +303,15 @@ const translations = {
     progressSaved: 'Progresso salvo! Você pode retomar depois.',
     na: 'N/D',
     yes: 'Sim',
-    no: 'Não'
+    no: 'Não',
+    
+    // Templates
+    templates: 'Modelos',
+    selectTemplate: 'Selecione um modelo para começar rapidamente',
+    clearTemplate: 'Limpar',
+    allCategories: 'Todos',
+    noTemplates: 'Nenhum modelo encontrado para esta categoria.',
+    loadingTemplates: 'Carregando modelos...'
   },
   
   sw: {
@@ -327,7 +351,15 @@ const translations = {
     progressSaved: 'Maendeleo yamehifadhiwa! Unaweza kurudisha baadaye.',
     na: 'Haipo',
     yes: 'Ndiyo',
-    no: 'Hapana'
+    no: 'Hapana',
+    
+    // Templates
+    templates: 'Vifaa',
+    selectTemplate: 'Chagua kifaa kuanzia haraka',
+    clearTemplate: 'Safisha',
+    allCategories: 'Yote',
+    noTemplates: 'Hakuna vifaa vipatikanavyo katika kategoria hii.',
+    loadingTemplates: 'Vifaa vinapokewa...'
   },
   
   ha: {
@@ -364,7 +396,15 @@ const translations = {
     progressSaved: 'An saka sabuwa! Za ka iya ƙarawa a bayan ya gabata.',
     na: 'Babban lafiya',
     yes: 'Iya',
-    no: 'A\'a'
+    no: 'A\'a',
+    
+    // Templates
+    templates: 'Tsajaji',
+    selectTemplate: 'Zaɓi tsaje don fara da ayyuka',
+    clearTemplate: 'Sake',
+    allCategories: 'Duka',
+    noTemplates: 'Babu wani tsaje a wannan bangaren.',
+    loadingTemplates: 'Ana karba tsajaji...'
   },
   
   yo: {
@@ -401,7 +441,15 @@ const translations = {
     progressSaved: 'Àyò̩kú à ti sààgbà! Ṣé à lẹ̀ ètò̀ sì àkọ́kọ́.',
     na: 'Kò sí',
     yes: 'Bẹ́ẹ̀',
-    no: 'Rará'
+    no: 'Rará',
+    
+    // Templates
+    templates: 'Àwọn Àdàkú',
+    selectTemplate: 'Yàànà àdàkú kan nínú èyí àwọn àwújọ̀',
+    clearTemplate: 'Fìlàá',
+    allCategories: 'Gbogbo',
+    noTemplates: 'Kò sí àdàkú kán nínú èyí àwọn àwújọ̀.',
+    loadingTemplates: 'Àwọn Àdàkú n dára...'
   }
 }
 
