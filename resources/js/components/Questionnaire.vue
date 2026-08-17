@@ -1,9 +1,40 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
 import TemplateSelector from './TemplateSelector.vue'
 import SessionManager from './SessionManager.vue'
+import useTranslations from '../composables/useTranslations'
+
+// Initialize translations
+const { t, setLanguage, getLanguageOptions, getCurrentLanguage, getLanguageName, getLanguageFlag } = useTranslations()
+
+// Load saved language from localStorage
+onMounted(() => {
+  const savedLang = localStorage.getItem('africa-prompt-lang')
+  if (savedLang) {
+    setLanguage(savedLang)
+  }
+})
+
+// Language selector state
+const showLanguageDropdown = ref(false)
+const languageOptions = getLanguageOptions()
+
+const toggleLanguageDropdown = () => {
+  showLanguageDropdown.value = !showLanguageDropdown.value
+}
+
+const selectLanguage = (langCode) => {
+  setLanguage(langCode)
+  showLanguageDropdown.value = false
+}
+
+const currentLang = computed(() => getCurrentLanguage())
+const currentLangDisplay = computed(() => {
+  const lang = languageOptions.find(l => l.code === currentLang.value)
+  return lang ? lang.display : 'English'
+})
 
 // African countries list
 const africanCountries = [
@@ -78,7 +109,7 @@ const errorMessage = ref(null)
 // Session management methods
 const handleSessionSave = (sessionData) => {
   currentSessionId.value = sessionData.session_id
-  sessionSuccessMessage.value = 'Session saved successfully! You can resume later.'
+  sessionSuccessMessage.value = t('sessionSaved')
   setTimeout(() => {
     sessionSuccessMessage.value = null
   }, 3000)
@@ -102,7 +133,7 @@ const handleSessionLoad = (sessionData) => {
   }
   
   currentSessionId.value = sessionData.session_id
-  sessionSuccessMessage.value = `Session "${sessionData.name}" loaded successfully!`
+  sessionSuccessMessage.value = `${t('sessionLoaded')}`
   
   setTimeout(() => {
     sessionSuccessMessage.value = null
@@ -114,7 +145,7 @@ const validateForm = () => {
   let isValid = true
   
   if (!form.value.idea.trim()) {
-    errors.value.idea = 'App idea is required'
+    errors.value.idea = t('ideaRequired')
     isValid = false
   } else {
     errors.value.idea = ''
@@ -243,14 +274,14 @@ const quickSave = async () => {
     const response = await axios.post('/api/sessions', payload)
     if (response.data.status === 'success') {
       currentSessionId.value = response.data.data.session_id
-      sessionSuccessMessage.value = 'Progress saved! You can resume later.'
+      sessionSuccessMessage.value = t('progressSaved')
       setTimeout(() => {
         sessionSuccessMessage.value = null
       }, 3000)
     }
   } catch (error) {
     console.error('Quick save failed:', error)
-    errorMessage.value = 'Failed to save progress. Please try again.'
+    errorMessage.value = t('failedToSave')
   } finally {
     isSubmitting.value = false
   }
@@ -297,6 +328,7 @@ const closeAllDropdowns = () => {
   showUserTypesDropdown.value = false
   showFeaturesDropdown.value = false
   showAiFeaturesDropdown.value = false
+  showLanguageDropdown.value = false
 }
 
 // Handle form submission
@@ -342,13 +374,13 @@ const handleSubmit = async () => {
     
     if (error.response) {
       // The request was made and the server responded with a status code
-      errorMessage.value = `Error: ${error.response.data.message || 'Server error'}`
+      errorMessage.value = `${t('serverError')}: ${error.response.data.message || t('serverError')}`
     } else if (error.request) {
       // The request was made but no response was received
-      errorMessage.value = 'Error: No response from server. Please check if the backend is running.'
+      errorMessage.value = t('noResponse')
     } else {
       // Something happened in setting up the request
-      errorMessage.value = `Error: ${error.message}`
+      errorMessage.value = `${t('serverError')}: ${error.message}`
     }
   } finally {
     isSubmitting.value = false
@@ -369,7 +401,7 @@ const getTemplateIcon = (category) => {
   return categoryIcons[category] || categoryIcons.general
 }
 
-// Reset form
+// {{ t('reset') }} form
 const resetForm = () => {
   form.value = {
     idea: '',
@@ -391,14 +423,47 @@ const resetForm = () => {
 
 <template>
   <div class="p-6 lg:p-8" @click="closeAllDropdowns">
+    <!-- Language Selector -->
+    <div class="mb-4 flex justify-end">
+      <div class="relative">
+        <button
+          @click.stop="toggleLanguageDropdown"
+          class="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all"
+        >
+          <span>{{ currentLangDisplay }}</span>
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        <div
+          v-show="showLanguageDropdown"
+          @click.stop
+          class="absolute z-50 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto right-0"
+        >
+          <div class="p-2">
+            <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded">
+              <button
+                @click="selectLanguage(lang.code)"
+                class="flex items-center space-x-2 w-full text-left"
+              >
+                <span>{{ lang.flag }}</span>
+                <span class="text-sm text-gray-700">{{ lang.native }}</span>
+                <span class="text-xs text-gray-500">({{ lang.name }})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Title and Description -->
     <div class="mb-8">
       <h2 class="text-2xl font-bold text-gray-800 mb-2">
-        African App Prompt Generator
+        {{ t('appTitle') }}
       </h2>
       <p class="text-gray-600">
-        Answer a few questions about your app idea, and we'll generate tailored prompts, roles, 
-        agents, and skills for your African-focused application.
+        {{ t('appDescription') }}
       </p>
     </div>
 
@@ -439,7 +504,7 @@ const resetForm = () => {
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-        Save & Load
+        {{ t('saveAndLoad') }}
       </button>
       
       <button
@@ -450,7 +515,7 @@ const resetForm = () => {
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
         </svg>
-        Resume Session
+        {{ t('resumeSession') }}
       </button>
 
       <button
@@ -466,7 +531,7 @@ const resetForm = () => {
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
-        Quick Save
+        {{ t('quickSave') }}
       </button>
     </div>
 
@@ -722,7 +787,7 @@ const resetForm = () => {
         </div>
       </div>
 
-      <!-- Submit and Reset Buttons -->
+      <!-- Submit and {{ t('reset') }} Buttons -->
       <div class="flex space-x-4 pt-4">
         <button
           type="submit"
@@ -733,7 +798,7 @@ const resetForm = () => {
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <span v-if="!isSubmitting">Generate Prompts</span>
+          <span v-if="!isSubmitting">{{ t('generatePrompts') }}</span>
           <span v-else>Generating...</span>
         </button>
         
@@ -742,7 +807,7 @@ const resetForm = () => {
           @click="resetForm"
           class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
         >
-          Reset
+          {{ t('reset') }}
         </button>
       </div>
     </form>
