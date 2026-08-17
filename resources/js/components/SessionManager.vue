@@ -1,6 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
+import useTranslations from './composables/useTranslations'
+
+// Initialize translations
+const { t } = useTranslations()
 
 const props = defineProps({
   modelValue: {
@@ -28,7 +32,7 @@ const hasSessions = computed(() => sessions.value.length > 0)
 const hasCurrentSession = computed(() => props.currentSession !== null)
 
 // Watch for prop changes
-import { watch } from 'vue'
+watch(() => props.modelValue, (value) => {
 watch(() => props.modelValue, (value) => {
   isOpen.value = value
   if (value) {
@@ -63,11 +67,14 @@ const handleSave = async () => {
   errorMessage.value = null
 
   try {
+    // Safely unwrap refs if `currentSession` contains refs (supports being passed refs or plain objects)
+    const unwrap = (v) => (v && typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'value')) ? v.value : v
+
     const payload = {
-      questionnaire_data: props.currentSession?.form || null,
-      generated_data: props.currentSession?.generatedData || null,
+      questionnaire_data: unwrap(props.currentSession?.form) || null,
+      generated_data: unwrap(props.currentSession?.generatedData) || null,
       name: sessionName.value || null,
-      session_id: props.currentSession?.sessionId || null
+      session_id: unwrap(props.currentSession?.sessionId) || null
     }
 
     const response = await axios.post('/api/sessions', payload)
@@ -191,10 +198,10 @@ watch(() => sessions.value, (value) => {
             </div>
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <h3 class="text-xl font-bold text-gray-900" id="modal-title">
-                Manage Sessions
+                {{ t('manageSessions') }}
               </h3>
               <p class="mt-1 text-sm text-gray-500">
-                Save your progress or load a previous session.
+                {{ t('saveOrLoadSession') }}
               </p>
             </div>
           </div>
@@ -220,7 +227,7 @@ watch(() => sessions.value, (value) => {
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p class="mt-2 text-sm">No sessions found. Your first save will create a session.</p>
+            <p class="mt-2 text-sm">{{ t('noSessions') }}</p>
           </div>
 
           <div v-if="hasSessions" class="space-y-3">
@@ -273,13 +280,13 @@ watch(() => sessions.value, (value) => {
         <div v-if="hasCurrentSession" class="px-4 sm:px-6 pb-4 border-t border-gray-200">
           <div class="mt-4">
             <label for="sessionName" class="block text-sm font-medium text-gray-700 mb-1">
-              Session Name (optional)
+              {{ t('sessionName') }} ({{ t('optional') }})
             </label>
             <input
               type="text"
               id="sessionName"
               v-model="sessionName"
-              placeholder="e.g., My AgriTech Project - Nigeria"
+              :placeholder="t('sessionNamePlaceholder')"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             />
           </div>
@@ -297,7 +304,7 @@ watch(() => sessions.value, (value) => {
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <span>Save Progress</span>
+            <span>{{ t('saveProgress') }}</span>
           </button>
           <button
             v-if="hasSessions"
@@ -305,13 +312,13 @@ watch(() => sessions.value, (value) => {
             :disabled="isLoading || !selectedSessionId"
             class="w-full sm:w-auto px-4 py-2 mt-2 sm:mt-0 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            <span>Load Selected</span>
+            <span>{{ t('loadSession') }}</span>
           </button>
           <button
             @click="isOpen = false"
             class="w-full sm:w-auto px-4 py-2 mt-2 sm:mt-0 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
           >
-            Cancel
+            {{ t('cancelButton') }}
           </button>
         </div>
       </div>

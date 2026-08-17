@@ -131,6 +131,20 @@ const translations = {
     selectTemplate: 'Select a template to get started quickly',
     clearTemplate: 'Clear',
     
+    // Session management
+    manageSessions: 'Manage Sessions',
+    saveOrLoadSession: 'Save your progress or load a previous session.',
+    saveSession: 'Save Session',
+    loadSession: 'Load Session',
+    deleteSession: 'Delete Session',
+    noSessions: 'No saved sessions found.',
+    loadingSessions: 'Loading sessions...',
+    sessionName: 'Session Name',
+    sessionNamePlaceholder: 'Give this session a name...',
+    saveButton: 'Save',
+    cancelButton: 'Cancel',
+    optional: '(optional)',
+    
     // Metadata for export
     metadata: 'Project Overview',
     appIdea: 'App Idea',
