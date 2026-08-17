@@ -154,6 +154,10 @@ DB_CONNECTION=sqlite
 MISTRAL_API_KEY=your_mistral_api_key_here
 MISTRAL_API_URL=https://api.mistral.ai/v1/chat/completions
 MISTRAL_MODEL=mistral-medium
+
+# Google Analytics 4 (Optional)
+# Get your Measurement ID from https://analytics.google.com (Format: G-XXXXXXXXXX)
+VITE_GA_MEASUREMENT_ID=
 ```
 
 ### 3. Run Migrations
@@ -220,6 +224,12 @@ Then visit: **http://localhost:8000**
 - `APP_ENV`: Environment (local, production, etc.)
 - `APP_DEBUG`: Debug mode
 - `APP_URL`: Application URL
+
+### Google Analytics (Optional)
+- `VITE_GA_MEASUREMENT_ID`: Your Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX)
+  - Get it from: https://analytics.google.com
+  - Leave empty to disable tracking
+  - Tracks: page views, form submissions, exports, shares
 
 ## Testing
 

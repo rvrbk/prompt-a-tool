@@ -5,9 +5,13 @@ import ResultsDisplay from './ResultsDisplay.vue'
 import TemplateSelector from './TemplateSelector.vue'
 import SessionManager from './SessionManager.vue'
 import useTranslations from '../composables/useTranslations'
+import useGoogleAnalytics from '../composables/useGoogleAnalytics'
 
 // Initialize translations
 const { t, setLanguage, getLanguageOptions, getCurrentLanguage, getLanguageName, getLanguageFlag } = useTranslations()
+
+// Initialize Google Analytics
+const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()
 
 // Load saved language from localStorage
 onMounted(() => {
@@ -342,6 +346,9 @@ const handleSubmit = async () => {
   errorMessage.value = null
   
   try {
+    // Track form submission attempt
+    trackFormSubmission('questionnaire')
+    
     // Make API call to Laravel backend
     const response = await axios.post('/api/generate-prompts', {
       idea: form.value.idea,
@@ -350,6 +357,13 @@ const handleSubmit = async () => {
       offlineAccess: form.value.offlineAccess,
       features: form.value.features,
       aiFeatures: form.value.aiFeatures
+    })
+    
+    // Track successful form submission
+    trackFormSubmission('questionnaire', true, {
+      countries_count: form.value.countries.length,
+      features_count: form.value.features.length,
+      has_ai: form.value.aiFeatures.length > 0
     })
     
     // Log form data to console (Iteration 1 requirement maintained)
@@ -371,6 +385,12 @@ const handleSubmit = async () => {
     showResults.value = true
   } catch (error) {
     console.error('API Error:', error)
+    
+    // Track failed form submission
+    trackFormSubmission('questionnaire', false, {
+      error_type: error.response ? 'server_error' : (error.request ? 'network_error' : 'client_error'),
+      error_message: error.message
+    })
     
     if (error.response) {
       // The request was made and the server responded with a status code

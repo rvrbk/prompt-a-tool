@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import useGoogleAnalytics from '../composables/useGoogleAnalytics'
 
 const props = defineProps({
   generatedData: {
@@ -18,6 +19,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['share-success', 'share-error'])
+
+// Google Analytics tracking
+const { trackExport, trackShare, trackEvent } = useGoogleAnalytics()
 
 // State for share functionality
 const shareUrl = ref(null)
@@ -119,6 +123,9 @@ const exportAsJson = () => {
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
+  
+  // Track export
+  trackExport('json', props.sessionId)
   
   jsonExported.value = true
   setTimeout(() => { jsonExported.value = false }, 2000)
@@ -234,6 +241,9 @@ const exportAsMarkdown = () => {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
   
+  // Track export
+  trackExport('markdown', props.sessionId)
+  
   markdownExported.value = true
   setTimeout(() => { markdownExported.value = false }, 2000)
 }
@@ -254,6 +264,10 @@ const shareSession = async () => {
     
     if (response.data.status === 'success') {
       shareUrl.value = response.data.data.share_url
+      
+      // Track share
+      trackShare('url', props.sessionId)
+      
       emit('share-success', {
         shareUrl: shareUrl.value,
         shareToken: response.data.data.share_token
