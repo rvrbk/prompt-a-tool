@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import ExportShare from './ExportShare.vue'
 
 const props = defineProps({
   generatedData: {
@@ -9,6 +10,14 @@ const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false
+  },
+  sessionId: {
+    type: String,
+    default: null
+  },
+  questionnaireData: {
+    type: Object,
+    default: null
   }
 })
 
@@ -259,6 +268,13 @@ const formatForCopy = (section) => {
         Generated Results
       </h3>
       <div class="flex items-center space-x-3">
+        <!-- Export and Share buttons -->
+        <ExportShare
+          :generatedData="generatedData"
+          :sessionId="sessionId"
+          :questionnaireData="questionnaireData"
+        />
+        
         <button
           @click="copyAllAsJson"
           class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all flex items-center"

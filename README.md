@@ -94,6 +94,25 @@ This is a **single unified project** with:
 - Session persistence for anonymous users via unique session IDs
 - Automatic session name generation from questionnaire data
 
+### Iteration 8: Export & Share Prompts
+- Export functionality with three formats:
+  - **Export as JSON**: Download generated prompts, roles, agents, and metadata as a JSON file
+  - **Export as Markdown**: Download structured documentation in Markdown format
+  - **Share via URL**: Generate a shareable link to the session
+- Database migration adding share_token, is_shared, and shared_at columns to user_sessions
+- Session model updated with share_token field, generateShareToken() method, and query scopes (shared, byShareToken)
+- SessionController extended with:
+  - POST /api/sessions/{id}/share - Generate a shareable link for a session
+  - GET /api/share/{shareToken} - Retrieve a shared session by token
+- ExportShare Vue component with:
+  - Export buttons (JSON, Markdown)
+  - Share button with loading state
+  - Share URL display with copy functionality
+  - Feedback notifications for all actions
+- Integration in ResultsDisplay component with export/share buttons in the header
+- Uses Blob API for client-side file downloads
+- Generates unique share tokens using PHP's random_bytes (server-side)
+
 ## Project Setup
 
 ### Prerequisites
@@ -185,7 +204,9 @@ Then visit: **http://localhost:8000**
 | POST | `/api/sessions` | Save a user session |
 | GET | `/api/sessions` | List user sessions |
 | GET | `/api/sessions/{id}` | Load a specific session |
+| POST | `/api/sessions/{id}/share` | Generate a shareable link for a session |
 | DELETE | `/api/sessions/{id}` | Delete a session |
+| GET | `/api/share/{shareToken}` | Load a shared session by token |
 
 ## Configuration Options
 
@@ -233,7 +254,7 @@ curl http://localhost:8000/api/mistral/status
 - [x] Iteration 5: Display generated output in UI (enhanced)
 - [x] Iteration 6: Add Africa-specific templates
 - [x] Iteration 7: Save & Load User Sessions
-- [ ] Iteration 8: Export & Share Prompts
+- [x] Iteration 8: Export & Share Prompts
 - [ ] Iteration 9: Add Offline Support (PWA)
 - [ ] Iteration 10: Deploy to Production
 

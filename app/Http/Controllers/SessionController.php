@@ -278,6 +278,139 @@ class SessionController extends Controller
     }
 
     /**
+     * Share a session and generate a shareable link
+     *
+     * @param  string  $sessionId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function share(string $sessionId): JsonResponse
+    {
+        $userId = request()->user()?->id;
+
+        // Find session by session_id or by numeric ID
+        $session = Session::where('session_id', $sessionId);
+        
+        // If session_id doesn't look like a UUID/timestamp, try numeric ID
+        if (!preg_match('/^sess_/', $sessionId)) {
+            $session = $session->orWhere('id', $sessionId);
+        }
+        
+        $session = $session->first();
+
+        if (!$session) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Session not found',
+            ], 404);
+        }
+
+        // For authenticated users, ensure they own the session
+        if ($userId && $session->user_id !== $userId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized to share this session',
+            ], 403);
+        }
+
+        try {
+            // Generate a share token if one doesn't exist
+            if (!$session->share_token) {
+                $session->share_token = Session::generateShareToken();
+            }
+            
+            $session->is_shared = true;
+            $session->shared_at = now();
+            $session->save();
+
+            $shareUrl = url("/share/{$session->share_token}");
+
+            Log::info('Session shared', [
+                'session_id' => $session->session_id,
+                'share_token' => $session->share_token,
+                'user_id' => $userId,
+                'share_url' => $shareUrl,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Session shared successfully',
+                'data' => [
+                    'session_id' => $session->session_id,
+                    'share_token' => $session->share_token,
+                    'share_url' => $shareUrl,
+                    'is_shared' => $session->is_shared,
+                    'shared_at' => $session->shared_at->toISOString(),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to share session', [
+                'error' => $e->getMessage(),
+                'session_id' => $session->session_id,
+                'user_id' => $userId,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to share session: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a shared session by share token
+     *
+     * @param  string  $shareToken
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getByShareToken(string $shareToken): JsonResponse
+    {
+        try {
+            $session = Session::byShareToken($shareToken)
+                ->where('is_shared', true)
+                ->first();
+
+            if (!$session) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Shared session not found',
+                ], 404);
+            }
+
+            Log::info('Shared session accessed', [
+                'session_id' => $session->session_id,
+                'share_token' => $shareToken,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Shared session loaded successfully',
+                'data' => [
+                    'session_id' => $session->session_id,
+                    'name' => $session->name,
+                    'questionnaire_data' => $session->questionnaire_data,
+                    'generated_data' => $session->generated_data,
+                    'is_anonymous' => $session->is_anonymous,
+                    'created_at' => $session->created_at->toISOString(),
+                    'updated_at' => $session->updated_at->toISOString(),
+                    'shared_at' => $session->shared_at?->toISOString(),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to load shared session', [
+                'error' => $e->getMessage(),
+                'share_token' => $shareToken,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to load shared session: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Generate a descriptive name for a session based on questionnaire data
      *
      * @param  array  $questionnaireData

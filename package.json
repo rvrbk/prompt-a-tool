@@ -8,8 +8,8 @@
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^4.5.0",
-        "axios": "^1.6.4",
         "autoprefixer": "^10.4.17",
+        "axios": "^1.6.4",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^0.7.0",
         "postcss": "^8.4.35",
@@ -19,5 +19,10 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "jspdf": "^4.2.1",
+        "markdown-it": "^15.0.0",
+        "nanoid": "^6.0.1"
     }
 }

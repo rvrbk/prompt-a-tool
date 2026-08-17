@@ -767,6 +767,8 @@ const resetForm = () => {
       v-if="showResults" 
       :generatedData="generatedData" 
       :isVisible="showResults" 
+      :sessionId="currentSessionId"
+      :questionnaireData="form"
       @close="showResults = false"
     />
     
@@ -787,9 +789,9 @@ const resetForm = () => {
     <SessionManager
       v-model="showSessionManager"
       :currentSession="{
-        form: form.value,
-        generatedData: generatedData.value,
-        sessionId: currentSessionId.value
+        form: form,
+        generatedData: generatedData,
+        sessionId: currentSessionId
       }"
       @loadSession="handleSessionLoad"
       @sessionSaved="handleSessionSave"

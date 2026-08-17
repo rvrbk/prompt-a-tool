@@ -30,6 +30,9 @@ class Session extends Model
         'is_anonymous',
         'ip_address',
         'user_agent',
+        'share_token',
+        'is_shared',
+        'shared_at',
     ];
 
     /**
@@ -41,6 +44,8 @@ class Session extends Model
         'questionnaire_data' => 'array',
         'generated_data' => 'array',
         'is_anonymous' => 'boolean',
+        'is_shared' => 'boolean',
+        'shared_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -98,5 +103,38 @@ class Session extends Model
     public static function generateSessionId(): string
     {
         return 'sess_' . bin2hex(random_bytes(16)) . '_' . time();
+    }
+
+    /**
+     * Generate a unique share token.
+     *
+     * @return string
+     */
+    public static function generateShareToken(): string
+    {
+        return 'share_' . bin2hex(random_bytes(8)) . '_' . substr(md5(uniqid((string) rand(), true)), 0, 8);
+    }
+
+    /**
+     * Scope to get shared sessions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeShared($query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('is_shared', true)->whereNotNull('share_token');
+    }
+
+    /**
+     * Scope to get session by share token.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $token
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByShareToken($query, string $token): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('share_token', $token);
     }
 }

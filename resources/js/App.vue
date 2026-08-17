@@ -1,9 +1,5 @@
 <script setup>
-import { ref } from 'vue'
 import Questionnaire from './components/Questionnaire.vue'
-
-// App state
-const currentView = ref('questionnaire')
 </script>
 
 <template>
@@ -28,7 +24,7 @@ const currentView = ref('questionnaire')
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="bg-white rounded-xl shadow-md overflow-hidden min-h-[60vh]">
-        <component :is="currentView" />
+        <Questionnaire />
       </div>
     </main>
 
