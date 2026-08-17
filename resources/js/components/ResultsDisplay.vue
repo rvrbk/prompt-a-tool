@@ -252,7 +252,15 @@ const formatForCopy = (section) => {
     case 'backendPrompts':
     case 'frontendPrompts':
       const prompts = section === 'backendPrompts' ? getBackendPrompts.value : getFrontendPrompts.value
-      return prompts.join('\n\n---\n\n')
+      return prompts.map(prompt => {
+        if (typeof prompt === 'string') {
+          return prompt
+        }
+        const title = prompt.title || `Iteration ${prompt.iteration}`
+        const tasks = prompt.tasks ? '\nTasks:\n- ' + prompt.tasks.join('\n- ') : ''
+        const deps = prompt.dependencies ? '\n\nDependencies:\n- ' + prompt.dependencies.join('\n- ') : ''
+        return `${title}\n${prompt.description || ''}${tasks}${deps}`
+      }).join('\n\n---\n\n')
     
     default:
       return ''
@@ -530,10 +538,41 @@ const formatForCopy = (section) => {
               class="bg-green-50 border border-green-100 rounded-lg p-4"
             >
               <div class="flex items-start justify-between mb-2">
-                <h5 class="font-medium text-green-800">Prompt {{ index + 1 }}</h5>
+                <h5 class="font-medium text-green-800">
+                  <span v-if="typeof prompt === 'string'">Prompt {{ index + 1 }}</span>
+                  <span v-else>Iteration {{ prompt.iteration }}: {{ prompt.title }}</span>
+                </h5>
+                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full">Iteration {{ prompt.iteration }}</span>
               </div>
               <div class="bg-white rounded p-3 overflow-x-auto">
-                <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
+                <div v-if="typeof prompt === 'string'">
+                  <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
+                </div>
+                <div v-else class="text-sm text-gray-800 space-y-2">
+                  <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
+                  <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
+                    <h6 class="text-xs font-medium text-green-600 uppercase tracking-wider mb-2">Tasks</h6>
+                    <ul class="space-y-1">
+                      <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{{ task }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
+                    <h6 class="text-xs font-medium text-green-600 uppercase tracking-wider mb-2">Dependencies</h6>
+                    <ul class="space-y-1">
+                      <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                        <span>{{ dep }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -587,10 +626,41 @@ const formatForCopy = (section) => {
               class="bg-orange-50 border border-orange-100 rounded-lg p-4"
             >
               <div class="flex items-start justify-between mb-2">
-                <h5 class="font-medium text-orange-800">Prompt {{ index + 1 }}</h5>
+                <h5 class="font-medium text-orange-800">
+                  <span v-if="typeof prompt === 'string'">Prompt {{ index + 1 }}</span>
+                  <span v-else>Iteration {{ prompt.iteration }}: {{ prompt.title }}</span>
+                </h5>
+                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">Iteration {{ prompt.iteration }}</span>
               </div>
               <div class="bg-white rounded p-3 overflow-x-auto">
-                <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
+                <div v-if="typeof prompt === 'string'">
+                  <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
+                </div>
+                <div v-else class="text-sm text-gray-800 space-y-2">
+                  <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
+                  <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
+                    <h6 class="text-xs font-medium text-orange-600 uppercase tracking-wider mb-2">Tasks</h6>
+                    <ul class="space-y-1">
+                      <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{{ task }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
+                    <h6 class="text-xs font-medium text-orange-600 uppercase tracking-wider mb-2">Dependencies</h6>
+                    <ul class="space-y-1">
+                      <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
+                        <svg class="w-4 h-4 mr-2 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                        <span>{{ dep }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

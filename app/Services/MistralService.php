@@ -143,14 +143,35 @@ Given the following African-focused app idea and context, generate a comprehensi
 
 1. A list of user roles (with permissions and actions) as JSON array
 2. A list of AI agents (with skills, tools, and responsibilities) as JSON array  
-3. Technical prompts for Laravel backend development as JSON array
-4. Technical prompts for Vue.js frontend development as JSON array
+3. Technical prompts for Laravel backend development as JSON array - ORGANIZED BY ITERATIONS
+4. Technical prompts for Vue.js frontend development as JSON array - ORGANIZED BY ITERATIONS
+
+IMPORTANT: Structure the backend_prompts and frontend_prompts as ITERATIVE DEVELOPMENT PLANS.
+Each iteration should build upon the previous one, following a logical development progression.
+
+For backend_prompts, structure as:
+- Iteration 1: Project Setup (Laravel installation, basic structure)
+- Iteration 2: Core Models & Migrations (Database schema, models)
+- Iteration 3: API Endpoints (RESTful routes, controllers)
+- Iteration 4: Authentication & Authorization (User auth, permissions)
+- Iteration 5: Business Logic (Service classes, business rules)
+- Iteration 6: Data Validation & Testing (Requests, tests)
+- Iteration 7: Deployment & Optimization (Production setup, performance)
+
+For frontend_prompts, structure as:
+- Iteration 1: Project Setup (Vue.js, Vite, Tailwind)
+- Iteration 2: Core Components (Main layout, routing)
+- Iteration 3: UI Forms & Inputs (User input components)
+- Iteration 4: API Integration (Axios, API calls)
+- Iteration 5: State Management (Pinia/Vuex, reactivity)
+- Iteration 6: Enhanced UX (Animations, transitions, accessibility)
+- Iteration 7: Testing & Build (Unit tests, production build)
 
 Format the FINAL output as a single JSON object with these exact keys:
 - "roles": array of role objects with name, description, permissions, and actions
 - "agents": array of agent objects with name, description, skills, and tools
-- "backend_prompts": array of backend development prompts
-- "frontend_prompts": array of frontend development prompts
+- "backend_prompts": array of backend development prompts (each with "iteration", "title", "description", "tasks", "dependencies")
+- "frontend_prompts": array of frontend development prompts (each with "iteration", "title", "description", "tasks", "dependencies")
 
 DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
 
@@ -161,7 +182,7 @@ DO NOT include any markdown, explanations, or text outside the JSON. Only return
 **AI Features**: {$aiFeatures}
 **Offline Access Required**: {$offlineAccess}
 
-Remember: This is for an African context. Consider local languages, connectivity challenges, mobile-first approach, and relevant African use cases.
+Remember: This is for an African context. Consider local languages, connectivity challenges, mobile-first approach, relevant African use cases, and iterative development that allows for gradual feature rollout.
 PROMPT;
     }
 

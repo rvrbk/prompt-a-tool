@@ -47,7 +47,9 @@ This is a **single unified project** with:
 
 ### Iteration 4: Mistral AI Integration
 - MistralService class for API communication
-- Prompt engineering for African context
+- Prompt engineering for African context with **iterative development structure**
+  - Backend prompts organized by iterations (Setup → Models → API → Auth → Logic → Validation → Deployment)
+  - Frontend prompts organized by iterations (Setup → Components → Forms → API → State → UX → Testing)
 - Response parsing and JSON handling
 - Error handling and logging
 - Configurable via .env file
