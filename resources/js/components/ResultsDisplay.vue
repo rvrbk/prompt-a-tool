@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useClipboard } from 'vue-clipboard3'
 
 const props = defineProps({
   generatedData: {
@@ -15,8 +14,29 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'edit'])
 
-// Clipboard functionality
-const { toClipboard } = useClipboard()
+// Native clipboard functionality
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (error) {
+    console.error('Failed to copy:', error)
+    // Fallback for older browsers
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'  // Prevent scrolling to bottom
+      document.body.appendChild(textarea)
+      textarea.select()
+      const result = document.execCommand('copy')
+      document.body.removeChild(textarea)
+      return result
+    } catch (fallbackError) {
+      console.error('Fallback copy failed:', fallbackError)
+      return false
+    }
+  }
+}
 
 // Local state for edited data
 const editedData = ref(null)
@@ -140,15 +160,13 @@ const toggleSection = (section) => {
 }
 
 // Copy to clipboard with feedback
-const copyToClipboard = async (content, section) => {
-  try {
-    await toClipboard(content)
+const copyWithFeedback = async (content, section) => {
+  const success = await copyToClipboard(content)
+  if (success) {
     copyStates.value[section] = true
     setTimeout(() => {
       copyStates.value[section] = false
     }, 2000)
-  } catch (error) {
-    console.error('Failed to copy:', error)
   }
 }
 
@@ -167,10 +185,12 @@ const copyAllAsJson = async () => {
         generated_at: editedData.value?.generated_at || new Date().toISOString()
       }
     }
-    await toClipboard(JSON.stringify(jsonData, null, 2))
-    // Show a temporary notification
-    const allCopied = ref(true)
-    setTimeout(() => { allCopied.value = false }, 2000)
+    const success = await copyToClipboard(JSON.stringify(jsonData, null, 2))
+    if (success) {
+      // Show a temporary notification
+      const allCopied = ref(true)
+      setTimeout(() => { allCopied.value = false }, 2000)
+    }
   } catch (error) {
     console.error('Failed to copy all:', error)
   }
@@ -289,7 +309,7 @@ const formatForCopy = (section) => {
         <div v-show="expandedSections.roles" class="p-4">
           <div class="flex items-center justify-end mb-4 space-x-2">
             <button
-              @click="copyToClipboard(formatForCopy('roles'), 'roles')"
+              @click="copyWithFeedback(formatForCopy('roles'), 'roles')"
               class="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-200 transition-all flex items-center"
             >
               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,7 +399,7 @@ const formatForCopy = (section) => {
         <div v-show="expandedSections.agents" class="p-4">
           <div class="flex items-center justify-end mb-4 space-x-2">
             <button
-              @click="copyToClipboard(formatForCopy('agents'), 'agents')"
+              @click="copyWithFeedback(formatForCopy('agents'), 'agents')"
               class="px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-200 transition-all flex items-center"
             >
               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -476,7 +496,7 @@ const formatForCopy = (section) => {
         <div v-show="expandedSections.backendPrompts" class="p-4">
           <div class="flex items-center justify-end mb-4 space-x-2">
             <button
-              @click="copyToClipboard(formatForCopy('backendPrompts'), 'backendPrompts')"
+              @click="copyWithFeedback(formatForCopy('backendPrompts'), 'backendPrompts')"
               class="px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-lg hover:bg-green-200 transition-all flex items-center"
             >
               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -533,7 +553,7 @@ const formatForCopy = (section) => {
         <div v-show="expandedSections.frontendPrompts" class="p-4">
           <div class="flex items-center justify-end mb-4 space-x-2">
             <button
-              @click="copyToClipboard(formatForCopy('frontendPrompts'), 'frontendPrompts')"
+              @click="copyWithFeedback(formatForCopy('frontendPrompts'), 'frontendPrompts')"
               class="px-3 py-1.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-lg hover:bg-orange-200 transition-all flex items-center"
             >
               <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
