@@ -64,6 +64,21 @@ This is a **single unified project** with:
 - Responsive grid layout for cards
 - Raw response fallback for debugging
 
+### Iteration 6: Add Africa-specific templates
+- Database migration for templates table with JSON fields
+- Template model with query scopes (byCategory, featured, ordered)
+- TemplateSeeder with 5 Africa-specific templates:
+  - AgriTech Marketplace (connecting farmers to buyers)
+  - Mobile Money FinTech (financial services for unbanked populations)
+  - EdTech Learning Platform (adaptive learning in African languages)
+  - HealthTech Telemedicine (rural healthcare access)
+  - Logistics & Delivery Platform (last-mile delivery)
+- TemplateController with RESTful endpoints
+- TemplateSelector Vue component with modal interface
+- Category filter tabs for easy browsing
+- Pre-fill questionnaire from selected template
+- Selected template display with clear option
+
 ## Project Setup
 
 ### Prerequisites
@@ -197,7 +212,7 @@ curl http://localhost:8000/api/mistral/status
 - [x] Iteration 3: Connect frontend to backend
 - [x] Iteration 4: Integrate Mistral AI for prompt generation
 - [x] Iteration 5: Display generated output in UI (enhanced)
-- [ ] Iteration 6: Add Africa-specific templates
+- [x] Iteration 6: Add Africa-specific templates
 - [ ] Iteration 7: Save & Load User Sessions
 - [ ] Iteration 8: Export & Share Prompts
 - [ ] Iteration 9: Add Offline Support (PWA)
