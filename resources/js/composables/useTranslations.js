@@ -3,6 +3,8 @@
  * Major African languages with ISO 639-1 codes
  */
 
+import { ref } from 'vue'
+
 // Supported languages with native names
 const SUPPORTED_LANGUAGES = {
   en: { name: 'English', native: 'English', flag: '🇬🇧' },

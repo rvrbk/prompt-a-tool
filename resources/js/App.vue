@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted } from 'vue'
 import Questionnaire from './components/Questionnaire.vue'
 import useGoogleAnalytics from './composables/useGoogleAnalytics'
 
