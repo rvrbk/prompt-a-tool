@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import ExportShare from './ExportShare.vue'
+import useTranslations from '../composables/useTranslations'
+
+// Initialize translations
+const { t } = useTranslations()
 
 const props = defineProps({
   generatedData: {
@@ -273,7 +277,7 @@ const formatForCopy = (section) => {
     <!-- Results Header -->
     <div class="flex items-center justify-between mb-6">
       <h3 class="text-xl font-bold text-gray-800">
-        Generated Results
+        {{ t('generatedResults') }}
       </h3>
       <div class="flex items-center space-x-3">
         <!-- Export and Share buttons -->
@@ -290,13 +294,13 @@ const formatForCopy = (section) => {
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
-          Copy All
+          {{ t('copyAll') }}
         </button>
         <button
           @click="$emit('close')"
           class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-all"
         >
-          Close
+          {{ t('close') }}
         </button>
       </div>
     </div>
@@ -314,7 +318,7 @@ const formatForCopy = (section) => {
             <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-            <h4 class="text-lg font-semibold text-blue-800">User Roles</h4>
+            <h4 class="text-lg font-semibold text-blue-800">{{ t('userRoles') }}</h4>
             <span class="ml-2 px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded-full">{{ getRoles.length }}</span>
           </div>
           <button class="p-1 rounded-lg hover:bg-blue-200 transition-colors">
@@ -404,7 +408,7 @@ const formatForCopy = (section) => {
             <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <h4 class="text-lg font-semibold text-purple-800">AI Agents</h4>
+            <h4 class="text-lg font-semibold text-purple-800">{{ t('aiAgents') }}</h4>
             <span class="ml-2 px-2 py-1 bg-purple-200 text-purple-800 text-xs rounded-full">{{ getAgents.length }}</span>
           </div>
           <button class="p-1 rounded-lg hover:bg-purple-200 transition-colors">
@@ -501,7 +505,7 @@ const formatForCopy = (section) => {
             <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-            <h4 class="text-lg font-semibold text-green-800">Backend Prompts (Laravel)</h4>
+            <h4 class="text-lg font-semibold text-green-800">{{ t('backendPrompts') }}</h4>
             <span class="ml-2 px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full">{{ getBackendPrompts.length }}</span>
           </div>
           <button class="p-1 rounded-lg hover:bg-green-200 transition-colors">
@@ -589,7 +593,7 @@ const formatForCopy = (section) => {
             <svg class="w-6 h-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <h4 class="text-lg font-semibold text-orange-800">Frontend Prompts (Vue.js)</h4>
+            <h4 class="text-lg font-semibold text-orange-800">{{ t('frontendPrompts') }}</h4>
             <span class="ml-2 px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">{{ getFrontendPrompts.length }}</span>
           </div>
           <button class="p-1 rounded-lg hover:bg-orange-200 transition-colors">
@@ -678,7 +682,7 @@ const formatForCopy = (section) => {
           </div>
           
           <div v-if="generatedData.raw_response" class="p-3 bg-gray-100 rounded-lg">
-            <h6 class="font-medium text-gray-700 mb-2 text-sm uppercase tracking-wider">Raw AI Response</h6>
+            <h6 class="font-medium text-gray-700 mb-2 text-sm uppercase tracking-wider">{{ t('rawResponse') }}</h6>
             <pre class="text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap">{{ generatedData.raw_response }}</pre>
           </div>
           
@@ -686,7 +690,7 @@ const formatForCopy = (section) => {
             <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p>No results to display. Try generating prompts with different inputs.</p>
+            <p>{{ t('noResultsHint') }}</p>
           </div>
         </div>
       </div>
@@ -697,8 +701,8 @@ const formatForCopy = (section) => {
       <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
-      <h4 class="text-lg font-semibold text-gray-700 mb-2">No Results Yet</h4>
-      <p class="text-gray-500">Fill out the questionnaire and click "Generate Prompts" to see results here.</p>
+      <h4 class="text-lg font-semibold text-gray-700 mb-2">{{ t('noResults') }}</h4>
+      <p class="text-gray-500">{{ t('noResultsHint') }}</p>
     </div>
   </div>
 </template>
