@@ -145,6 +145,11 @@ const translations = {
     cancelButton: 'Cancel',
     optional: '(optional)',
     
+    // Templates
+    allCategories: 'All',
+    noTemplates: 'No templates found for this category.',
+    loadingTemplates: 'Loading templates...',
+    
     // Metadata for export
     metadata: 'Project Overview',
     appIdea: 'App Idea',

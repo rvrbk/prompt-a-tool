@@ -1,6 +1,10 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import axios from 'axios'
+import useTranslations from '../composables/useTranslations'
+
+// Initialize translations
+const { t } = useTranslations()
 
 const props = defineProps({
   modelValue: {
@@ -117,7 +121,7 @@ defineExpose({
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
       </svg>
-      Start from Template
+      {{ t('templates') }}
     </button>
 
     <!-- Template Selection Modal -->
@@ -137,8 +141,8 @@ defineExpose({
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
             <div>
-              <h3 class="text-lg font-bold text-gray-800">Select a Template</h3>
-              <p class="text-sm text-gray-500">Jumpstart your project with a pre-built African app template</p>
+              <h3 class="text-lg font-bold text-gray-800">{{ t('templates') }}</h3>
+              <p class="text-sm text-gray-500">{{ t('selectTemplate') }}</p>
             </div>
           </div>
           <button
@@ -167,7 +171,7 @@ defineExpose({
                 }"
               >
                 <span v-if="category === 'all'" class="mr-1">🌍</span>
-                <span v-else>{{ category }}</span>
+                <span v-else>{{ category === 'all' ? t('allCategories') : category }}</span>
                 <span class="ml-1">({{ filteredTemplates.filter(t => category === 'all' || t.category === category).length }})</span>
               </button>
             </div>
@@ -187,7 +191,7 @@ defineExpose({
           </div>
 
           <!-- Templates Grid -->
-          <div v-else class="max-h-[400px] overflow-y-auto pr-2">
+          <div v-else class="max-h-[400px] overflow-y-auto pr-2 mb-6 pb-6">
             <div
               v-if="filteredTemplates.length === 0"
               class="text-center py-8 text-gray-500"
@@ -195,7 +199,7 @@ defineExpose({
               <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p>No templates found for this category.</p>
+              <p>{{ t('noTemplates') }}</p>
             </div>
             
             <div v-else class="grid gap-4">
@@ -236,8 +240,8 @@ defineExpose({
           </div>
         </div>
 
-        <!-- Footer -->
-        <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <!-- Footer (sticky) -->
+        <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-white sticky bottom-0">
           <button
             @click="showModal = false"
             class="px-4 py-2 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition-all"
