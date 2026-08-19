@@ -17,6 +17,16 @@ This is a **single unified project** with:
 - **Frontend**: Vue.js 3 with Vite + Tailwind CSS v4
 - **AI Integration**: Mistral AI via HTTP API
 
+### Application Entry Point
+
+The main application template (`resources/views/app.blade.php`) includes:
+- **Google Analytics 4** integration (optional, enabled via `VITE_GA_MEASUREMENT_ID` environment variable)
+- **Google Fonts**: Ubuntu (weights 300-700) for typography
+- **Flag Icons**: Country flag CSS library via CDN for internationalization support
+- **Vite**: Frontend asset compilation with HMR (Hot Module Replacement)
+- **CSRF Protection**: Laravel CSRF token for secure form submissions
+- **Single Page Application**: Root `<div id="app">` mount point for Vue.js
+
 ## Features Implemented
 
 ### Iteration 1: Questionnaire (Frontend)
