@@ -5,7 +5,7 @@ import ResultsDisplay from './ResultsDisplay.vue'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
 
 // Use translations from App.vue provider
-const { t } = inject('translations')
+const { t, currentLanguage } = inject('translations')
 
 // Initialize Google Analytics
 const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()
@@ -77,7 +77,8 @@ const generateFollowUpQuestions = async () => {
   
   try {
     const response = await axios.post('/api/generate-questions', {
-      idea: form.value?.idea
+      idea: form.value?.idea,
+      language: currentLanguage.value
     }, {
       signal: abortController.signal
     })
@@ -184,7 +185,8 @@ const handleSubmit = async () => {
     const response = await axios.post('/api/generate-prompts', {
       idea: form.value?.idea,
       followUpAnswers: form.value?.followUpAnswers,
-      offlineAccess: form.value?.offlineAccess
+      offlineAccess: form.value?.offlineAccess,
+      language: currentLanguage.value
     })
     
     // Track successful form submission
@@ -256,7 +258,7 @@ const resetForm = () => {
         <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
           {{ t('appTitle') }}
         </h2>
-        <p class="text-gray-500 leading-relaxed">
+        <p class="text-gray-500 leading-relaxed text-xs">
           {{ t('appDescription') }}
         </p>
       </div>
@@ -483,6 +485,7 @@ const resetForm = () => {
       :generatedData="generatedData" 
       :isVisible="showResults" 
       :questionnaireData="form"
+      :followUpQuestions="followUpQuestions"
       @close="showResults = false"
     />
     
@@ -506,6 +509,7 @@ const resetForm = () => {
       :generatedData="generatedData" 
       :isVisible="showResults" 
       :questionnaireData="form"
+      :followUpQuestions="followUpQuestions"
       @close="showResults = false"
     />
   </div>

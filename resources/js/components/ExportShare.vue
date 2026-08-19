@@ -10,6 +10,10 @@ const props = defineProps({
   questionnaireData: {
     type: Object,
     default: null
+  },
+  followUpQuestions: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -103,7 +107,8 @@ const exportAsJson = () => {
     roles: getRolesForExport.value,
     agents: getAgentsForExport.value,
     backend_prompts: getBackendPromptsForExport.value,
-    frontend_prompts: getFrontendPromptsForExport.value
+    frontend_prompts: getFrontendPromptsForExport.value,
+    follow_up_questions: props.followUpQuestions
   }
   
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -134,32 +139,42 @@ const exportAsMarkdown = () => {
   const backendPrompts = getBackendPromptsForExport.value
   const frontendPrompts = getFrontendPromptsForExport.value
   
-  let markdown = `# Prompt Generator Export\n\n`
+  let markdown = `# ${t('promptGeneratorExport')}\n\n`
   
   // Metadata section
-  markdown += `## Project Overview\n\n`
-  markdown += `**App Idea:** ${metadata.app_idea || ''}\n\n`
-  markdown += `**Follow-up Answers:** ${JSON.stringify(metadata.followUpAnswers || {}, null, 2)}\n\n`
-  markdown += `**Offline Access:** ${metadata.offlineAccess === true ? 'Yes' : 'No'}\n\n`
-  markdown += `**Generated:** ${new Date(metadata.generated_at).toLocaleString()}\n\n`
+  markdown += `## ${t('projectOverview')}\n\n`
+  markdown += `**${t('appIdeaExport')}:** ${metadata.app_idea || ''}\n\n`
+  
+  // Include follow-up questions with answers
+  if (props.followUpQuestions.length > 0) {
+    markdown += `**${t('followUpQuestions')}:**\n\n`
+    props.followUpQuestions.forEach((question, index) => {
+      const answer = metadata.followUpAnswers?.[question.id]
+      markdown += `${index + 1}. **Q${question.id}:** ${question.question}\n`
+      markdown += `   **${t('answer')}:** ${answer !== undefined ? answer : t('notAnswered')}\n\n`
+    })
+  }
+  
+  markdown += `**Offline Access:** ${metadata.offlineAccess === true ? t('yes') : t('no')}\n\n`
+  markdown += `**${t('generated')}:** ${new Date(metadata.generated_at).toLocaleString()}\n\n`
   markdown += `---\n\n`
   
   // Roles section
   if (roles.length > 0) {
-    markdown += `## User Roles\n\n`
+    markdown += `## ${t('userRoles')}\n\n`
     roles.forEach((role, index) => {
       markdown += `### ${role.name || `Role ${index + 1}`}\n\n`
-      markdown += `**Description:** ${role.description || 'N/A'}\n\n`
-      markdown += `**Type:** ${role.type || 'Standard'}\n\n`
+      markdown += `**${t('description')}:** ${role.description || t('na')}\n\n`
+      markdown += `**${t('type')}:** ${role.type || t('standard')}\n\n`
       if (role.permissions?.length > 0) {
-        markdown += `**Permissions:**\n`
+        markdown += `**${t('permissions')}:**\n`
         role.permissions.forEach(p => {
           markdown += `- ${p}\n`
         })
         markdown += `\n`
       }
       if (role.actions?.length > 0) {
-        markdown += `**Actions:**\n`
+        markdown += `**${t('actions')}:**\n`
         role.actions.forEach(a => {
           markdown += `- ${a}\n`
         })
@@ -171,23 +186,23 @@ const exportAsMarkdown = () => {
   
   // Agents section
   if (agents.length > 0) {
-    markdown += `## AI Agents\n\n`
+    markdown += `## ${t('aiAgents')}\n\n`
     agents.forEach((agent, index) => {
       markdown += `### ${agent.name || `Agent ${index + 1}`}\n\n`
-      markdown += `**Description:** ${agent.description || 'N/A'}\n\n`
-      markdown += `**Type:** ${agent.type || 'Standard'}\n\n`
+      markdown += `**${t('description')}:** ${agent.description || t('na')}\n\n`
+      markdown += `**${t('type')}:** ${agent.type || t('standard')}\n\n`
       if (agent.responsibilities?.length > 0) {
-        markdown += `**Responsibilities:**\n`
+        markdown += `**${t('responsibilities')}:**\n`
         agent.responsibilities.forEach(r => {
           markdown += `- ${r}\n`
         })
         markdown += `\n`
       }
       if (agent.skills?.length > 0) {
-        markdown += `**Skills:** ${agent.skills.join(', ')}\n\n`
+        markdown += `**${t('skills')}:** ${agent.skills.join(', ')}\n\n`
       }
       if (agent.tools?.length > 0) {
-        markdown += `**Tools:** ${agent.tools.join(', ')}\n\n`
+        markdown += `**${t('tools')}:** ${agent.tools.join(', ')}\n\n`
       }
       markdown += `---\n\n`
     })
@@ -195,9 +210,9 @@ const exportAsMarkdown = () => {
   
   // Backend prompts section
   if (backendPrompts.length > 0) {
-    markdown += `## Backend Prompts (Laravel)\n\n`
+    markdown += `## ${t('backendPromptsLaravel')}\n\n`
     backendPrompts.forEach((prompt, index) => {
-      markdown += `### Prompt ${index + 1}\n\n`
+      markdown += `### ${t('promptLabel')} ${index + 1}\n\n`
       markdown += '\`\`\`\n'
       // Handle both string and object prompts
       if (typeof prompt === 'string') {
@@ -212,9 +227,9 @@ const exportAsMarkdown = () => {
   
   // Frontend prompts section
   if (frontendPrompts.length > 0) {
-    markdown += `## Frontend Prompts (Vue.js)\n\n`
+    markdown += `## ${t('frontendPromptsVue')}\n\n`
     frontendPrompts.forEach((prompt, index) => {
-      markdown += `### Prompt ${index + 1}\n\n`
+      markdown += `### ${t('promptLabel')} ${index + 1}\n\n`
       markdown += '\`\`\`\n'
       // Handle both string and object prompts
       if (typeof prompt === 'string') {
@@ -228,7 +243,7 @@ const exportAsMarkdown = () => {
   }
   
   markdown += `---\n\n`
-  markdown += `*Generated by [Prompt Generator](${window.location.origin})*\n`
+  markdown += `*Generated by [${t('appTitle')}](${window.location.origin})*\n`
   
   const blob = new Blob([markdown], { type: 'text/markdown' })
   const url = URL.createObjectURL(blob)

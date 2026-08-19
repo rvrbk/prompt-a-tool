@@ -35,10 +35,12 @@ class QuestionController extends Controller
         // Validate the request data
         $validated = $request->validate([
             'idea' => 'required|string|max:1000',
+            'language' => 'sometimes|string|max:10',
         ]);
 
         Log::info('Follow-up questions generation request received', [
-            'idea' => $validated['idea']
+            'idea' => $validated['idea'],
+            'language' => $validated['language'] ?? 'en'
         ]);
 
         try {
@@ -52,7 +54,8 @@ class QuestionController extends Controller
             }
 
             // Generate questions using Mistral AI
-            $questions = $this->mistralService->generateFollowUpQuestions($validated['idea']);
+            $language = $validated['language'] ?? null;
+            $questions = $this->mistralService->generateFollowUpQuestions($validated['idea'], $language);
 
             return response()->json([
                 'status' => 'success',

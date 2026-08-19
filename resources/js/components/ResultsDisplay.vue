@@ -17,6 +17,10 @@ const props = defineProps({
   questionnaireData: {
     type: Object,
     default: null
+  },
+  followUpQuestions: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -279,6 +283,7 @@ const formatForCopy = (section) => {
         <ExportShare
           :generatedData="generatedData"
           :questionnaireData="questionnaireData"
+          :followUpQuestions="followUpQuestions"
         />
         
         <button
@@ -337,8 +342,8 @@ const formatForCopy = (section) => {
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              <span v-if="!copyStates.roles">Copy</span>
-              <span v-else class="text-gray-900">Copied!</span>
+              <span v-if="!copyStates.roles">{{ t('copy') }}</span>
+              <span v-else class="text-gray-900">{{ t('copied') }}</span>
             </button>
           </div>
           
@@ -351,13 +356,13 @@ const formatForCopy = (section) => {
               <div class="flex items-start justify-between mb-4">
                 <h5 class="font-medium text-gray-900">{{ role.name || `Role ${index + 1}` }}</h5>
                 <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200">
-                  {{ role.type || 'Standard' }}
+                  {{ role.type || t('standard') }}
                 </span>
               </div>
               <p v-if="role.description" class="text-sm text-gray-600 mb-4">{{ role.description }}</p>
               
               <div v-if="role.permissions && role.permissions.length > 0" class="mb-4">
-                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Permissions</h6>
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('permissions') }}</h6>
                 <ul class="space-y-2">
                   <li 
                     v-for="(permission, pIndex) in formatList(role.permissions)" 
@@ -373,7 +378,7 @@ const formatForCopy = (section) => {
               </div>
               
               <div v-if="role.actions && role.actions.length > 0">
-                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Actions</h6>
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('actions') }}</h6>
                 <ul class="space-y-2">
                   <li 
                     v-for="(action, aIndex) in formatList(role.actions)" 
@@ -447,7 +452,7 @@ const formatForCopy = (section) => {
               <p v-if="agent.description" class="text-sm text-gray-600 mb-4">{{ agent.description }}</p>
               
               <div v-if="agent.responsibilities && agent.responsibilities.length > 0" class="mb-4">
-                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Responsibilities</h6>
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('responsibilities') }}</h6>
                 <ul class="space-y-2">
                   <li 
                     v-for="(resp, rIndex) in formatList(agent.responsibilities)" 
@@ -460,7 +465,7 @@ const formatForCopy = (section) => {
               </div>
               
               <div v-if="agent.skills && agent.skills.length > 0" class="mb-4">
-                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Skills</h6>
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('skills') }}</h6>
                 <div class="flex flex-wrap gap-2">
                   <span 
                     v-for="(skill, sIndex) in formatList(agent.skills)" 
@@ -473,7 +478,7 @@ const formatForCopy = (section) => {
               </div>
               
               <div v-if="agent.tools && agent.tools.length > 0">
-                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tools</h6>
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('tools') }}</h6>
                 <div class="flex flex-wrap gap-2">
                   <span 
                     v-for="(tool, tIndex) in formatList(agent.tools)" 
@@ -549,7 +554,7 @@ const formatForCopy = (section) => {
                 <div v-else class="text-sm text-gray-800 space-y-3">
                   <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
                   <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tasks</h6>
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('tasks') }}</h6>
                     <ul class="space-y-2">
                       <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
                         <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -560,7 +565,7 @@ const formatForCopy = (section) => {
                     </ul>
                   </div>
                   <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Dependencies</h6>
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('dependencies') }}</h6>
                     <ul class="space-y-2">
                       <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
                         <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,7 +642,7 @@ const formatForCopy = (section) => {
                 <div v-else class="text-sm text-gray-800 space-y-3">
                   <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
                   <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tasks</h6>
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('tasks') }}</h6>
                     <ul class="space-y-2">
                       <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
                         <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -648,7 +653,7 @@ const formatForCopy = (section) => {
                     </ul>
                   </div>
                   <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Dependencies</h6>
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ t('dependencies') }}</h6>
                     <ul class="space-y-2">
                       <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
                         <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

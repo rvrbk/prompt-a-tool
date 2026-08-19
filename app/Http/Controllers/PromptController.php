@@ -38,11 +38,13 @@ class PromptController extends Controller
             'idea' => 'required|string|max:1000',
             'followUpAnswers' => 'nullable|array',
             'offlineAccess' => 'required|boolean',
+            'language' => 'sometimes|string|max:10',
         ]);
 
         // Log the received data for debugging
         Log::info('Prompt generation request received', [
-            'data' => $validated
+            'data' => $validated,
+            'language' => $validated['language'] ?? 'en'
         ]);
 
         try {
@@ -56,7 +58,8 @@ class PromptController extends Controller
             }
 
             // Call Mistral AI to generate prompts
-            $mistralResponse = $this->mistralService->generatePrompts($validated);
+            $language = $validated['language'] ?? null;
+            $mistralResponse = $this->mistralService->generatePrompts($validated, $language);
 
             // Build the response
             $response = [

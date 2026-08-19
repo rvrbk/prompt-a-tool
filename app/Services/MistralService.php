@@ -43,16 +43,17 @@ class MistralService
      * Generate prompts, roles, and agents based on questionnaire data
      *
      * @param array $data The questionnaire data
+     * @param string|null $language The language code for prompt generation
      * @return array Parsed response with roles, agents, and prompts
      * @throws Exception If the API request fails
      */
-    public function generatePrompts(array $data): array
+    public function generatePrompts(array $data, ?string $language = null): array
     {
         if (empty($this->apiKey)) {
             throw new Exception('Mistral API key is not configured. Please set MISTRAL_API_KEY in your .env file.');
         }
 
-        $prompt = $this->buildPrompt($data);
+        $prompt = $this->buildPrompt($data, $language);
 
         Log::info('Mistral API request', [
             'model' => $this->model,
@@ -128,19 +129,33 @@ class MistralService
      * Build the prompt for Mistral AI based on questionnaire data
      *
      * @param array $data The questionnaire data
+     * @param string|null $language The language code for prompt generation
      * @return string The formatted prompt
      */
-    protected function buildPrompt(array $data): string
+    protected function buildPrompt(array $data, ?string $language = null): string
     {
         $offlineAccess = ($data['offlineAccess'] ?? false) ? 'Yes' : 'No';
         
         // Format follow-up answers for the prompt
         $followUpInfo = '';
         if (!empty($data['followUpAnswers']) && is_array($data['followUpAnswers'])) {
-            $followUpInfo = "\n\n**Follow-up Answers:**\n";
-            foreach ($data['followUpAnswers'] as $id => $answer) {
-                $followUpInfo .= "- Q{$id}: " . (is_bool($answer) ? ($answer ? 'Yes' : 'No') : $answer) . "\n";
+            if ($language === 'fr') {
+                $followUpInfo = "\n\n**Réponses de suivi:**\n";
+                foreach ($data['followUpAnswers'] as $id => $answer) {
+                    $answerText = is_bool($answer) ? ($answer ? 'Oui' : 'Non') : $answer;
+                    $followUpInfo .= "- Q{$id}: {$answerText}\n";
+                }
+            } else {
+                $followUpInfo = "\n\n**Follow-up Answers:**\n";
+                foreach ($data['followUpAnswers'] as $id => $answer) {
+                    $answerText = is_bool($answer) ? ($answer ? 'Yes' : 'No') : $answer;
+                    $followUpInfo .= "- Q{$id}: {$answerText}\n";
+                }
             }
+        }
+
+        if ($language && $language !== 'en') {
+            return $this->buildLocalizedPrompt($data, $language, $offlineAccess, $followUpInfo);
         }
 
         return <<<PROMPT
@@ -183,6 +198,106 @@ DO NOT include any markdown, explanations, or text outside the JSON. Only return
 **App Idea**: {$data['idea']}{$followUpInfo}
 **Offline Access Required**: {$offlineAccess}
 PROMPT;
+    }
+
+    /**
+     * Build a localized prompt in the specified language
+     *
+     * @param array $data The questionnaire data
+     * @param string $language The language code
+     * @param string $offlineAccess Offline access text
+     * @param string $followUpInfo Follow-up answers text
+     * @return string The localized prompt
+     */
+    protected function buildLocalizedPrompt(array $data, string $language, string $offlineAccess, string $followUpInfo): string
+    {
+        $languageName = $this->getLanguageName($language);
+        
+        // Get localized prompt parts
+        $localized = $this->getLocalizedPromptParts($language);
+
+        return <<<PROMPT
+{$localized['instruction']}
+
+CRITICAL INSTRUCTION: ALL output must be in {$languageName} language. This includes:
+- Role names, descriptions
+- Permission names (must be {$languageName} words, not English)
+- Action names (must be {$languageName} words, not English)
+- Agent names, descriptions, skills, tools, responsibilities
+- ALL prompt text (titles, descriptions, tasks, dependencies)
+- Use ONLY {$languageName} vocabulary throughout
+
+1. {$localized['roles_desc']}
+2. {$localized['agents_desc']}
+3. {$localized['backend_prompts_desc']}
+4. {$localized['frontend_prompts_desc']}
+
+IMPORTANT: {$localized['iteration_structure']}
+{$localized['iteration_explanation']}
+
+{$localized['backend_structure']}
+
+{$localized['frontend_structure']}
+
+{$localized['format_instruction']}
+- "roles": {$localized['roles_format']}
+- "agents": {$localized['agents_format']}
+- "backend_prompts": {$localized['backend_prompts_format']}
+- "frontend_prompts": {$localized['frontend_prompts_format']}
+
+DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
+
+REMEMBER: ALL content MUST be in {$languageName} language. NO English words allowed in the output.
+
+**App Idea**: {$data['idea']}{$followUpInfo}
+**Offline Access Required**: {$offlineAccess}
+PROMPT;
+    }
+
+    /**
+     * Get localized prompt parts for a specific language
+     *
+     * @param string $language The language code
+     * @return array Localized prompt parts
+     */
+    protected function getLocalizedPromptParts(string $language): array
+    {
+        $prompts = [
+            'fr' => [
+                'instruction' => 'Étant donné l\'idée de l\'application et le contexte suivant, générez une réponse complète avec:',
+                'roles_desc' => 'Une liste de rôles utilisateur (avec permissions et actions) sous forme de tableau JSON',
+                'agents_desc' => 'Une liste d\'agents IA (avec compétences, outils et responsabilités) sous forme de tableau JSON',
+                'backend_prompts_desc' => 'Des prompts techniques pour le développement backend Laravel sous forme de tableau JSON - ORGANISÉS PAR ITÉRATIONS',
+                'frontend_prompts_desc' => 'Des prompts techniques pour le développement frontend Vue.js sous forme de tableau JSON - ORGANISÉS PAR ITÉRATIONS',
+                'iteration_structure' => 'IMPORTANT: Structurez les backend_prompts et frontend_prompts comme des PLANS DE DÉVELOPPEMENT ITÉRATIFS.',
+                'iteration_explanation' => 'Chaque itération doit s\'appuyer sur la précédente, en suivant une progression logique de développement.',
+                'backend_structure' => 'Pour backend_prompts, structurez comme:\n- Itération 1: Configuration initiale du projet (installation de Laravel, structure de base)\n- Itération 2: Modèles et Migrations de base de données (schéma, modèles)\n- Itération 3: Points de terminaison API (routes, contrôleurs)\n- Itération 4: Authentification et Autorisation (auth utilisateur, permissions)\n- Itération 5: Logique métier (classes de service, règles métier)\n- Itération 6: Validation des données et Tests (requêtes, tests)\n- Itération 7: Déploiement et Optimisation (configuration production, performance)',
+                'frontend_structure' => 'Pour frontend_prompts, structurez comme:\n- Itération 1: Configuration initiale du projet (Vue.js, Vite, Tailwind)\n- Itération 2: Composants principaux (layout, routage)\n- Itération 3: Formulaires et Entrées utilisateur (composants d\'entrée)\n- Itération 4: Intégration API (Axios, appels API)\n- Itération 5: Gestion d\'état (Pinia/Vuex, réactivité)\n- Itération 6: UX Améliorée (animations, transitions, accessibilité)\n- Itération 7: Tests et Build (tests, build de production)',
+                'format_instruction' => 'Formatez la sortie FINALE sous forme d\'un seul objet JSON avec ces clés exactes:',
+                'roles_format' => 'tableau d\'objets rôle avec name, description, permissions, et actions',
+                'agents_format' => 'tableau d\'objets agent avec name, description, skills, et tools',
+                'backend_prompts_format' => 'tableau de prompts de développement backend (chacun avec "iteration", "title", "description", "tasks", "dependencies")',
+                'frontend_prompts_format' => 'tableau de prompts de développement frontend (chacun avec "iteration", "title", "description", "tasks", "dependencies")',
+            ],
+            // Add other languages as needed
+        ];
+
+        return $prompts[$language] ?? [
+            'instruction' => 'Given the following app idea and context, generate a comprehensive response with:',
+            'roles_desc' => 'A list of user roles (with permissions and actions) as JSON array',
+            'agents_desc' => 'A list of AI agents (with skills, tools, and responsibilities) as JSON array',
+            'backend_prompts_desc' => 'Technical prompts for Laravel backend development as JSON array - ORGANIZED BY ITERATIONS',
+            'frontend_prompts_desc' => 'Technical prompts for Vue.js frontend development as JSON array - ORGANIZED BY ITERATIONS',
+            'iteration_structure' => 'IMPORTANT: Structure the backend_prompts and frontend_prompts as ITERATIVE DEVELOPMENT PLANS.',
+            'iteration_explanation' => 'Each iteration should build upon the previous one, following a logical development progression.',
+            'backend_structure' => 'For backend_prompts, structure as:\n- Iteration 1: Project Setup\n- Iteration 2: Core Models & Migrations\n- Iteration 3: API Endpoints\n- Iteration 4: Authentication & Authorization\n- Iteration 5: Business Logic\n- Iteration 6: Data Validation & Testing\n- Iteration 7: Deployment & Optimization',
+            'frontend_structure' => 'For frontend_prompts, structure as:\n- Iteration 1: Project Setup\n- Iteration 2: Core Components\n- Iteration 3: UI Forms & Inputs\n- Iteration 4: API Integration\n- Iteration 5: State Management\n- Iteration 6: Enhanced UX\n- Iteration 7: Testing & Build',
+            'format_instruction' => 'Format the FINAL output as a single JSON object with these exact keys:',
+            'roles_format' => 'array of role objects with name, description, permissions, and actions',
+            'agents_format' => 'array of agent objects with name, description, skills, and tools',
+            'backend_prompts_format' => 'array of backend development prompts (each with "iteration", "title", "description", "tasks", "dependencies")',
+            'frontend_prompts_format' => 'array of frontend development prompts (each with "iteration", "title", "description", "tasks", "dependencies")',
+        ];
     }
 
     /**
@@ -234,16 +349,17 @@ PROMPT;
      * Generate follow-up questions based on app idea
      *
      * @param string $idea The app idea description
+     * @param string|null $language The language code for question generation (e.g., 'en', 'fr', 'es')
      * @return array Array of follow-up questions
      * @throws \Exception If the API request fails
      */
-    public function generateFollowUpQuestions(string $idea): array
+    public function generateFollowUpQuestions(string $idea, ?string $language = null): array
     {
         if (empty($this->apiKey)) {
             throw new \Exception('Mistral API key is not configured. Please set MISTRAL_API_KEY in your .env file.');
         }
 
-        $prompt = $this->buildFollowUpQuestionsPrompt($idea);
+        $prompt = $this->buildFollowUpQuestionsPrompt($idea, $language);
 
         Log::info('Mistral API follow-up questions request', [
             'model' => $this->model,
@@ -313,10 +429,15 @@ PROMPT;
      * Build the prompt for generating follow-up questions
      *
      * @param string $idea The app idea
+     * @param string|null $language The language code for question generation
      * @return string The formatted prompt
      */
-    protected function buildFollowUpQuestionsPrompt(string $idea): string
+    protected function buildFollowUpQuestionsPrompt(string $idea, ?string $language = null): string
     {
+        if ($language && $language !== 'en') {
+            return $this->buildLocalizedFollowUpPrompt($idea, $language);
+        }
+
         return <<<PROMPT
 Analyze the following app idea and generate 3-5 relevant follow-up questions to better understand the requirements.
 
@@ -359,6 +480,93 @@ Example format:
 
 App Idea: {$idea}
 PROMPT;
+    }
+
+    /**
+     * Build a localized follow-up questions prompt in the specified language
+     *
+     * @param string $idea The app idea
+     * @param string $language The language code
+     * @return string The localized prompt
+     */
+    protected function buildLocalizedFollowUpPrompt(string $idea, string $language): string
+    {
+        $languageName = $this->getLanguageName($language);
+
+        return <<<PROMPT
+Analysez l'idée d'application suivante et générez 3 à 5 questions de suivi pertinentes pour mieux comprendre les exigences.
+
+CRITICAL: ALL questions and options MUST be in {$languageName} language. Use ONLY {$languageName} words.
+
+Chaque question doit aider à clarifier:
+- Les utilisateurs cibles ou le contexte
+- Les fonctionnalités ou exigences techniques clés
+
+Formatez la réponse sous forme d'objet JSON avec une seule clé "questions" contenant un tableau d'objets question.
+Chaque objet question doit avoir:
+- "id": identifiant unique (nombre)
+- "question": le texte de la question
+- "type": l'un de "multiple_choice", "text", ou "boolean"
+- Si type est "multiple_choice", incluez "options": tableau des réponses possibles
+- Si type est "text", incluez éventuellement "placeholder": texte d'indice
+
+NE PAS inclure de markdown, explications ou texte en dehors du JSON. Retournez uniquement l'objet JSON.
+
+Format d'exemple:
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "Quel est le public cible principal de cette application?",
+      "type": "multiple_choice",
+      "options": ["Étudiants", "Propriétaires de petites entreprises", "Travailleurs de la santé", "Grand public"]
+    },
+    {
+      "id": 2,
+      "question": "Cette application nécessitera-t-elle des fonctionnalités hors ligne?",
+      "type": "boolean"
+    },
+    {
+      "id": 3,
+      "question": "Y a-t-il des exigences techniques spécifiques?",
+      "type": "text",
+      "placeholder": "ex. synchronisation en temps réel, gestion de grands fichiers"
+    }
+  ]
+}
+
+REMEMBER: ALL content MUST be in {$languageName} language. NO English words allowed.
+
+App Idea: {$idea}
+PROMPT;
+    }
+
+    /**
+     * Get the full language name from a language code
+     *
+     * @param string $code The language code
+     * @return string The language name
+     */
+    protected function getLanguageName(string $code): string
+    {
+        $languages = [
+            'am' => 'Amharic',
+            'ar' => 'Arabic',
+            'en' => 'English',
+            'fr' => 'French',
+            'ha' => 'Hausa',
+            'ig' => 'Igbo',
+            'lg' => 'Luganda',
+            'or' => 'Oromo',
+            'sw' => 'Swahili',
+            'yo' => 'Yoruba',
+            'es' => 'Spanish',
+            'pt' => 'Portuguese',
+            'de' => 'German',
+            'it' => 'Italian',
+        ];
+
+        return $languages[$code] ?? $code;
     }
 
 }

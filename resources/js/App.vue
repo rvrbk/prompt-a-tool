@@ -80,6 +80,11 @@ const selectLanguage = (langCode) => {
 const currentLang = computed(() => currentLanguage.value)
 const currentLangNative = computed(() => getLanguageName(currentLang.value))
 
+// Title class - use text-md for Oromo (or) to prevent overflow
+const titleClass = computed(() => {
+  return currentLang.value === 'or' ? 'text-md' : 'text-lg'
+})
+
 // Compute language display values
 const currentLangFlag = computed(() => SUPPORTED_LANGUAGES[currentLang.value]?.countryCode || 'us')
 const currentLangDisplay = computed(() => (SUPPORTED_LANGUAGES[currentLang.value]?.countryCode || 'EN').toUpperCase())
@@ -158,7 +163,7 @@ const closeMobileMenu = () => {
               <svg class="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <h1 class="text-lg font-semibold text-gray-900 tracking-tight">Prompt Generator</h1>
+              <h1 :class="[titleClass, 'font-semibold text-gray-900 tracking-tight']">{{ t('appTitle') }}</h1>
             </router-link>
             <nav class="hidden md:flex items-center space-x-6">
               <router-link
@@ -167,12 +172,12 @@ const closeMobileMenu = () => {
                 :class="{ 'text-gray-900': route.path === '/about' }"
                 @click.stop
               >
-                About
+                {{ t('navAbout') }}
               </router-link>
             </nav>
           </div>
 
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-2 ml-auto">
             <!-- Language Selector -->
             <div class="relative">
               <button
@@ -206,8 +211,7 @@ const closeMobileMenu = () => {
                 </div>
               </div>
             </div>
-
-            <!-- Mobile menu button - visible only on screens below 768px -->
+            <!-- Menu button -->
             <button
               @click.stop="toggleMobileMenu"
               class="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
@@ -238,14 +242,14 @@ const closeMobileMenu = () => {
           class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors py-2"
           @click="closeMobileMenu"
         >
-          Home
+          {{ t('navHome') }}
         </router-link>
         <router-link
           to="/about"
           class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors py-2"
           @click="closeMobileMenu"
         >
-          About
+          {{ t('navAbout') }}
         </router-link>
       </nav>
     </div>

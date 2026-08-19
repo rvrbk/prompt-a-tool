@@ -11,3 +11,8 @@ Route::get('/', function () {
 Route::get('/health', function () {
     return response()->json(['status' => 'healthy']);
 });
+
+// Catch-all route for SPA - must be last
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '.*');

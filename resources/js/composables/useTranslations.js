@@ -37,8 +37,12 @@ const getLanguageOptions = () => {
 const translations = {
   en: {
     // App title and description
-    appTitle: 'App Prompt Generator',
+    appTitle: 'Prompt a Tool',
     appDescription: 'Answer a few questions about your app idea, and we\'ll generate tailored prompts, roles, agents, and skills for your application.',
+    
+    // Navigation
+    navHome: 'Home',
+    navAbout: 'About',
     
     // Form labels
     appIdeaLabel: 'App Idea',
@@ -72,6 +76,31 @@ const translations = {
     noResults: 'No Results Yet',
     noResultsHint: 'Fill the questionnaire and click Generate to see results.',
     
+    // Role/Agent detail labels
+    permissions: 'Permissions',
+    actions: 'Actions',
+    responsibilities: 'Responsibilities',
+    skills: 'Skills',
+    tools: 'Tools',
+    tasks: 'Tasks',
+    dependencies: 'Dependencies',
+    standard: 'Standard',
+    na: 'N/A',
+    answer: 'Answer',
+    notAnswered: 'Not answered',
+    
+    // Export/Markdown labels
+    promptGeneratorExport: 'Prompt a Tool Export',
+    projectOverview: 'Project Overview',
+    appIdeaExport: 'App Idea',
+    followUpAnswers: 'Follow-up Answers',
+    generated: 'Generated',
+    description: 'Description',
+    type: 'Type',
+    backendPromptsLaravel: 'Backend Prompts (Laravel)',
+    frontendPromptsVue: 'Frontend Prompts (Vue.js)',
+    promptLabel: 'Prompt',
+    
     // Export/Share
     exportJson: 'JSON',
     exportMarkdown: 'MD',
@@ -100,7 +129,7 @@ const translations = {
     optional: '(optional)',
     
     // About page
-    aboutTitle: 'About Prompt Generator',
+    aboutTitle: 'About Prompt a Tool',
     aboutSubtitle: 'A simple tool to help you plan your app',
     aboutWhatItDoes: 'What does this tool do?',
     aboutDescription1: 'This tool helps you turn your app idea into a clear plan. Whether you are building a mobile app, a website, or any digital product, we make the planning process simple and straightforward.',
@@ -127,8 +156,13 @@ const translations = {
   },
   
   ar: {
-    appTitle: 'مولد المطالبات',
+    appTitle: 'أداة المطالبات',
     appDescription: 'أجب عن بعض الأسئلة حول فكرة تطبيقك، وسنولد مطالبات ودوراً ووكالات ومهارات مخصصة لتطبيقك.',
+    
+    // Navigation
+    navHome: 'الرئيسية',
+    navAbout: 'من نحن',
+    
     appIdeaLabel: 'فكرة التطبيق',
     appIdeaPlaceholder: 'وصف فكرة التطبيق (مثال: "تطبيق فنتك لمجموعات التوفير", "منصة تكنولوجيا زراعية تربط المزارعين بالسوق")',
     appIdeaHint: 'كن محددًا بشأن هدف التطبيق وجمهورك المستهدف.',
@@ -154,6 +188,7 @@ const translations = {
     rawResponse: 'استجابة الذكاء الاصطناعي الخام',
     noResults: 'لا يوجد نتائج بعد',
     noResultsHint: 'املأ الاستبيان وانقر على إنشاء للمشاهدة النتائج.',
+    promptGeneratorExport: 'تصدير أداة المطالبات',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'تم نسخ الرابط!',
@@ -176,7 +211,7 @@ const translations = {
     no: 'لا',
     
     // About page
-    aboutTitle: 'عن مولد المطالبات',
+    aboutTitle: 'عن أداة المطالبات',
     aboutSubtitle: 'أداة بسيطة لمساعدتك على التخطيط لتطبيقك',
     aboutWhatItDoes: 'ماذا تفيد هذه الأداة؟',
     aboutDescription1: 'تساعدك هذه الأداة على تحويل فكرة تطبيقك إلى خطة واضحة. سواء كنت تبني تطبيق جوال أو موقع ويب أو أي منتج رقمي، فنحن نجعل عملية التخطيط بسيطة ومباشرة.',
@@ -203,8 +238,13 @@ const translations = {
   },
   
   fr: {
-    appTitle: 'Générateur de Prompts pour Applications',
+    appTitle: 'Outil de Prompts',
     appDescription: 'Répondez à quelques questions sur votre idée d\'application, et nous générerons des prompts, rôles, agents et compétences adaptés pour votre application.',
+    
+    // Navigation
+    navHome: 'Accueil',
+    navAbout: 'À propos',
+    
     appIdeaLabel: 'Idée de l\'application',
     appIdeaPlaceholder: 'Décrivez votre idée d\'application (ex: "Une application fintech pour les groupes d\'épargne", "Une plateforme agri-tech connectant les agriculteurs aux marchés")',
     appIdeaHint: 'Soyez précis concernant le but de votre application et votre public cible.',
@@ -251,8 +291,33 @@ const translations = {
     yes: 'Oui',
     no: 'Non',
     
+    // Role/Agent detail labels
+    permissions: 'Autorisations',
+    actions: 'Actions',
+    responsibilities: 'Responsabilités',
+    skills: 'Compétences',
+    tools: 'Outils',
+    tasks: 'Tâches',
+    dependencies: 'Dépendances',
+    standard: 'Standard',
+    na: 'N/D',
+    answer: 'Réponse',
+    notAnswered: 'Non répondu',
+    
+    // Export/Markdown labels
+    promptGeneratorExport: 'Exportation de l\'Outil de Prompts',
+    projectOverview: 'Aperçu du Projet',
+    appIdeaExport: 'Idée de l\'Application',
+    followUpAnswers: 'Réponses de Suivi',
+    generated: 'Généré',
+    description: 'Description',
+    type: 'Type',
+    backendPromptsLaravel: 'Prompts Backend (Laravel)',
+    frontendPromptsVue: 'Prompts Frontend (Vue.js)',
+    promptLabel: 'Prompt',
+    
     // About page
-    aboutTitle: 'À propos du Générateur de Prompts',
+    aboutTitle: 'À propos de l\'Outil de Prompts',
     aboutSubtitle: 'Un outil simple pour vous aider à planifier votre application',
     aboutWhatItDoes: 'Que fait cet outil ?',
     aboutDescription1: 'Cet outil vous aide à transformer votre idée d\'application en un plan clair. Que vous construisiez une application mobile, un site web ou tout autre produit numérique, nous simplifions le processus de planification.',
@@ -279,8 +344,13 @@ const translations = {
   },
   
   sw: {
-    appTitle: 'Mtengenezi wa Maombi',
+    appTitle: 'Kifaa cha Maombi',
     appDescription: 'Jibu maswali machache kuhusu wazo la programu yako, na tutaunda maombi, majukumu, waajiri, na ujuzi.',
+    
+    // Navigation
+    navHome: 'Nyumbani',
+    navAbout: 'Kuhusu',
+    
     appIdeaLabel: 'Wazo la programu',
     appIdeaPlaceholder: 'Eleza wazo la programu yako (mfano: "Programu ya fedha kwa makundi ya uokoaji", "Jukwaa la Teknologia ya kilimo linaunganisha wakulima na soko")',
     appIdeaHint: 'Weweka kwa ufafanu wa lengo la programu yako na watazamaji wako.',
@@ -306,6 +376,7 @@ const translations = {
     rawResponse: 'Jibu Kamili ya AI',
     noResults: 'Bado Hakuna Matokeo',
     noResultsHint: 'Jaza fomuli na bonyeza Unda kuona matokeo.',
+    promptGeneratorExport: 'Utoaji wa Kifaa cha Maombi',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'URL Imenakiliwa!',
@@ -328,7 +399,7 @@ const translations = {
     no: 'Hapana',
     
     // About page
-    aboutTitle: 'Kuhusu Mtengenezi wa Maombi',
+    aboutTitle: 'Kuhusu Kifaa cha Maombi',
     aboutSubtitle: 'Chombo rahisi kuwasaidia kupanga programu yako',
     aboutWhatItDoes: 'Chombo hiki kinatenda nini?',
     aboutDescription1: 'Chombo hiki kinakusaidia kubadili wazo lako la programu kuwa mpango wa kawaida. Ukiwa unajenga programu ya simu, tovuti au bidhaa yoyote ya dijiti, tunafanya mchakato wa kupanga kuwa rahisi na wa moja kwa moja.',
@@ -355,8 +426,13 @@ const translations = {
   },
   
   ha: {
-    appTitle: 'ɗan ƙirar Ayyuka',
+    appTitle: 'Manufar Ayyuka',
     appDescription: 'Amsa wasu tambayoyi game da fatan ayyukarka, zai ƙirƙira ayyuka, asusun, waɗanda suka fi duniya da aiki masu alhaki don ayyukarka.',
+    
+    // Navigation
+    navHome: 'Gida',
+    navAbout: 'Game da',
+    
     appIdeaLabel: 'Fatan Ayyuka',
     appIdeaPlaceholder: 'Bayyana fata na ayyukarka (misali: "Ayyukan fintech don ƙungiyoyin kudade", "Sashin agri-tech mai haɗuwa wa masu kula da asuwanni")',
     appIdeaHint: 'Ka bayyana fata na ayyukarka da yaushe da alhakin mutane da ayyukarka.',
@@ -382,6 +458,7 @@ const translations = {
     rawResponse: 'Amfani da AI a cikin gaskiya',
     noResults: 'Babanin Sabuwa',
     noResultsHint: 'Cire fom na nan da shigar da Ƙirƙiri don ganin sabuwa.',
+    promptGeneratorExport: 'Sabunta Manufar Ayyuka',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'An kwafa URL!',
@@ -404,7 +481,7 @@ const translations = {
     no: 'A\'a',
     
     // About page
-    aboutTitle: 'Game da Ƙirar Ayyuka',
+    aboutTitle: 'Game da Manufar Ayyuka',
     aboutSubtitle: 'Manufar sadarwa mai sauƙi don taimakon shirya ayyukarka',
     aboutWhatItDoes: 'Mene manufa ita ke yi?',
     aboutDescription1: 'Manufar wannan sadarwa shi ne taimaka wa ku can canzawa fatan ayyukarka zuwa tsarin gaskiya. Idan kuna yin ayyuka a wayar hira, shafin yanar gizo ko abin da yake da sauƙi a cikin dijital, muna sauƙaƙa wa sabuwar tsarin shirye.',
@@ -431,8 +508,13 @@ const translations = {
   },
   
   yo: {
-    appTitle: 'Àgbàlàwọ́ Àwọn Àmò̩lùwípò',
+    appTitle: 'Àkó̩sílẹ̀ Àdàhùnsẹ̀',
     appDescription: 'Dá àgbéyẹ̀ àwọn ìbàwọ́lẹ̀ àwọn ìtẹ̀wọ́ àwọn àkó̩sílẹ̀ àwọn àmò̩lùwípò, àwọn ìdí, àwọn àgẹ̀ntí, àti àwọn ìlà àwújọ̀ fún àwọn àkó̩sílẹ̀.',
+    
+    // Navigation
+    navHome: 'Ìlà',
+    navAbout: 'Nípa',
+    
     appIdeaLabel: 'Àwọn Ìtẹ̀wọ́ Àmò̩lùwípò',
     appIdeaPlaceholder: 'Ṣàlà àwọn ìtẹ̀wọ́ àwọn àkó̩sílẹ̀ (Àwújọ̀: "Àmò̩lùwípò Fínánṣí fún àwọn àgùtàn àkọ́jọ̀", "Àgbàlàwọ́ Àgri-tech tó máa shàfí àwọn ònílẹ̀dẹ́ àwọn àwòòràn")',
     appIdeaHint: 'Jẹ́ àgbàlàwọ́ àwọn àwújọ̀ àti àwọn olùkọ́ àwọn àkó̩sílẹ̀.',
@@ -458,6 +540,7 @@ const translations = {
     rawResponse: 'Àdáhùnsẹ̀ Àgùtàn AI',
     noResults: 'Rara Àkó̩sílẹ̀',
     noResultsHint: 'Tẹ̀ àwọn fọ́ọ̀mù àti pẹ̀ Àmò̩lùwípò láti rì àwọn àkó̩sílẹ̀.',
+    promptGeneratorExport: 'Àkó̩sílẹ̀ Àdàhùnsẹ̀',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'À ti kópipí URL!',
@@ -480,7 +563,7 @@ const translations = {
     no: 'Rará',
     
     // About page
-    aboutTitle: 'Nínú Àgbàlàwọ́ Àwọn Àmò̩lùwípò',
+    aboutTitle: 'Nípa Àkó̩sílẹ̀ Àdàhùnsẹ̀',
     aboutSubtitle: 'Àwọn ìrú ọkàn púpọ̀ tó gbà àwọn àdàhùnsẹ̀ ìtọ́jú àwọn àkó̩sílẹ̀',
     aboutWhatItDoes: 'Ṣé àwọn Àgbàlàwọ́ Àmò̩lùwípò wá',
     aboutDescription1: 'Àwọn Àgbàlàwọ́ Àmò̩lùwípò jẹ́ àlàkò́sílẹ̀ àwọn àwújọ̀ tó tún àwọn àkó̩sílẹ̀ nínú àwọn àdàhùnsẹ̀. Àwọn Àgbàlàwọ́ Àmò̩lùwípò jẹ́ àlàkò́sílẹ̀ àwọn àwújọ̀ àti àwọn èdè tó yẹ́ kí à lò àwọn àkó̩sílẹ̀.',
@@ -507,8 +590,13 @@ const translations = {
   },
   
   am: {
-    appTitle: 'አፍሪካ አፕሊኬሽን ጥናት አጠቃቀም',
-    appDescription: 'ለአፍሪካ የተሟላ አፕሊኬሽን እንደዚሁ ሁሉት ጥናቶች በጣም ከፍተኛ አጠቃቀም፤ ዕድገት፤ አገንቶች እና ክህንቶች ይፍጠሩ።',
+    appTitle: 'ጥናት አጠቃቀም',
+    appDescription: 'ለአፕሊኬሽን እንደዚሁ ሁሉት ጥናቶች በጣም ከፍተኛ አጠቃቀም፤ ዕድገት፤ አገንቶች እና ክህንቶች ይፍጠሩ።',
+    
+    // Navigation
+    navHome: 'መነሻ',
+    navAbout: 'ስለእኛ',
+    
     appIdeaLabel: 'የአፕሊኬሽን እዲያ',
     appIdeaPlaceholder: 'የአፕሊኬሽን እዲያዎን ያጋሩ',
     appIdeaHint: 'እንደዚሁ አፕሊኬሽን ባለ፤ የሚፈለገውን ዓለም እና ባለ ሰርተው ያጋሩ።',
@@ -534,6 +622,7 @@ const translations = {
     rawResponse: 'አጠቃቀም ቅጥታ በቅር',
     noResults: 'ምንም ናት አይፈጠርም',
     noResultsHint: 'ፎርምን ይሞላና እና "ጥናቶችን አጠቃቀም" ይጫን።',
+    promptGeneratorExport: 'ጥናት አጠቃቀም',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'አድራሻውን አትግብኩ!',
@@ -557,7 +646,7 @@ const translations = {
     optional: '(አንደርገዋለሁ)',
     
     // About page
-    aboutTitle: 'ስለ አፕሊኬሽን ጥናት አጠቃቀም',
+    aboutTitle: 'ስለ ጥናት አጠቃቀም',
     aboutSubtitle: 'የአፕሊኬሽንዎን እያንዳንድ ለማነጻጸር ጣልቅ ነው',
     aboutWhatItDoes: 'ይህ ጣልቅ ምን እንደገና ይሠራ?',
     aboutDescription1: 'ይህ ጣልቅ የአፕሊኬሽንዎን እዲያ ማተግበር እና ማገናግን ይበጥራል። እንደማነት አፕሊኬሽን ሳለ ስልክ ወይን አካል ዲጂታል ፈጣን፤ ጥናቶችን አጠቃቀም ብልክ እናማነሰራለን።',
@@ -584,11 +673,16 @@ const translations = {
   },
   
   or: {
-    appTitle: 'Afrika Aplikeshinii Camsaa Qorannoo',
-    appDescription: 'Yeroo aftoota Afrikaa keessaa qophaa nii jiraachuuf, camsaa qophaawwan, roolaawwan, ejennoowwan, snaa barnootaargan akka waan jiraachuuf.',
+    appTitle: 'Qophaawwan Camsaa',
+    appDescription: 'Qophaa jiraachuuf, camsaa qophaawwan, roolaawwan, ejennoowwan.',
+    
+    // Navigation
+    navHome: 'Garaa',
+    navAbout: 'Waa\'ee',
+    
     appIdeaLabel: 'Aplikeshinii Qophaa',
     appIdeaPlaceholder: 'Qophaa aplikeshinichaa barree',
-    appIdeaHint: 'Qophaa aplikeshinichaa fi yeroo aftota Afrikaa keessatti argadhu.',
+    appIdeaHint: 'Qophaa aplikeshinichaa fi argadhu.',
     offlineAccessLabel: 'Intarnetii Alaa',
     offlineAccessHint: 'Aplikeshinichaa intarneti alaa deebisuufi?',
     offlineYes: 'Eeyyee',
@@ -627,6 +721,7 @@ const translations = {
     no: 'Lakkoofsa',
     cancelButton: 'Haala Gaaffii',
     optional: '(Akkamii)',
+    promptGeneratorExport: 'Qophaawwan Camsaa',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'URL cufame!',
@@ -634,7 +729,7 @@ const translations = {
     markdownDownloaded: 'Daawwadi!',
     
     // About page
-    aboutTitle: 'Waaee Aplikeshinii Camsaa Qorannoo',
+    aboutTitle: 'Waaee Qophaawwan Camsaa',
     aboutSubtitle: 'Qalbii sadarkaa argachuu Aplikeshinii keessattis',
     aboutWhatItDoes: 'Eessatti waan itti fayyadamaa?',
     aboutDescription1: 'Qalbii kun waan hojii Aplikeshinii qophaa keessattis argachuu. Aplikeshiniiqaa keessattis moo nagaa sadii, web saaytii moo nagaa dijitaalii, nagaan dirree qabee. Aplikeshiniin waan barnoota qophii, roolii, ejennoowwanii fi qophaa qabeessa jiraachuu. Aplikeshinii qophaa itti fayyadamaa waan barnoota isaa argachuuf.',
@@ -661,8 +756,13 @@ const translations = {
   },
   
   ig: {
-    appTitle: 'Mmepe Aṅwạn Úzọ̀',
+    appTitle: 'Àkụ̀ Àkwúkwọ̀',
     appDescription: 'Dị mkpúre na àkwúkwọ̀ gbasara aṅwạn úzọ̀ gị, anyị ga emépe àkwúkwọ̀, ónwe, ákwúkwọ̀ na mmúmmú.',
+    
+    // Navigation
+    navHome: 'Úlọ̀',
+    navAbout: 'Gbasara',
+    
     appIdeaLabel: 'Aṅwạn Úzọ̀',
     appIdeaPlaceholder: 'Kpebie aṅwạn úzọ̀ gị',
     appIdeaHint: 'Bìakwute na ọrụ aṅwạn úzọ̀ gị na ndị na agba ụlọ.',
@@ -688,6 +788,7 @@ const translations = {
     rawResponse: 'AI Ákříkṛ',
     noResults: 'Ọ dịghị present',
     noResultsHint: 'Fịlị form na kwado Generate ka ịghọta result.',
+    promptGeneratorExport: 'Àkụ̀ Àkwúkwọ̀',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'URL kopí!',
@@ -710,7 +811,7 @@ const translations = {
     no: 'Mba',
     
     // About page
-    aboutTitle: 'Makwuchita Mmepe Àkwúkwọ̀',
+    aboutTitle: 'Makwuchita Àkụ̀ Àkwúkwọ̀',
     aboutSubtitle: 'Ụzọ̀ dị mfe na agbakwunye gị na mpaghara Àkwúkwọ̀ gị',
     aboutWhatItDoes: 'Kedu ka ụzọ̀ a na emé?',
     aboutDescription1: 'Ụzọ̀ a na agbakwunye gị na agba ụzọ̀ gị na mpaghara. Na mmepe Àkwúkwọ̀, ónwe, ákwúkwọ̀ na mmúmmú naÀkwúkwọ̀ gị.',
@@ -737,8 +838,13 @@ const translations = {
   },
   
   lg: {
-    appTitle: 'Olusanu Olwino',
+    appTitle: 'Ebifaananyizo',
     appDescription: 'Yongera ku musaanyizibwa gwe ga ku byo by input yonna, ne tumugattako olusanu olwino, obugula, abagendako, ne obulimi ebifanana.',
+    
+    // Navigation
+    navHome: 'Akawungeezi',
+    navAbout: 'Ebyo',
+    
     appIdeaLabel: 'Ekirobyo eky Olwino',
     appIdeaPlaceholder: 'Nyandikira ekirobyo eky olwino lyo',
     appIdeaHint: 'Obulembeze ku lwatu lwa olwino lyo ne abayizi byo.',
@@ -764,6 +870,7 @@ const translations = {
     rawResponse: 'Ekitundibwa kya AI',
     noResults: 'Tewali ebifanana',
     noResultsHint: 'Jjukira ebyo bya fofi ne nkuleeta "Gattako Ebifanana".',
+    promptGeneratorExport: 'Ebifaananyizo',
     exportJson: 'JSON',
     exportMarkdown: 'MD',
     shareUrlCopied: 'URL byakoppiyibwa!',
@@ -786,7 +893,7 @@ const translations = {
     no: 'Ate',
     
     // About page
-    aboutTitle: 'Ebyolusanu Olwino',
+    aboutTitle: 'Ebyo bya Ebifaananyizo',
     aboutSubtitle: 'Ekizikiza ekigenderera okuwasa ku kyokola olwino lwawe',
     aboutWhatItDoes: 'Ekizikiza kino kiyinza?',
     aboutDescription1: 'Ekizikiza kino ekigenderera okuwasa ku kyokola olwino lwawe. Oli olwino lw Engeri yonna, ennyimba, olwino olwino lw Engeri yonna, ne tutwasa okuwasa ku byona byokola olwino lwawe.',
@@ -902,3 +1009,4 @@ const useTranslations = (language = 'en', options = {}) => {
 }
 
 export default useTranslations
+export { SUPPORTED_LANGUAGES, translations }
