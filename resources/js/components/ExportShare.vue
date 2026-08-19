@@ -39,11 +39,14 @@ const exportData = computed(() => {
   const backendPrompts = props.generatedData.backend_prompts || []
   const frontendPrompts = props.generatedData.frontend_prompts || []
   
+  // Safely extract questionnaire data
+  const qData = props.questionnaireData || props.generatedData?.data || {}
+  
   return {
     metadata: {
-      app_idea: props.questionnaireData?.idea || props.generatedData?.data?.idea || '',
-      followUpAnswers: props.questionnaireData?.followUpAnswers || props.generatedData?.data?.followUpAnswers || {},
-      offlineAccess: props.questionnaireData?.offlineAccess || props.generatedData?.data?.offlineAccess || false,
+      app_idea: qData?.idea || '',
+      followUpAnswers: qData?.followUpAnswers || {},
+      offlineAccess: qData?.offlineAccess !== undefined ? qData.offlineAccess : false,
       generated_at: props.generatedData?.generated_at || new Date().toISOString()
     },
     roles,
@@ -126,7 +129,7 @@ const exportAsJson = () => {
 const exportAsMarkdown = () => {
   if (!exportData.value) return
   
-  const metadata = exportData.value.metadata
+  const metadata = exportData.value?.metadata || {}
   const roles = getRolesForExport.value
   const agents = getAgentsForExport.value
   const backendPrompts = getBackendPromptsForExport.value
@@ -136,9 +139,9 @@ const exportAsMarkdown = () => {
   
   // Metadata section
   markdown += `## Project Overview\n\n`
-  markdown += `**App Idea:** ${metadata.app_idea}\n\n`
-  markdown += `**Follow-up Answers:** ${JSON.stringify(metadata.followUpAnswers, null, 2)}\n\n`
-  markdown += `**Offline Access:** ${metadata.offlineAccess ? 'Yes' : 'No'}\n\n`
+  markdown += `**App Idea:** ${metadata.app_idea || ''}\n\n`
+  markdown += `**Follow-up Answers:** ${JSON.stringify(metadata.followUpAnswers || {}, null, 2)}\n\n`
+  markdown += `**Offline Access:** ${metadata.offlineAccess === true ? 'Yes' : 'No'}\n\n`
   markdown += `**Generated:** ${new Date(metadata.generated_at).toLocaleString()}\n\n`
   markdown += `---\n\n`
   

@@ -188,9 +188,9 @@ const copyAllAsJson = async () => {
       backend_prompts: getBackendPrompts.value,
       frontend_prompts: getFrontendPrompts.value,
       metadata: {
-        idea: editedData.value?.data?.idea || editedData.value?.idea || '',
-        followUpAnswers: editedData.value?.data?.followUpAnswers || editedData.value?.followUpAnswers || {},
-        offlineAccess: editedData.value?.data?.offlineAccess || editedData.value?.offlineAccess || false,
+        idea: props.questionnaireData?.idea || editedData.value?.data?.idea || editedData.value?.idea || '',
+        followUpAnswers: props.questionnaireData?.followUpAnswers || editedData.value?.data?.followUpAnswers || editedData.value?.followUpAnswers || {},
+        offlineAccess: props.questionnaireData?.offlineAccess !== undefined ? props.questionnaireData?.offlineAccess : (editedData.value?.data?.offlineAccess ?? editedData.value?.offlineAccess ?? false),
         generated_at: editedData.value?.generated_at || new Date().toISOString()
       }
     }
