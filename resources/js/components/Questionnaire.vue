@@ -154,7 +154,7 @@ const currentQuestion = computed(() => {
 // Check if all questions are answered
 const allQuestionsAnswered = computed(() => {
   return followUpQuestions.value.length === 0 || 
-         followUpQuestions.value.every(q => form.value.followUpAnswers[q.id] !== undefined)
+         followUpQuestions.value.every(q => q?.id !== undefined && form.value.followUpAnswers?.[q.id] !== undefined)
 })
 
 // Close all dropdowns
@@ -328,24 +328,24 @@ const resetForm = () => {
         <!-- Question Display -->
         <div v-if="currentQuestion" class="bg-white p-4 rounded-lg border border-purple-200">
           <p class="text-gray-700 font-medium mb-2">
-            {{ currentQuestion.question }}
+            {{ currentQuestion?.question }}
           </p>
           
           <!-- Multiple Choice -->
-          <div v-if="currentQuestion.type === 'multiple_choice'" class="space-y-2">
+          <div v-if="currentQuestion?.type === 'multiple_choice' && currentQuestion?.options" class="space-y-2">
             <label 
-              v-for="option in currentQuestion.options" 
+              v-for="option in currentQuestion?.options" 
               :key="option"
               class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
               :class="{
-                'border-purple-500 bg-purple-50': form.value.followUpAnswers[currentQuestion.id] === option
+                'border-purple-500 bg-purple-50': form.value.followUpAnswers?.[currentQuestion?.id] === option
               }"
             >
               <input
                 type="radio"
-                :name="'q-' + currentQuestion.id"
+                :name="'q-' + currentQuestion?.id"
                 :value="option"
-                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                v-model="form.value.followUpAnswers[currentQuestion?.id]"
                 class="mr-3 h-4 w-4 text-purple-600"
               />
               <span class="text-gray-700">{{ option }}</span>
@@ -353,23 +353,23 @@ const resetForm = () => {
           </div>
           
           <!-- Text Input -->
-          <div v-else-if="currentQuestion.type === 'text'" class="mt-2">
+          <div v-else-if="currentQuestion?.type === 'text'" class="mt-2">
             <textarea
-              v-model="form.value.followUpAnswers[currentQuestion.id]"
-              :placeholder="currentQuestion.placeholder || t('enterYourAnswer')"
+              v-model="form.value.followUpAnswers[currentQuestion?.id]"
+              :placeholder="currentQuestion?.placeholder || t('enterYourAnswer')"
               rows="3"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
             />
           </div>
           
           <!-- Yes/No -->
-          <div v-else-if="currentQuestion.type === 'boolean'" class="flex gap-4 mt-2">
+          <div v-else-if="currentQuestion?.type === 'boolean'" class="flex gap-4 mt-2">
             <label class="flex items-center cursor-pointer">
               <input
                 type="radio"
-                :name="'q-' + currentQuestion.id"
+                :name="'q-' + currentQuestion?.id"
                 :value="true"
-                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                v-model="form.value.followUpAnswers[currentQuestion?.id]"
                 class="mr-2 h-4 w-4 text-purple-600"
               />
               <span class="text-gray-700">{{ t('yes') }}</span>
@@ -377,9 +377,9 @@ const resetForm = () => {
             <label class="flex items-center cursor-pointer">
               <input
                 type="radio"
-                :name="'q-' + currentQuestion.id"
+                :name="'q-' + currentQuestion?.id"
                 :value="false"
-                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                v-model="form.value.followUpAnswers[currentQuestion?.id]"
                 class="mr-2 h-4 w-4 text-purple-600"
               />
               <span class="text-gray-700">{{ t('no') }}</span>
