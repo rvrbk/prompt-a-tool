@@ -42,8 +42,6 @@ const exportData = computed(() => {
   return {
     metadata: {
       app_idea: props.questionnaireData?.idea || props.generatedData?.data?.idea || '',
-      countries: props.questionnaireData?.countries || props.generatedData?.data?.countries || [],
-      userTypes: props.questionnaireData?.userTypes || props.generatedData?.data?.userTypes || [],
       offlineAccess: props.questionnaireData?.offlineAccess || props.generatedData?.data?.offlineAccess || false,
       generated_at: props.generatedData?.generated_at || new Date().toISOString()
     },
@@ -138,8 +136,6 @@ const exportAsMarkdown = () => {
   // Metadata section
   markdown += `## Project Overview\n\n`
   markdown += `**App Idea:** ${metadata.app_idea}\n\n`
-  markdown += `**Target Countries:** ${metadata.countries.join(', ') || 'N/A'}\n\n`
-  markdown += `**User Types:** ${metadata.userTypes.join(', ') || 'N/A'}\n\n`
   markdown += `**Offline Access:** ${metadata.offlineAccess ? 'Yes' : 'No'}\n\n`
   markdown += `**Generated:** ${new Date(metadata.generated_at).toLocaleString()}\n\n`
   markdown += `---\n\n`

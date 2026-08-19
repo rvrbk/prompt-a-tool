@@ -44,12 +44,6 @@ const translations = {
     appIdeaPlaceholder: 'Describe your app idea (e.g., \'A Nigerian fintech app for savings groups\', \'A Kenyan agri-tech platform connecting farmers to markets\')',
     appIdeaHint: 'Be specific about your app\'s purpose and target audience in Africa.',
     
-    targetCountriesLabel: 'Target Countries',
-    targetCountriesPlaceholder: 'Select countries...',
-    
-    userTypesLabel: 'Primary User Types',
-    userTypesPlaceholder: 'Select user types...',
-    
     offlineAccessLabel: 'Offline Access',
     offlineAccessHint: 'Will your app need to work without internet connectivity?',
     offlineYes: 'Yes',
@@ -92,24 +86,10 @@ const translations = {
     noResponse: 'Error: No server response. Please check backend.',
     serverError: 'Server error',
     
-    // Templates
-    templates: 'Templates',
-    selectTemplate: 'Select a template to get started',
-    clearTemplate: 'Clear',
-    allCategories: 'All Categories',
-    noTemplates: 'No templates available',
-    loadingTemplates: 'Loading templates...',
-    applyTemplate: 'Apply Template',
     cancelButton: 'Cancel',
     optional: '(optional)',
     
     // Category names
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'General'
   },
   
   ar: {
@@ -118,10 +98,6 @@ const translations = {
     appIdeaLabel: 'فكرة التطبيق',
     appIdeaPlaceholder: 'وصف فكرة التطبيق (مثال: "تطبيق فنتك نيجيري لمجموعات التوفير", "منصة تكنولوجيا زراعية كينية تربط المزارعين بالسوق")',
     appIdeaHint: 'كن محددًا بشأن هدف التطبيق وجمهورك المستهدف في أفريقيا.',
-    targetCountriesLabel: 'الدول المستهدفة',
-    targetCountriesPlaceholder: 'حدد الدول...',
-    userTypesLabel: 'أنواع المستخدمين الرئيسية',
-    userTypesPlaceholder: 'حدد أنواع المستخدمين...',
     offlineAccessLabel: 'الوصول بدون اتصال',
     offlineAccessHint: 'هل تحتاج تطبيقاتك للعمل بدون اتصال بالانترنت؟',
     offlineYes: 'نعم',
@@ -149,23 +125,9 @@ const translations = {
     yes: 'نعم',
     no: 'لا',
     
-    // Templates
-    templates: 'القوالب',
-    selectTemplate: 'حدد قالباً للبدء',
-    clearTemplate: 'مسح',
-    allCategories: 'جميع الفئات',
-    noTemplates: 'لا توجد قوالب متاحة',
-    loadingTemplates: 'جاري تحميل القوالب...',
-    applyTemplate: 'تطبيق القالب',
     cancelButton: 'إلغاء',
     
     // Category names
-    agritech: 'تكنولوجيا زراعية',
-    fintech: 'تكنولوجيا مالية',
-    edtech: 'تكنولوجيا تعليمية',
-    healthtech: 'تكنولوجيا صحية',
-    logistics: 'اللوجستيات',
-    general: 'عام'
   },
   
   fr: {
@@ -174,10 +136,6 @@ const translations = {
     appIdeaLabel: 'Idée de l\'application',
     appIdeaPlaceholder: 'Décrivez votre idée d\'application (ex: "Une application fintech nigériane pour les groupes d\'épargne", "Une plateforme agri-tech kényane connectant les agriculteurs aux marchés")',
     appIdeaHint: 'Soyez précis concernant le but de votre application et votre public cible en Afrique.',
-    targetCountriesLabel: 'Pays cibles',
-    targetCountriesPlaceholder: 'Sélectionnez des pays...',
-    userTypesLabel: 'Types d\'utilisateurs principaux',
-    userTypesPlaceholder: 'Sélectionnez des types d\'utilisateurs...',
     offlineAccessLabel: 'Accès hors ligne',
     offlineAccessHint: 'Votre application doit-elle fonctionner sans connexion internet ?',
     offlineYes: 'Oui',
@@ -205,23 +163,9 @@ const translations = {
     yes: 'Oui',
     no: 'Non',
     
-    // Templates
-    templates: 'Modèles',
-    selectTemplate: 'Sélectionnez un modèle pour commencer',
-    clearTemplate: 'Effacer',
-    allCategories: 'Toutes les catégories',
-    noTemplates: 'Aucun modèle disponible',
-    loadingTemplates: 'Chargement des modèles...',
-    applyTemplate: 'Appliquer le modèle',
     cancelButton: 'Annuler',
     
     // Category names
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistique',
-    general: 'Général'
   },
   
   sw: {
@@ -230,10 +174,6 @@ const translations = {
     appIdeaLabel: 'Wazo la programu',
     appIdeaPlaceholder: 'Eleza wazo la programu yako (mfano: "Programu ya fedha ya Kijo Nijeria kwa makundi ya uokoaji", "Jukwaa la Teknologia ya kilimo Kenya linaunganisha wakulima na soko")',
     appIdeaHint: 'Weweka kwa ufafanu wa lengo la programu yako na watazamaji wako Afrika.',
-    targetCountriesLabel: 'Nchi malengo',
-    targetCountriesPlaceholder: 'Chagua nchi...',
-    userTypesLabel: 'Aina ya watumiaji',
-    userTypesPlaceholder: 'Chagua aina ya watumiaji...',
     offlineAccessLabel: 'Ufikatili wa mtandaoni',
     offlineAccessHint: 'Je, programu yako inahitaji kufanya kazi bila mtandao?',
     offlineYes: 'Ndiyo',
@@ -259,23 +199,9 @@ const translations = {
     yes: 'Ndiyo',
     no: 'Hapana',
     
-    // Templates
-    templates: 'Mifano',
-    selectTemplate: 'Chagua kifaa cha kuanza',
-    clearTemplate: 'Safisha',
-    allCategories: 'Makundi Yote',
-    noTemplates: 'Hakuna mifano iliyopatikana',
-    loadingTemplates: 'Vifaa vinapokewa...',
-    applyTemplate: 'Tumia Kifaa',
     cancelButton: 'Batilisha',
     
     // Category names
-    agritech: 'Teknolojia ya Kilimo',
-    fintech: 'Teknolojia ya Fedha',
-    edtech: 'Teknolojia ya Elimu',
-    healthtech: 'Teknolojia ya Afya',
-    logistics: 'Usafiri',
-    general: 'Jumla'
   },
   
   ha: {
@@ -284,10 +210,6 @@ const translations = {
     appIdeaLabel: 'Fatan Ayyuka',
     appIdeaPlaceholder: 'Bayyana fata na ayyukarka (misali: "Ayyukan fintech na Nijeriya don ƙungiyoyin kudade", "Sashin agri-tech na Kenya mai haɗuwa wa masu kula da asuwanni")',
     appIdeaHint: 'Ka bayyana fata na ayyukarka da yaushe da alhakin mutane da ayyukarka a Afirka.',
-    targetCountriesLabel: 'Yankuna Masu Alƙawari',
-    targetCountriesPlaceholder: 'Zaɓi yankuna...',
-    userTypesLabel: 'Awa li ta mutane masu amfani',
-    userTypesPlaceholder: 'Zaɓi awi...',
     offlineAccessLabel: 'Amfani a tsagin intanet',
     offlineAccessHint: 'Ayyukarka zai iya aiki a tsagin intanet?',
     offlineYes: 'Iya',
@@ -310,23 +232,9 @@ const translations = {
     yes: 'Iya',
     no: 'A\'a',
     
-    // Templates
-    templates: 'Misalai',
-    selectTemplate: 'Zaɓi misali don fara',
-    clearTemplate: 'Sake',
-    allCategories: 'Duk Na\'urar',
-    noTemplates: 'Babu wani misali',
-    loadingTemplates: 'Ana karba tsajaji...',
-    applyTemplate: 'Aiwatar da Misali',
     cancelButton: 'Soke',
     
     // Category names
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'Ga Mai Yawa'
   },
   
   yo: {
@@ -335,10 +243,6 @@ const translations = {
     appIdeaLabel: 'Àwọn Ìtẹ̀wọ́ Àmò̩lùwípò',
     appIdeaPlaceholder: 'Ṣàlà àwọn ìtẹ̀wọ́ àwọn àkó̩sílẹ̀ (Àwújọ̀: "Àmò̩lùwípò Fínánṣí Nàìjíríà fún àwọn àgùtàn àkọ́jọ̀", "Àgbàlàwọ́ Àgri-tech Kẹ́níyà tó máa shàfí àwọn ònílẹ̀dẹ́ àwọn àwòòràn")',
     appIdeaHint: 'Jẹ́ àgbàlàwọ́ àwọn àwújọ̀ àti àwọn olùkọ́ àwọn àmò̩lùwípò nínú Àfríkà.',
-    targetCountriesLabel: 'Àwọn Orílẹ̀dẹ́ àwújọ̀',
-    targetCountriesPlaceholder: 'Yàànà àwọn orílẹ̀dẹ́...',
-    userTypesLabel: 'Àwọn Ìdí Olùkọ́ Àwújọ̀',
-    userTypesPlaceholder: 'Yàànà àwọn ìdí olùkọ́...',
     offlineAccessLabel: 'Àwújọ̀ Ìtànkálẹ̀',
     offlineAccessHint: 'Ṣé àmò̩lùwípò yẹ́n í lẹ̀ àlààfin àkọ́jọ̀ àwọn ìtànkálẹ̀?',
     offlineYes: 'Bẹ́ẹ̀',
@@ -361,23 +265,9 @@ const translations = {
     yes: 'Bẹ́ẹ̀',
     no: 'Rará',
     
-    // Templates
-    templates: 'Àwọn Àdàkú',
-    selectTemplate: 'Yàànà àdàkú kan sílẹ̀',
-    clearTemplate: 'Fìlàá',
-    allCategories: 'Àwọn Ètò Gbogbo',
-    noTemplates: 'Kò sí àdàkú kan',
-    loadingTemplates: 'Àwọn Àdàkú n dára...',
-    applyTemplate: 'Ṣe Àdàkú àṣẹ',
     cancelButton: 'Dàgbà',
     
     // Category names
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'Àpẹ́ẹ̀rẹ́'
   },
   
   am: {
@@ -386,10 +276,6 @@ const translations = {
     appIdeaLabel: 'የአፕሊኬሽን እዲያ',
     appIdeaPlaceholder: 'የአፕሊኬሽን እዲያዎን ያጋሩ',
     appIdeaHint: 'እንደዚሁ አፕሊኬሽን ባለ፤ የሚፈለገውን ዓለም እና ባለ ሰርተው ያጋሩ።',
-    targetCountriesLabel: 'የሚፈለገው አገር',
-    targetCountriesPlaceholder: 'አገር ይምረጣ...',
-    userTypesLabel: 'የተጠቃሚ ዓይነት',
-    userTypesPlaceholder: 'ዓይነት ይምረጣ...',
     offlineAccessLabel: 'ያልተገናኘ ጎበኛ',
     offlineAccessHint: 'አፕሊኬሽንዎ ነው ያልተገናኘ ለማግኘት አለበት?',
     offlineYes: 'አዎ',
@@ -425,17 +311,6 @@ const translations = {
     shareUrlCopied: 'አድራሻውን አትግብኩ!',
     jsonDownloaded: 'አልገባለሁ!',
     markdownDownloaded: 'አልገባለሁ!',
-    templates: 'ሰንደቆች',
-    selectTemplate: 'ሠንደቅ ምረጥ',
-    allCategories: 'ሁሉን ክፍሎች',
-    noTemplates: 'ምንም ሰንደቅ አይነበረም',
-    applyTemplate: 'ሰንደቅን አተክል',
-    agritech: 'አግሪ-ተክ',
-    fintech: 'ፌንትክ',
-    edtech: 'አድራሻ ትምህርት',
-    healthtech: 'እህትነት ጤና',
-    logistics: 'ሎጅስቲክስ',
-    general: 'አጠቃለለን'
   },
   
   or: {
@@ -444,10 +319,6 @@ const translations = {
     appIdeaLabel: 'Aplikeshinii Qophaa',
     appIdeaPlaceholder: 'Qophaa aplikeshinichaa barree',
     appIdeaHint: 'Qophaa aplikeshinichaa fi yeroo aftota Afrikaa keessatti argadhu.',
-    targetCountriesLabel: 'Yeroo Guddifataa',
-    targetCountriesPlaceholder: 'Yeroo filadhu...',
-    userTypesLabel: 'Seensollee Taayitaa',
-    userTypesPlaceholder: 'Seensolee filadhu...',
     offlineAccessLabel: 'Intarnetii Alaa',
     offlineAccessHint: 'Aplikeshinichaa intarneti alaa deebisuufi?',
     offlineYes: 'Eeyyee',
@@ -483,17 +354,6 @@ const translations = {
     shareUrlCopied: 'URL cufame!',
     jsonDownloaded: 'Daawwadi!',
     markdownDownloaded: 'Daawwadi!',
-    templates: 'Templeetii',
-    selectTemplate: 'Templeetii fayyadaa',
-    allCategories: 'Qubeellee Hama',
-    noTemplates: 'Templeetii hin jiru',
-    applyTemplate: 'Templeetii Qophaawwaa',
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'Asii'
   },
   
   ig: {
@@ -502,10 +362,6 @@ const translations = {
     appIdeaLabel: 'Aṅwạn Úzọ̀',
     appIdeaPlaceholder: 'Kpebie aṅwạn úzọ̀ gị',
     appIdeaHint: 'Bìakwute na ọrụ aṅwạn úzọ̀ gị na ndị na agba ụlọ n Áfrìkà.',
-    targetCountriesLabel: 'Obodo Mmetuta',
-    targetCountriesPlaceholder: 'Họrọ obodo...',
-    userTypesLabel: 'Ụdị Ndi Onye Onye',
-    userTypesPlaceholder: 'Họrọ ụdị ndị onye onye...',
     offlineAccessLabel: 'Ọrụ N etiti',
     offlineAccessHint: 'Ga emesi aṅwạn úzọ̀ gị ịrụ ọrụ n etiti onwe ya?',
     offlineYes: 'Ee',
@@ -541,17 +397,6 @@ const translations = {
     shareUrlCopied: 'URL kopí!',
     jsonDownloaded: 'Dowonloade!',
     markdownDownloaded: 'Dowonloade!',
-    templates: 'Nduziakwa',
-    selectTemplate: 'Họrọ nduziakwa usoro',
-    allCategories: 'Ndị niile',
-    noTemplates: 'Amaghị nduziakwa',
-    applyTemplate: 'Jiri Nduziakwa',
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'Ntukwasi obu'
   },
   
   lg: {
@@ -560,10 +405,6 @@ const translations = {
     appIdeaLabel: 'Ekirobyo eky Olwino',
     appIdeaPlaceholder: 'Nyandikira ekirobyo eky olwino lyo',
     appIdeaHint: 'Obulembeze ku lwatu lwa olwino lyo ne abayizi byo bya Afrika.',
-    targetCountriesLabel: 'Ebifanana Ebibateekateeka',
-    targetCountriesPlaceholder: 'Londa ebifanana...',
-    userTypesLabel: 'Abayizi Abataasobola',
-    userTypesPlaceholder: 'Londa abayizi...',
     offlineAccessLabel: 'Okuzimbibwa ku Internet',
     offlineAccessHint: 'Olwino lwo lwanga lwa kulemwa okuzimbibwa ku internet?',
     offlineYes: 'Yee',
@@ -599,17 +440,6 @@ const translations = {
     shareUrlCopied: 'URL byakoppiyibwa!',
     jsonDownloaded: 'Byadduka!',
     markdownDownloaded: 'Byadduka!',
-    templates: 'Ebifananyiza',
-    selectTemplate: 'Londa ebifananyiza ku lwatu',
-    allCategories: 'Ebifanana Byona',
-    noTemplates: 'Tewali ebifananyiza',
-    applyTemplate: 'Kozesa Ebifananyiza',
-    agritech: 'AgriTech',
-    fintech: 'FinTech',
-    edtech: 'EdTech',
-    healthtech: 'HealthTech',
-    logistics: 'Logistics',
-    general: 'Ebyo bya kati'
   }
 }
 

@@ -18,41 +18,7 @@ export function useMistralClient() {
     const error = ref(null)
     const lastResponse = ref(null)
 
-    /**
-     * Fetch templates from your Laravel backend (which proxies to Mistral)
-     * 
-     * @param {string|null} category - Optional category filter
-     * @param {string|null} context - Optional context for template generation
-     * @returns {Promise<Array>} Array of template objects
-     */
-    const fetchTemplates = async (category = null, context = null) => {
-        isLoading.value = true
-        error.value = null
-        
-        try {
-            const params = new URLSearchParams()
-            if (category) params.append('category', category)
-            if (context) params.append('context', context)
-            
-            const endpoint = '/api/templates/mistral' + (params.toString() ? '?' + params.toString() : '')
-            
-            const response = await axios.get(endpoint)
-            
-            if (response.data.status === 'success') {
-                lastResponse.value = response.data
-                return response.data.data || response.data.templates || []
-            }
-            
-            throw new Error(response.data.message || 'Unknown error')
-            
-        } catch (err) {
-            error.value = err.message || 'Failed to fetch templates from Mistral'
-            console.error('Mistral templates error:', err)
-            throw err
-        } finally {
-            isLoading.value = false
-        }
-    }
+
 
     /**
      * Generate prompts from Mistral AI via Laravel backend
@@ -157,7 +123,6 @@ export function useMistralClient() {
         isLoading,
         error,
         lastResponse,
-        fetchTemplates,
         generatePrompts,
         callMistralDirect,
         checkStatus

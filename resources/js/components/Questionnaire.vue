@@ -38,32 +38,11 @@ const currentLangDisplay = computed(() => {
   return lang ? lang.display : 'English'
 })
 
-// African countries list
-const africanCountries = [
-  'Nigeria', 'Kenya', 'Ghana', 'South Africa', 'Uganda', 'Rwanda', 'Tanzania', 'Ethiopia',
-  'Egypt', 'Morocco', 'Algeria', 'Tunisia', 'Libya', 'Sudan', 'Senegal', 'Mali', 'Burkina Faso',
-  'Niger', 'Chad', 'Cameroon', 'DR Congo', 'Angola', 'Mozambique', 'Zambia', 'Zimbabwe',
-  'Botswana', 'Namibia', 'Malawi', 'Lesotho', 'Eswatini', 'Mauritius', 'Seychelles',
-  'Liberia', 'Sierra Leone', 'Guinea', 'Ivory Coast', 'Benin', 'Togo', 'Gabon', 'Equatorial Guinea',
-  'Central African Republic', 'Somalia', 'Djibouti', 'Eritrea', 'Burundi', 'Comoros', 'Cabo Verde',
-  'Sao Tome and Principe', 'Mauritania', 'Gambia', 'Guinea-Bissau', 'Madagascar'
-]
-
-// Primary user types
-const userTypes = [
-  'Farmers', 'Teachers', 'Healthcare Workers', 'Small Business Owners', 'Students',
-  'Government Officials', 'NGO Workers', 'Tech Professionals', 'Entrepreneurs',
-  'Artisans', 'Traders', 'Drivers', 'Fishermen', 'Pastoralists', 'Community Leaders',
-  'Youth', 'Women Groups', 'Cooperatives', 'Investors', 'Tourists'
-]
-
 
 
 // Form state
 const form = ref({
   idea: '',
-  countries: [],
-  userTypes: [],
   offlineAccess: false
 })
 
@@ -97,56 +76,8 @@ const validateForm = () => {
   return isValid
 }
 
-// Country selection helpers
-const toggleCountry = (country) => {
-  const index = form.value.countries.indexOf(country)
-  if (index === -1) {
-    form.value.countries.push(country)
-  } else {
-    form.value.countries.splice(index, 1)
-  }
-}
-
-const toggleUserType = (userType) => {
-  const index = form.value.userTypes.indexOf(userType)
-  if (index === -1) {
-    form.value.userTypes.push(userType)
-  } else {
-    form.value.userTypes.splice(index, 1)
-  }
-}
-
-
-
-// Check if item is selected
-const isCountrySelected = (country) => form.value.countries.includes(country)
-const isUserTypeSelected = (userType) => form.value.userTypes.includes(userType)
-
-// Compute selected counts for display
-const selectedCountriesCount = computed(() => form.value.countries.length)
-const selectedUserTypesCount = computed(() => form.value.userTypes.length)
-
-
-
-// Show/hide dropdowns
-const showCountriesDropdown = ref(false)
-const showUserTypesDropdown = ref(false)
-
-// Toggle dropdowns
-const toggleCountriesDropdown = () => {
-  showCountriesDropdown.value = !showCountriesDropdown.value
-  showUserTypesDropdown.value = false
-}
-
-const toggleUserTypesDropdown = () => {
-  showUserTypesDropdown.value = !showUserTypesDropdown.value
-  showCountriesDropdown.value = false
-}
-
 // Close all dropdowns
 const closeAllDropdowns = () => {
-  showCountriesDropdown.value = false
-  showUserTypesDropdown.value = false
   showLanguageDropdown.value = false
 }
 
@@ -167,21 +98,15 @@ const handleSubmit = async () => {
     // Make API call to Laravel backend
     const response = await axios.post('/api/generate-prompts', {
       idea: form.value.idea,
-      countries: form.value.countries,
-      userTypes: form.value.userTypes,
       offlineAccess: form.value.offlineAccess
     })
     
     // Track successful form submission
-    trackFormSubmission('questionnaire', true, {
-      countries_count: form.value.countries.length
-    })
+    trackFormSubmission('questionnaire', true)
     
     // Log form data to console (Iteration 1 requirement maintained)
     console.log('Form Data Submitted:', {
       idea: form.value.idea,
-      countries: form.value.countries,
-      userTypes: form.value.userTypes,
       offlineAccess: form.value.offlineAccess
     })
     
@@ -216,12 +141,10 @@ const handleSubmit = async () => {
   }
 }
 
-// {{ t('reset') }} form
+// Reset form
 const resetForm = () => {
   form.value = {
     idea: '',
-    countries: [],
-    userTypes: [],
     offlineAccess: false
   }
   errors.value = { idea: '' }
@@ -299,98 +222,6 @@ const resetForm = () => {
         <p class="text-gray-500 text-sm">
           {{ t('appIdeaHint') }}
         </p>
-      </div>
-
-      <!-- Target Countries -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700">
-          {{ t('targetCountriesLabel') }}
-        </label>
-        <div class="relative">
-          <button
-            type="button"
-            @click.stop="toggleCountriesDropdown"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white"
-          >
-            <div class="flex items-center justify-between">
-              <span v-if="selectedCountriesCount === 0" class="text-gray-500">
-                {{ t('targetCountriesPlaceholder') }}
-              </span>
-              <span v-else class="text-gray-700">
-                {{ selectedCountriesCount }} country{{ selectedCountriesCount > 1 ? 'ies' : '' }} selected
-              </span>
-              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
-          
-          <div
-            v-show="showCountriesDropdown"
-            @click.stop
-            class="absolute z-[100] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-          >
-            <div class="p-2">
-              <div v-for="country in africanCountries" :key="country" class="px-3 py-2">
-                <label class="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    :checked="isCountrySelected(country)"
-                    @change="toggleCountry(country)"
-                    class="mr-3 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
-                  <span class="text-sm text-gray-700">{{ country }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Primary User Types -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700">
-          {{ t('userTypesLabel') }}
-        </label>
-        <div class="relative">
-          <button
-            type="button"
-            @click.stop="toggleUserTypesDropdown"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all bg-white"
-          >
-            <div class="flex items-center justify-between">
-              <span v-if="selectedUserTypesCount === 0" class="text-gray-500">
-                {{ t('userTypesPlaceholder') }}
-              </span>
-              <span v-else class="text-gray-700">
-                {{ selectedUserTypesCount }} user type{{ selectedUserTypesCount > 1 ? 's' : '' }} selected
-              </span>
-              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
-          
-          <div
-            v-show="showUserTypesDropdown"
-            @click.stop
-            class="absolute z-[100] mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-          >
-            <div class="p-2">
-              <div v-for="userType in userTypes" :key="userType" class="px-3 py-2">
-                <label class="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    :checked="isUserTypeSelected(userType)"
-                    @change="toggleUserType(userType)"
-                    class="mr-3 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
-                  <span class="text-sm text-gray-700">{{ userType }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Offline Access -->
