@@ -270,12 +270,12 @@ const formatForCopy = (section) => {
 
 <template>
   <div v-if="isVisible && generatedData" class="mt-8">
-    <!-- Results Header -->
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-xl font-bold text-gray-800">
+    <!-- Results Header - Modern Minimal -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <h3 class="text-lg sm:text-xl font-semibold text-gray-900">
         {{ t('generatedResults') }}
       </h3>
-      <div class="flex items-center space-x-3">
+      <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
         <!-- Export and Share buttons -->
         <ExportShare
           :generatedData="generatedData"
@@ -284,7 +284,7 @@ const formatForCopy = (section) => {
         
         <button
           @click="copyAllAsJson"
-          class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all flex items-center"
+          class="px-4 py-2.5 bg-gray-900 text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-gray-800 transition-all flex items-center shadow-sm"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -293,32 +293,32 @@ const formatForCopy = (section) => {
         </button>
         <button
           @click="$emit('close')"
-          class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-all"
+          class="px-4 py-2.5 border border-gray-200 text-gray-600 text-xs sm:text-sm font-medium rounded-xl hover:bg-gray-50 transition-all"
         >
           {{ t('close') }}
         </button>
       </div>
     </div>
 
-    <!-- Results Container -->
-    <div v-if="hasData" class="space-y-6">
+    <!-- Results Container - Modern Minimal -->
+    <div v-if="hasData" class="space-y-4">
       
-      <!-- User Roles Section -->
-      <div v-if="getRoles.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <!-- User Roles Section - Modern Minimal -->
+      <div v-if="getRoles.length > 0" class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div 
           @click="toggleSection('roles')"
-          class="flex items-center justify-between p-4 bg-blue-50 border-b border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors"
+          class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition-colors"
         >
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-            <h4 class="text-lg font-semibold text-blue-800">{{ t('userRoles') }}</h4>
-            <span class="ml-2 px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded-full">{{ getRoles.length }}</span>
+            <h4 class="text-base font-medium text-gray-900">{{ t('userRoles') }}</h4>
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getRoles.length }}</span>
           </div>
-          <button class="p-1 rounded-lg hover:bg-blue-200 transition-colors">
+          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <svg 
-              class="w-5 h-5 text-blue-600 transition-transform duration-200"
+              class="w-4 h-4 text-gray-500 transition-transform duration-200"
               :class="{ 'rotate-180': expandedSections.roles }"
               fill="none" 
               stroke="currentColor" 
@@ -329,43 +329,43 @@ const formatForCopy = (section) => {
           </button>
         </div>
         
-        <div v-show="expandedSections.roles" class="p-4">
-          <div class="flex items-center justify-end mb-4 space-x-2">
+        <div v-show="expandedSections.roles" class="p-5">
+          <div class="flex items-center justify-end mb-5">
             <button
               @click="copyWithFeedback(formatForCopy('roles'), 'roles')"
-              class="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-200 transition-all flex items-center"
+              class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2"
             >
-              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <span v-if="!copyStates.roles">Copy</span>
-              <span v-else class="text-green-600">Copied!</span>
+              <span v-else class="text-gray-900">Copied!</span>
             </button>
           </div>
           
-          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             <div 
               v-for="(role, index) in getRoles" 
               :key="index"
-              class="bg-blue-50 border border-blue-100 rounded-lg p-4 hover:shadow-md transition-shadow"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-5"
             >
-              <div class="flex items-start justify-between mb-2">
-                <h5 class="font-semibold text-blue-800">{{ role.name || `Role ${index + 1}` }}</h5>
-                <span class="text-xs text-blue-500 bg-blue-200 px-2 py-1 rounded-full">
+              <div class="flex items-start justify-between mb-4">
+                <h5 class="font-medium text-gray-900">{{ role.name || `Role ${index + 1}` }}</h5>
+                <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200">
                   {{ role.type || 'Standard' }}
                 </span>
               </div>
-              <p v-if="role.description" class="text-sm text-blue-700 mb-3">{{ role.description }}</p>
+              <p v-if="role.description" class="text-sm text-gray-600 mb-4">{{ role.description }}</p>
               
-              <div v-if="role.permissions && role.permissions.length > 0" class="mb-3">
-                <h6 class="text-xs font-medium text-blue-600 uppercase tracking-wider mb-1.5">Permissions</h6>
-                <ul class="space-y-1">
+              <div v-if="role.permissions && role.permissions.length > 0" class="mb-4">
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Permissions</h6>
+                <ul class="space-y-2">
                   <li 
                     v-for="(permission, pIndex) in formatList(role.permissions)" 
                     :key="pIndex"
-                    class="text-sm text-blue-700 flex items-center"
+                    class="text-sm text-gray-700 flex items-center"
                   >
-                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     {{ permission }}
@@ -374,14 +374,14 @@ const formatForCopy = (section) => {
               </div>
               
               <div v-if="role.actions && role.actions.length > 0">
-                <h6 class="text-xs font-medium text-blue-600 uppercase tracking-wider mb-1.5">Actions</h6>
-                <ul class="space-y-1">
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Actions</h6>
+                <ul class="space-y-2">
                   <li 
                     v-for="(action, aIndex) in formatList(role.actions)" 
                     :key="aIndex"
-                    class="text-sm text-blue-700 flex items-center"
+                    class="text-sm text-gray-700 flex items-center"
                   >
-                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                     {{ action }}
@@ -392,23 +392,23 @@ const formatForCopy = (section) => {
           </div>
         </div>
       </div>
-
-      <!-- AI Agents Section -->
-      <div v-if="getAgents.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      
+      <!-- AI Agents Section - Modern Minimal -->
+      <div v-if="getAgents.length > 0" class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div 
           @click="toggleSection('agents')"
-          class="flex items-center justify-between p-4 bg-purple-50 border-b border-purple-100 cursor-pointer hover:bg-purple-100 transition-colors"
+          class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition-colors"
         >
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <h4 class="text-lg font-semibold text-purple-800">{{ t('aiAgents') }}</h4>
-            <span class="ml-2 px-2 py-1 bg-purple-200 text-purple-800 text-xs rounded-full">{{ getAgents.length }}</span>
+            <h4 class="text-base font-medium text-gray-900">{{ t('aiAgents') }}</h4>
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getAgents.length }}</span>
           </div>
-          <button class="p-1 rounded-lg hover:bg-purple-200 transition-colors">
+          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <svg 
-              class="w-5 h-5 text-purple-600 transition-transform duration-200"
+              class="w-4 h-4 text-gray-500 transition-transform duration-200"
               :class="{ 'rotate-180': expandedSections.agents }"
               fill="none" 
               stroke="currentColor" 
@@ -419,54 +419,54 @@ const formatForCopy = (section) => {
           </button>
         </div>
         
-        <div v-show="expandedSections.agents" class="p-4">
-          <div class="flex items-center justify-end mb-4 space-x-2">
+        <div v-show="expandedSections.agents" class="p-5">
+          <div class="flex items-center justify-end mb-5">
             <button
               @click="copyWithFeedback(formatForCopy('agents'), 'agents')"
-              class="px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-200 transition-all flex items-center"
+              class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2"
             >
-              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <span v-if="!copyStates.agents">Copy</span>
-              <span v-else class="text-green-600">Copied!</span>
+              <span v-else class="text-gray-900">Copied!</span>
             </button>
           </div>
           
-          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             <div 
               v-for="(agent, index) in getAgents" 
               :key="index"
-              class="bg-purple-50 border border-purple-100 rounded-lg p-4 hover:shadow-md transition-shadow"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-5"
             >
-              <div class="flex items-start justify-between mb-2">
-                <h5 class="font-semibold text-purple-800">{{ agent.name || `Agent ${index + 1}` }}</h5>
-                <span v-if="agent.type" class="text-xs text-purple-500 bg-purple-200 px-2 py-1 rounded-full">
+              <div class="flex items-start justify-between mb-4">
+                <h5 class="font-medium text-gray-900">{{ agent.name || `Agent ${index + 1}` }}</h5>
+                <span v-if="agent.type" class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200">
                   {{ agent.type }}
                 </span>
               </div>
-              <p v-if="agent.description" class="text-sm text-purple-700 mb-3">{{ agent.description }}</p>
+              <p v-if="agent.description" class="text-sm text-gray-600 mb-4">{{ agent.description }}</p>
               
-              <div v-if="agent.responsibilities && agent.responsibilities.length > 0" class="mb-3">
-                <h6 class="text-xs font-medium text-purple-600 uppercase tracking-wider mb-1.5">Responsibilities</h6>
-                <ul class="space-y-1">
+              <div v-if="agent.responsibilities && agent.responsibilities.length > 0" class="mb-4">
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Responsibilities</h6>
+                <ul class="space-y-2">
                   <li 
                     v-for="(resp, rIndex) in formatList(agent.responsibilities)" 
                     :key="rIndex"
-                    class="text-sm text-purple-700"
+                    class="text-sm text-gray-700"
                   >
                     {{ resp }}
                   </li>
                 </ul>
               </div>
               
-              <div v-if="agent.skills && agent.skills.length > 0" class="mb-3">
-                <h6 class="text-xs font-medium text-purple-600 uppercase tracking-wider mb-1.5">Skills</h6>
-                <div class="flex flex-wrap gap-1">
+              <div v-if="agent.skills && agent.skills.length > 0" class="mb-4">
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Skills</h6>
+                <div class="flex flex-wrap gap-2">
                   <span 
                     v-for="(skill, sIndex) in formatList(agent.skills)" 
                     :key="sIndex"
-                    class="px-2 py-1 bg-purple-200 text-purple-800 text-xs rounded-full"
+                    class="px-3 py-1 bg-white text-gray-700 text-xs rounded-full border border-gray-200"
                   >
                     {{ skill }}
                   </span>
@@ -474,12 +474,12 @@ const formatForCopy = (section) => {
               </div>
               
               <div v-if="agent.tools && agent.tools.length > 0">
-                <h6 class="text-xs font-medium text-purple-600 uppercase tracking-wider mb-1.5">Tools</h6>
-                <div class="flex flex-wrap gap-1">
+                <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tools</h6>
+                <div class="flex flex-wrap gap-2">
                   <span 
                     v-for="(tool, tIndex) in formatList(agent.tools)" 
                     :key="tIndex"
-                    class="px-2 py-1 bg-purple-200 text-purple-800 text-xs rounded-full"
+                    class="px-3 py-1 bg-white text-gray-700 text-xs rounded-full border border-gray-200"
                   >
                     {{ tool }}
                   </span>
@@ -490,22 +490,22 @@ const formatForCopy = (section) => {
         </div>
       </div>
 
-      <!-- Backend Prompts Section -->
-      <div v-if="getBackendPrompts.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <!-- Backend Prompts Section - Modern Minimal -->
+      <div v-if="getBackendPrompts.length > 0" class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div 
           @click="toggleSection('backendPrompts')"
-          class="flex items-center justify-between p-4 bg-green-50 border-b border-green-100 cursor-pointer hover:bg-green-100 transition-colors"
+          class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition-colors"
         >
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-            <h4 class="text-lg font-semibold text-green-800">{{ t('backendPrompts') }}</h4>
-            <span class="ml-2 px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full">{{ getBackendPrompts.length }}</span>
+            <h4 class="text-base font-medium text-gray-900">{{ t('backendPrompts') }}</h4>
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getBackendPrompts.length }}</span>
           </div>
-          <button class="p-1 rounded-lg hover:bg-green-200 transition-colors">
+          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <svg 
-              class="w-5 h-5 text-green-600 transition-transform duration-200"
+              class="w-4 h-4 text-gray-500 transition-transform duration-200"
               :class="{ 'rotate-180': expandedSections.backendPrompts }"
               fill="none" 
               stroke="currentColor" 
@@ -516,58 +516,58 @@ const formatForCopy = (section) => {
           </button>
         </div>
         
-        <div v-show="expandedSections.backendPrompts" class="p-4">
-          <div class="flex items-center justify-end mb-4 space-x-2">
+        <div v-show="expandedSections.backendPrompts" class="p-5">
+          <div class="flex items-center justify-end mb-5">
             <button
               @click="copyWithFeedback(formatForCopy('backendPrompts'), 'backendPrompts')"
-              class="px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-lg hover:bg-green-200 transition-all flex items-center"
+              class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2"
             >
-              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <span v-if="!copyStates.backendPrompts">Copy</span>
-              <span v-else class="text-green-600">Copied!</span>
+              <span v-else class="text-gray-900">Copied!</span>
             </button>
           </div>
           
-          <div class="space-y-4">
+          <div class="space-y-5">
             <div 
               v-for="(prompt, index) in getBackendPrompts" 
               :key="index"
-              class="bg-green-50 border border-green-100 rounded-lg p-4"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-5"
             >
-              <div class="flex items-start justify-between mb-2">
-                <h5 class="font-medium text-green-800">
+              <div class="flex items-start justify-between mb-4">
+                <h5 class="font-medium text-gray-900">
                   <span v-if="typeof prompt === 'string'">Prompt {{ index + 1 }}</span>
                   <span v-else>Iteration {{ prompt.iteration }}: {{ prompt.title }}</span>
                 </h5>
-                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full">Iteration {{ prompt.iteration }}</span>
+                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-white text-gray-600 text-xs rounded-full border border-gray-200">Iteration {{ prompt.iteration }}</span>
               </div>
-              <div class="bg-white rounded p-3 overflow-x-auto">
+              <div class="bg-white rounded-lg p-4 overflow-x-auto border border-gray-200">
                 <div v-if="typeof prompt === 'string'">
                   <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
                 </div>
-                <div v-else class="text-sm text-gray-800 space-y-2">
+                <div v-else class="text-sm text-gray-800 space-y-3">
                   <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
                   <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-green-600 uppercase tracking-wider mb-2">Tasks</h6>
-                    <ul class="space-y-1">
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tasks</h6>
+                    <ul class="space-y-2">
                       <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
-                        <svg class="w-4 h-4 mr-2 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span>{{ task }}</span>
+                        <span class="text-sm">{{ task }}</span>
                       </li>
                     </ul>
                   </div>
                   <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-green-600 uppercase tracking-wider mb-2">Dependencies</h6>
-                    <ul class="space-y-1">
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Dependencies</h6>
+                    <ul class="space-y-2">
                       <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
-                        <svg class="w-4 h-4 mr-2 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                         </svg>
-                        <span>{{ dep }}</span>
+                        <span class="text-sm">{{ dep }}</span>
                       </li>
                     </ul>
                   </div>
@@ -578,22 +578,22 @@ const formatForCopy = (section) => {
         </div>
       </div>
 
-      <!-- Frontend Prompts Section -->
-      <div v-if="getFrontendPrompts.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <!-- Frontend Prompts Section - Modern Minimal -->
+      <div v-if="getFrontendPrompts.length > 0" class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div 
           @click="toggleSection('frontendPrompts')"
-          class="flex items-center justify-between p-4 bg-orange-50 border-b border-orange-100 cursor-pointer hover:bg-orange-100 transition-colors"
+          class="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 transition-colors"
         >
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <h4 class="text-lg font-semibold text-orange-800">{{ t('frontendPrompts') }}</h4>
-            <span class="ml-2 px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">{{ getFrontendPrompts.length }}</span>
+            <h4 class="text-base font-medium text-gray-900">{{ t('frontendPrompts') }}</h4>
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getFrontendPrompts.length }}</span>
           </div>
-          <button class="p-1 rounded-lg hover:bg-orange-200 transition-colors">
+          <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <svg 
-              class="w-5 h-5 text-orange-600 transition-transform duration-200"
+              class="w-4 h-4 text-gray-500 transition-transform duration-200"
               :class="{ 'rotate-180': expandedSections.frontendPrompts }"
               fill="none" 
               stroke="currentColor" 
@@ -604,58 +604,58 @@ const formatForCopy = (section) => {
           </button>
         </div>
         
-        <div v-show="expandedSections.frontendPrompts" class="p-4">
-          <div class="flex items-center justify-end mb-4 space-x-2">
+        <div v-show="expandedSections.frontendPrompts" class="p-5">
+          <div class="flex items-center justify-end mb-5">
             <button
               @click="copyWithFeedback(formatForCopy('frontendPrompts'), 'frontendPrompts')"
-              class="px-3 py-1.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-lg hover:bg-orange-200 transition-all flex items-center"
+              class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2"
             >
-              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
               <span v-if="!copyStates.frontendPrompts">Copy</span>
-              <span v-else class="text-green-600">Copied!</span>
+              <span v-else class="text-gray-900">Copied!</span>
             </button>
           </div>
           
-          <div class="space-y-4">
+          <div class="space-y-5">
             <div 
               v-for="(prompt, index) in getFrontendPrompts" 
               :key="index"
-              class="bg-orange-50 border border-orange-100 rounded-lg p-4"
+              class="bg-gray-50 border border-gray-200 rounded-xl p-5"
             >
-              <div class="flex items-start justify-between mb-2">
-                <h5 class="font-medium text-orange-800">
+              <div class="flex items-start justify-between mb-4">
+                <h5 class="font-medium text-gray-900">
                   <span v-if="typeof prompt === 'string'">Prompt {{ index + 1 }}</span>
                   <span v-else>Iteration {{ prompt.iteration }}: {{ prompt.title }}</span>
                 </h5>
-                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">Iteration {{ prompt.iteration }}</span>
+                <span v-if="typeof prompt !== 'string' && prompt.iteration" class="px-2 py-1 bg-white text-gray-600 text-xs rounded-full border border-gray-200">Iteration {{ prompt.iteration }}</span>
               </div>
-              <div class="bg-white rounded p-3 overflow-x-auto">
+              <div class="bg-white rounded-lg p-4 overflow-x-auto border border-gray-200">
                 <div v-if="typeof prompt === 'string'">
                   <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ prompt }}</pre>
                 </div>
-                <div v-else class="text-sm text-gray-800 space-y-2">
+                <div v-else class="text-sm text-gray-800 space-y-3">
                   <p v-if="prompt.description" class="text-gray-700">{{ prompt.description }}</p>
                   <div v-if="prompt.tasks && prompt.tasks.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-orange-600 uppercase tracking-wider mb-2">Tasks</h6>
-                    <ul class="space-y-1">
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tasks</h6>
+                    <ul class="space-y-2">
                       <li v-for="(task, tIndex) in prompt.tasks" :key="tIndex" class="flex items-start">
-                        <svg class="w-4 h-4 mr-2 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span>{{ task }}</span>
+                        <span class="text-sm">{{ task }}</span>
                       </li>
                     </ul>
                   </div>
                   <div v-if="prompt.dependencies && prompt.dependencies.length" class="mt-3">
-                    <h6 class="text-xs font-medium text-orange-600 uppercase tracking-wider mb-2">Dependencies</h6>
-                    <ul class="space-y-1">
+                    <h6 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Dependencies</h6>
+                    <ul class="space-y-2">
                       <li v-for="(dep, dIndex) in prompt.dependencies" :key="dIndex" class="flex items-start">
-                        <svg class="w-4 h-4 mr-2 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 mr-2.5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                         </svg>
-                        <span>{{ dep }}</span>
+                        <span class="text-sm">{{ dep }}</span>
                       </li>
                     </ul>
                   </div>
@@ -666,33 +666,33 @@ const formatForCopy = (section) => {
         </div>
       </div>
 
-      <!-- Raw Response Section (for debugging/fallback) -->
+      <!-- Raw Response Section (for debugging/fallback) - Modern Minimal -->
       <div 
         v-if="(getRoles.length === 0 && getAgents.length === 0 && getBackendPrompts.length === 0 && getFrontendPrompts.length === 0) || (generatedData.raw_response || generatedData.message)"
-        class="bg-gray-50 border border-gray-200 rounded-xl shadow-sm"
+        class="bg-white border border-gray-200 rounded-2xl"
       >
-        <div class="p-4">
-          <div v-if="generatedData.message" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg mb-4">
-            <p class="text-yellow-700 text-sm">{{ generatedData.message }}</p>
+        <div class="p-5">
+          <div v-if="generatedData.message" class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-5">
+            <p class="text-sm text-yellow-700">{{ generatedData.message }}</p>
           </div>
           
-          <div v-if="generatedData.raw_response" class="p-3 bg-gray-100 rounded-lg">
-            <h6 class="font-medium text-gray-700 mb-2 text-sm uppercase tracking-wider">{{ t('rawResponse') }}</h6>
+          <div v-if="generatedData.raw_response" class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <h6 class="font-medium text-gray-700 mb-3 text-xs uppercase tracking-wider">{{ t('rawResponse') }}</h6>
             <pre class="text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap">{{ generatedData.raw_response }}</pre>
           </div>
           
-          <div v-if="!hasData && !generatedData.raw_response && !generatedData.message" class="p-6 text-center text-gray-500">
+          <div v-if="!hasData && !generatedData.raw_response && !generatedData.message" class="p-8 text-center text-gray-500">
             <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p>{{ t('noResultsHint') }}</p>
+            <p class="text-sm">{{ t('noResultsHint') }}</p>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Empty State -->
-    <div v-else class="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
+    <!-- Empty State - Modern Minimal -->
+    <div v-else class="bg-white border border-gray-200 rounded-2xl p-10 text-center">
       <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
@@ -734,5 +734,44 @@ pre {
   background: rgba(0, 0, 0, 0.02);
   padding: 0.5rem;
   border-radius: 0.25rem;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  /* Reduce card shadow for better mobile performance */
+  .hover\:shadow-md {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Ensure touch targets are adequate */
+  button {
+    min-height: 36px;
+  }
+  
+  /* Prevent horizontal overflow */
+  .overflow-hidden {
+    overflow-x: hidden;
+  }
+}
+
+/* Modern minimal design enhancements */
+pre {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  background: transparent;
+  padding: 0;
+}
+
+/* Subtle hover effects for cards */
+.hover\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Smooth transitions */
+.transition-shadow {
+  transition: box-shadow 0.2s ease;
+}
+
+.transition-colors {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 </style>

@@ -1,10 +1,10 @@
-# Africa Prompt Generator
+# Prompt Generator
 
-A **Laravel 13 + Vue.js 3** full-stack web application for generating tailored prompts, roles, agents, and skills for African-focused app ideas using **Mistral AI**.
+A **Laravel 13 + Vue.js 3** full-stack web application for generating tailored prompts, roles, agents, and skills for app ideas using **Mistral AI**.
 
 ## Overview
 
-This application allows users to answer a questionnaire about their African app idea and generates:
+This application allows users to answer a questionnaire about their app idea and generates:
 - User roles with permissions and actions
 - AI agents with skills and tools
 - Technical prompts for Laravel backend development
@@ -24,8 +24,7 @@ This is a **single unified project** with:
 - Tailwind CSS v4 for styling
 - Multi-step questionnaire with:
   - App Idea (textarea, required)
-  - Target Countries (multi-select dropdown with 50+ African countries)
-  - Primary User Types (multi-select checkboxes)
+  - AI-generated follow-up questions (wizard format)
   - Offline Access (Yes/No radio buttons)
 - Basic validation
 - Clean, mobile-friendly, professional UI
@@ -45,7 +44,7 @@ This is a **single unified project** with:
 
 ### Iteration 4: Mistral AI Integration
 - MistralService class for API communication
-- Prompt engineering for African context with **iterative development structure**
+- Prompt engineering with **iterative development structure**
   - Backend prompts organized by iterations (Setup → Models → API → Auth → Logic → Validation → Deployment)
   - Frontend prompts organized by iterations (Setup → Components → Forms → API → State → UX → Testing)
 - Response parsing and JSON handling
@@ -64,20 +63,7 @@ This is a **single unified project** with:
 - Responsive grid layout for cards
 - Raw response fallback for debugging
 
-### Iteration 6: Add Africa-specific templates
-- Database migration for templates table with JSON fields
-- Template model with query scopes (byCategory, featured, ordered)
-- TemplateSeeder with 5 Africa-specific templates:
-  - AgriTech Marketplace (connecting farmers to buyers)
-  - Mobile Money FinTech (financial services for unbanked populations)
-  - EdTech Learning Platform (adaptive learning in African languages)
-  - HealthTech Telemedicine (rural healthcare access)
-  - Logistics & Delivery Platform (last-mile delivery)
-- TemplateController with RESTful endpoints
-- TemplateSelector Vue component with modal interface
-- Category filter tabs for easy browsing
-- Pre-fill questionnaire from selected template
-- Selected template display with clear option
+
 
 ### Iteration 7: Save & Load User Sessions
 - Database migration for user_sessions table with JSON fields
@@ -142,7 +128,7 @@ cp .env .env.local
 Update the following in `.env.local`:
 
 ```env
-APP_NAME=Africa_Prompt_Generator
+APP_NAME=Prompt_Generator
 APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
@@ -188,12 +174,9 @@ Then visit: **http://localhost:8000**
 
 1. Open the application in your browser
 2. Fill out the questionnaire:
-   - Describe your African app idea
-   - Select target countries
-   - Select user types
+   - Describe your app idea
+   - Answer AI-generated follow-up questions (wizard)
    - Choose if offline access is needed
-   - Select core features
-   - Select AI features
 3. Click "Generate Prompts"
 4. View the generated roles, agents, and prompts
 
@@ -241,8 +224,7 @@ curl -X POST http://localhost:8000/api/generate-prompts \
   -H "Content-Type: application/json" \
   -d '{
     "idea": "A Nigerian fintech app for savings groups",
-    "countries": ["Nigeria"],
-    "userTypes": ["Small Business Owners"],
+    "followUpAnswers": {},
     "offlineAccess": true
   }'
 ```
@@ -260,7 +242,7 @@ curl http://localhost:8000/api/mistral/status
 - [x] Iteration 3: Connect frontend to backend
 - [x] Iteration 4: Integrate Mistral AI for prompt generation
 - [x] Iteration 5: Display generated output in UI (enhanced)
-- [x] Iteration 6: Add Africa-specific templates
+- [x] Iteration 6: Add AI-generated follow-up questions wizard
 - [x] Iteration 7: Save & Load User Sessions
 - [x] Iteration 8: Export & Share Prompts
 - [ ] Iteration 9: Add Offline Support (PWA)

@@ -1,47 +1,25 @@
-# Africa Prompt Generator - LLM Instructions
+# Prompt Generator - LLM Instructions
 
 ## Overview
-This file provides instructions for Large Language Models (LLMs) interacting with the Africa Prompt Generator application.
+This file provides instructions for Large Language Models (LLMs) interacting with the Prompt Generator application.
 
 ## Application Purpose
-The Africa Prompt Generator is a tool that helps developers create tailored prompts, roles, agents, and skills for building African-focused applications. Users answer questions about their app idea, target countries, and user types, and the system generates comprehensive development prompts.
+The Prompt Generator is a tool that helps developers create tailored prompts, roles, agents, and skills for building applications. Users answer questions about their app idea through AI-generated follow-up questions, and the system generates comprehensive development prompts.
 
 ## Target Audience
-- African developers and entrepreneurs
-- Startups building solutions for African markets
-- NGOs and organizations creating digital tools for Africa
-- Tech professionals working on African-focused projects
+- Developers and entrepreneurs
+- Startups building digital solutions
+- Organizations creating digital tools
+- Tech professionals working on app projects
 
 ## Key Features
 1. **Questionnaire**: Guided form to capture app requirements
 2. **Prompt Generation**: AI-powered generation of development prompts
-3. **Multi-language Support**: Available in 8 major African languages (English, French, Arabic, Swahili, Hausa, Yoruba, Amharic, Luganda)
-4. **Template System**: Pre-built templates for common African app categories (AgriTech, FinTech, EdTech, HealthTech, Logistics, E-commerce, Social)
-5. **Session Management**: Save, load, and resume user sessions
-6. **Export Capabilities**: Download results as JSON or Markdown
-7. **Share Functionality**: Generate shareable links for sessions
-8. **Offline Support (PWA)**: Progressive Web App capabilities for offline access
-
-## African Context Considerations
-When generating content for this application, consider:
-- Low-bandwidth and offline-capable solutions
-- Mobile-first approaches
-- Local languages and dialects
-- Cultural nuances and local business practices
-- Infrastructure limitations in various African regions
-- Payment methods popular in African markets (Mobile Money, M-Pesa, MTN Mobile Money, Airtel Money, Orange Money, etc.)
-- Local regulations and compliance requirements (data sovereignty, financial regulations)
-- Connectivity patterns (intermittent connectivity, 2G/3G prevalence)
-
-## Common African App Categories
-- **AgriTech**: Agriculture technology for farmers, connecting farmers to buyers, crop advice, market prices
-- **FinTech**: Financial services including mobile money, savings groups, peer-to-peer lending, digital wallets
-- **EdTech**: Educational technology and e-learning, localized content, adaptive learning platforms
-- **HealthTech**: Healthcare access and telemedicine, rural healthcare delivery, appointment scheduling
-- **Logistics**: Delivery and transportation solutions, last-mile delivery, route optimization
-- **E-commerce**: Online marketplaces and trading platforms, classifieds, B2B trading
-- **Social**: Community and networking platforms, local groups, professional networks
-- **Utilities**: Payment utilities, bill splitting, airtime purchase, service discovery
+3. **Multi-language Support**: Available in multiple languages (English, French, Arabic, Swahili, Hausa, Yoruba, Amharic, Luganda)
+4. **Session Management**: Save, load, and resume user sessions
+5. **Export Capabilities**: Download results as JSON or Markdown
+6. **Share Functionality**: Generate shareable links for sessions
+7. **Offline Support (PWA)**: Progressive Web App capabilities for offline access
 
 ## Technical Stack
 - **Frontend**: Vue.js 3, Vite, Tailwind CSS v4, Pinia for state management
@@ -64,10 +42,10 @@ When generating content for this application, consider:
 - **Iteration 3**: Frontend-Backend Connection
 - **Iteration 4**: Mistral AI Integration
 - **Iteration 5**: Display Generated Output in UI (Enhanced)
-- **Iteration 6**: Add Africa-specific templates
+- **Iteration 6**: Add AI-generated follow-up questions wizard
 - **Iteration 7**: Save & Load User Sessions
 - **Iteration 8**: Export & Share Prompts
-- **Iteration 9**: Complete Multi-language Support (8 languages) and ExportShare translations
+- **Iteration 9**: Complete Multi-language Support (8 languages)
 - **Iteration 10**: Add Offline Support (PWA) - Current
 
 ## API Endpoints
@@ -75,11 +53,6 @@ When generating content for this application, consider:
 ### Core Generation
 - POST /api/generate-prompts - Generate prompts from questionnaire data
 - GET /api/mistral/status - Check Mistral AI configuration
-
-### Templates
-- GET /api/templates - List available templates
-- GET /api/templates/{id} - Get template details
-- GET /api/templates/{id}/apply - Apply template to questionnaire
 
 ### Sessions
 - POST /api/sessions - Save a user session
@@ -95,13 +68,13 @@ When generating content for this application, consider:
 - GET /health - Health check endpoint
 
 ## PWA (Progressive Web App) Specifications
-- **Service Worker**: Caches API responses, templates, and static assets for offline use
+- **Service Worker**: Caches API responses and static assets for offline use
 - **Cache Strategy**: Network-first with offline fallback for critical assets
 - **Manifest**: Includes app name, icons (192x192, 512x512), theme colors
 - **Install Prompt**: Automatic on repeat visits, manual install option
 - **Offline Page**: Custom offline page guiding users to reconnect
 - **Background Sync**: Queue prompt generation requests when offline, sync when online
-- **Asset Pre-caching**: Templates, country lists, and common resources cached on first load
+- **Asset Pre-caching**: Common resources cached on first load
 
 ## Security Considerations
 - All API requests should be validated with Laravel form request classes
@@ -133,13 +106,13 @@ The application provides user-friendly error messages. When errors occur:
 - **RTL Support**: Direction detection for Arabic, automatic layout adjustment
 - **Fallback**: English as fallback language
 - **Language Switcher**: Persistent user preference stored in localStorage
-- **Component Coverage**: All major components translated (Questionnaire, ResultsDisplay, SessionManager, TemplateSelector, ExportShare)
+- **Component Coverage**: All major components translated (Questionnaire, ResultsDisplay, SessionManager, ExportShare)
 
 ## Data Format Specifications
-- **Questionnaire Data**: JSON object with idea, countries, userTypes, offlineAccess
+- **Questionnaire Data**: JSON object with idea, followUpAnswers, offlineAccess
 - **Generated Output**: Structured JSON with userRoles, aiAgents, backendPrompts, frontendPrompts
 - **Session Data**: Includes questionnaire state, generated results, metadata (name, created_at, updated_at)
-- **Template Data**: JSON with name, category, description, questionnaire defaults
+
 - **Export JSON**: Complete session data with version info
 - **Export Markdown**: Formatted documentation with sections for roles, agents, prompts
 
@@ -150,4 +123,4 @@ The application provides user-friendly error messages. When errors occur:
 2026-08-18
 
 ## Contact
-For questions about the Africa Prompt Generator, please refer to the README.md file in the project root.
+For questions about the Prompt Generator, please refer to the README.md file in the project root.

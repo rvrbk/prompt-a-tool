@@ -1,6 +1,6 @@
 /**
- * Translations for Africa Prompt Generator
- * Major African languages with ISO 639-1 codes
+ * Translations for Prompt Generator
+ * Multiple languages with ISO 639-1 codes
  */
 
 import { ref } from 'vue'
@@ -36,13 +36,13 @@ const getLanguageOptions = () => {
 const translations = {
   en: {
     // App title and description
-    appTitle: 'African App Prompt Generator',
-    appDescription: 'Answer a few questions about your app idea, and we\'ll generate tailored prompts, roles, agents, and skills for your African-focused application.',
+    appTitle: 'App Prompt Generator',
+    appDescription: 'Answer a few questions about your app idea, and we\'ll generate tailored prompts, roles, agents, and skills for your application.',
     
     // Form labels
     appIdeaLabel: 'App Idea',
-    appIdeaPlaceholder: 'Describe your app idea (e.g., \'A Nigerian fintech app for savings groups\', \'A Kenyan agri-tech platform connecting farmers to markets\')',
-    appIdeaHint: 'Be specific about your app\'s purpose and target audience in Africa.',
+    appIdeaPlaceholder: 'Describe your app idea (e.g., \'A fintech app for savings groups\', \'An agri-tech platform connecting farmers to markets\')',
+    appIdeaHint: 'Be specific about your app\'s purpose and target audience.',
     
     offlineAccessLabel: 'Offline Access',
     offlineAccessHint: 'Will your app need to work without internet connectivity?',
@@ -86,6 +86,7 @@ const translations = {
     generatingQuestions: 'Generating questions',
     failedToGenerateQuestions: 'Failed to generate questions. Please try again.',
     enterYourAnswer: 'Enter your answer',
+    pleaseAnswerAllQuestions: 'Please answer all follow-up questions before generating prompts.',
     
     // Success/Error messages
     promptsGenerated: 'Prompts generated successfully!',
@@ -127,6 +128,7 @@ const translations = {
     backendPrompts: 'مطالبات backend (Laravel)',
     frontendPrompts: 'مطالبات frontend (Vue.js)',
     ideaRequired: 'فكرة التطبيق مطلوبة',
+    pleaseAnswerAllQuestions: 'الرجاء الإجابة على جميع الأسئلة التكميلية قبل إنشاء المطالبات.',
     promptsGenerated: 'تم إنشاء المطالبات بنجاح!',
     progressSaved: 'تم حفظ التقدم! يمكنك استئنافه لاحقا.',
     na: 'غير متوفر',
@@ -139,11 +141,11 @@ const translations = {
   },
   
   fr: {
-    appTitle: 'Générateur de Prompts pour Applications Africaines',
-    appDescription: 'Répondez à quelques questions sur votre idée d\'application, et nous générerons des prompts, rôles, agents et compétences adaptés pour votre application axée sur l\'Afrique.',
+    appTitle: 'Générateur de Prompts pour Applications',
+    appDescription: 'Répondez à quelques questions sur votre idée d\'application, et nous générerons des prompts, rôles, agents et compétences adaptés pour votre application.',
     appIdeaLabel: 'Idée de l\'application',
-    appIdeaPlaceholder: 'Décrivez votre idée d\'application (ex: "Une application fintech nigériane pour les groupes d\'épargne", "Une plateforme agri-tech kényane connectant les agriculteurs aux marchés")',
-    appIdeaHint: 'Soyez précis concernant le but de votre application et votre public cible en Afrique.',
+    appIdeaPlaceholder: 'Décrivez votre idée d\'application (ex: "Une application fintech pour les groupes d\'épargne", "Une plateforme agri-tech connectant les agriculteurs aux marchés")',
+    appIdeaHint: 'Soyez précis concernant le but de votre application et votre public cible.',
     offlineAccessLabel: 'Accès hors ligne',
     offlineAccessHint: 'Votre application doit-elle fonctionner sans connexion internet ?',
     offlineYes: 'Oui',
@@ -165,6 +167,7 @@ const translations = {
     backendPrompts: 'Prompts Backend (Laravel)',
     frontendPrompts: 'Prompts Frontend (Vue.js)',
     ideaRequired: 'L\'idée de l\'application est requise',
+    pleaseAnswerAllQuestions: 'Veuillez répondre à toutes les questions de suivi avant de générer les prompts.',
     promptsGenerated: 'Prompts générés avec succès !',
     progressSaved: 'Progression sauvegardée ! Vous pouvez reprendre plus tard.',
     na: 'N/D',
@@ -376,7 +379,7 @@ const translations = {
     offlineNo: 'Mba',
     generatePrompts: 'Mmepe Àkwúkwọ̀',
     generating: 'Agba empatu...',
-    reset: 'Tipịsịa',
+    reset: 'Tipịsị',
     close: 'Mechịe',
     copy: 'Kopí',
     copied: 'Ọ dị kopí!',
@@ -459,7 +462,7 @@ const useTranslations = (language = 'en') => {
     if (SUPPORTED_LANGUAGES[langCode]) {
       currentLanguage.value = langCode
       // Save to localStorage for persistence
-      localStorage.setItem('africa-prompt-lang', langCode)
+      localStorage.setItem('prompt-generator-lang', langCode)
     }
   }
   

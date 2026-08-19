@@ -26,7 +26,7 @@ class PromptController extends Controller
      * Generate prompts based on questionnaire data
      *
      * This endpoint accepts questionnaire data and uses Mistral AI to generate
-     * roles, agents, and prompts for the African-focused app idea.
+     * roles, agents, and prompts for the app idea.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse

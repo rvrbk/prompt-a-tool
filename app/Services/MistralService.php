@@ -144,7 +144,7 @@ class MistralService
         }
 
         return <<<PROMPT
-Given the following African-focused app idea and context, generate a comprehensive response with:
+Given the following app idea and context, generate a comprehensive response with:
 
 1. A list of user roles (with permissions and actions) as JSON array
 2. A list of AI agents (with skills, tools, and responsibilities) as JSON array  
@@ -182,8 +182,6 @@ DO NOT include any markdown, explanations, or text outside the JSON. Only return
 
 **App Idea**: {$data['idea']}{$followUpInfo}
 **Offline Access Required**: {$offlineAccess}
-
-Remember: This is for an African context. Consider local languages, connectivity challenges, mobile-first approach, relevant African use cases, and iterative development that allows for gradual feature rollout.
 PROMPT;
     }
 
@@ -320,12 +318,11 @@ PROMPT;
     protected function buildFollowUpQuestionsPrompt(string $idea): string
     {
         return <<<PROMPT
-Analyze the following African-focused app idea and generate 3-5 relevant follow-up questions to better understand the requirements.
+Analyze the following app idea and generate 3-5 relevant follow-up questions to better understand the requirements.
 
 Each question should help clarify:
 - The target users or context
 - Key features or technical requirements
-- Specific African considerations (languages, connectivity, local challenges)
 
 Format the response as a JSON object with a single "questions" key containing an array of question objects.
 Each question object must have:
@@ -344,7 +341,7 @@ Example format:
       "id": 1,
       "question": "What is the primary target audience for this app?",
       "type": "multiple_choice",
-      "options": ["Farmers", "Students", "Small Business Owners", "Healthcare Workers", "General Public"]
+      "options": ["Students", "Small Business Owners", "Healthcare Workers", "General Public"]
     },
     {
       "id": 2,
@@ -353,16 +350,14 @@ Example format:
     },
     {
       "id": 3,
-      "question": "Are there any specific local languages that need to be supported?",
+      "question": "Are there any specific technical requirements?",
       "type": "text",
-      "placeholder": "e.g., Swahili, Hausa, Amharic"
+      "placeholder": "e.g., real-time sync, large file handling"
     }
   ]
 }
 
 App Idea: {$idea}
-
-Remember: This is for an African context. Consider local challenges, languages, connectivity, and mobile-first approach.
 PROMPT;
     }
 

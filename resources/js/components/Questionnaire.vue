@@ -13,7 +13,7 @@ const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics
 
 // Load saved language from localStorage
 onMounted(() => {
-  const savedLang = localStorage.getItem('africa-prompt-lang')
+  const savedLang = localStorage.getItem('prompt-generator-lang')
   if (savedLang) {
     setLanguage(savedLang)
   }
@@ -74,7 +74,7 @@ const errorMessage = ref(null)
 const validateForm = () => {
   let isValid = true
   
-  if (!form.value.idea.trim()) {
+  if (!form.value?.idea?.trim()) {
     errors.value.idea = t('ideaRequired')
     isValid = false
   } else {
@@ -84,52 +84,77 @@ const validateForm = () => {
   return isValid
 }
 
+// Abort controller for canceling pending requests
+let abortController = null
+
 // Generate follow-up questions from AI
 const generateFollowUpQuestions = async () => {
-  if (!form.value.idea.trim()) {
+  if (!form.value?.idea?.trim()) {
     followUpQuestions.value = []
     showQuestionsWizard.value = false
     return
   }
   
+  // Cancel any pending request
+  if (abortController) {
+    abortController.abort()
+  }
+  
+  abortController = new AbortController()
   isLoadingQuestions.value = true
   questionsError.value = null
   
   try {
     const response = await axios.post('/api/generate-questions', {
-      idea: form.value.idea
+      idea: form.value?.idea
+    }, {
+      signal: abortController.signal
     })
     
     if (response.data.status === 'success' && response.data.questions) {
       followUpQuestions.value = response.data.questions
       currentQuestionIndex.value = 0
-      form.value.followUpAnswers = {}
+      if (form.value) form.value.followUpAnswers = {}
       showQuestionsWizard.value = true
     } else {
       followUpQuestions.value = []
       showQuestionsWizard.value = false
     }
   } catch (error) {
-    console.error('Failed to generate follow-up questions:', error)
-    questionsError.value = t('failedToGenerateQuestions')
-    followUpQuestions.value = []
-    showQuestionsWizard.value = false
+    if (error.name !== 'AbortError') {
+      console.error('Failed to generate follow-up questions:', error)
+      questionsError.value = t('failedToGenerateQuestions')
+      followUpQuestions.value = []
+      showQuestionsWizard.value = false
+    }
   } finally {
-    isLoadingQuestions.value = false
+    if (!abortController.signal.aborted) {
+      isLoadingQuestions.value = false
+    }
+    abortController = null
   }
 }
 
-// Watch idea changes to generate questions
+// Watch idea changes to generate questions with debounce
+let debounceTimer = null
+
 watch(() => form.value.idea, (newIdea) => {
-  if (newIdea.trim()) {
-    // Debounce the call
-    const timer = setTimeout(() => {
+  // Clear any existing debounce timer
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+    debounceTimer = null
+  }
+  
+  // Clear existing questions immediately when idea changes
+  followUpQuestions.value = []
+  showQuestionsWizard.value = false
+  
+  if (newIdea?.trim()) {
+    // Debounce with 2000ms delay
+    debounceTimer = setTimeout(() => {
       generateFollowUpQuestions()
-      clearTimeout(timer)
-    }, 1000)
-  } else {
-    followUpQuestions.value = []
-    showQuestionsWizard.value = false
+      debounceTimer = null
+    }, 2000)
   }
 })
 
@@ -154,7 +179,7 @@ const currentQuestion = computed(() => {
 // Check if all questions are answered
 const allQuestionsAnswered = computed(() => {
   return followUpQuestions.value.length === 0 || 
-         followUpQuestions.value.every(q => q?.id !== undefined && form.value.followUpAnswers?.[q.id] !== undefined)
+         followUpQuestions.value.every(q => q?.id !== undefined && form.value?.followUpAnswers?.[q.id] !== undefined)
 })
 
 // Close all dropdowns
@@ -178,9 +203,9 @@ const handleSubmit = async () => {
     
     // Make API call to Laravel backend
     const response = await axios.post('/api/generate-prompts', {
-      idea: form.value.idea,
-      followUpAnswers: form.value.followUpAnswers,
-      offlineAccess: form.value.offlineAccess
+      idea: form.value?.idea,
+      followUpAnswers: form.value?.followUpAnswers,
+      offlineAccess: form.value?.offlineAccess
     })
     
     // Track successful form submission
@@ -188,9 +213,9 @@ const handleSubmit = async () => {
     
     // Log form data to console (Iteration 1 requirement maintained)
     console.log('Form Data Submitted:', {
-      idea: form.value.idea,
-      followUpAnswers: form.value.followUpAnswers,
-      offlineAccess: form.value.offlineAccess
+      idea: form.value?.idea,
+      followUpAnswers: form.value?.followUpAnswers,
+      offlineAccess: form.value?.offlineAccess
     })
     
     console.log('API Response:', response.data)
@@ -246,14 +271,14 @@ const resetForm = () => {
 <template>
   <div class="p-6 lg:p-8" @click="closeAllDropdowns">
     <!-- Language Selector -->
-    <div class="mb-4 flex justify-end">
+    <div class="mb-6 flex justify-end">
       <div class="relative">
         <button
           @click.stop="toggleLanguageDropdown"
-          class="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all"
+          class="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
         >
           <span>{{ currentLangDisplay }}</span>
-          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
@@ -261,17 +286,17 @@ const resetForm = () => {
         <div
           v-show="showLanguageDropdown"
           @click.stop
-          class="absolute z-[100] mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto right-0"
+          class="absolute z-[100] mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto right-0"
         >
           <div class="p-2">
-            <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded">
+            <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
               <button
                 @click="selectLanguage(lang.code)"
                 class="flex items-center space-x-2 w-full text-left"
               >
-                <span>{{ lang.flag }}</span>
+                <span class="text-lg">{{ lang.flag }}</span>
                 <span class="text-sm text-gray-700">{{ lang.native }}</span>
-                <span class="text-xs text-gray-500">({{ lang.name }})</span>
+                <span class="text-xs text-gray-400">({{ lang.name }})</span>
               </button>
             </div>
           </div>
@@ -280,18 +305,18 @@ const resetForm = () => {
     </div>
 
     <!-- Title and Description -->
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-gray-800 mb-2">
+    <div class="mb-10">
+      <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
         {{ t('appTitle') }}
       </h2>
-      <p class="text-gray-600">
+      <p class="text-gray-500 leading-relaxed">
         {{ t('appDescription') }}
       </p>
     </div>
 
-    <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-6">
+    <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-8">
       <!-- App Idea -->
-      <div class="space-y-2">
+      <div class="space-y-3">
         <label for="idea" class="block text-sm font-medium text-gray-700">
           {{ t('appIdeaLabel') }} <span class="text-red-500">*</span>
         </label>
@@ -304,49 +329,56 @@ const resetForm = () => {
           }"
           rows="4"
           :placeholder="t('appIdeaPlaceholder')"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all bg-white"
         />
         <p v-if="errors.idea" class="text-red-500 text-sm">{{ errors.idea }}</p>
-        <p class="text-gray-500 text-sm">
+        <p class="text-gray-400 text-sm">
           {{ t('appIdeaHint') }}
+        </p>
+        <p v-if="isLoadingQuestions" class="text-gray-600 text-sm flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          {{ t('generatingQuestions') }}
         </p>
       </div>
 
       <!-- AI Follow-up Questions Wizard -->
-      <div v-if="showQuestionsWizard && followUpQuestions.length > 0" class="space-y-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
+      <div v-if="showQuestionsWizard && followUpQuestions.length > 0" class="space-y-4 p-5 bg-gray-50 rounded-2xl border border-gray-200">
         <div class="flex items-center justify-between mb-4">
-          <h4 class="text-lg font-semibold text-purple-800">
+          <h4 class="text-base font-semibold text-gray-800">
             {{ t('followUpQuestions') }}
           </h4>
           <div class="flex items-center gap-2">
-            <span class="text-sm text-purple-600">
+            <span class="text-sm text-gray-500">
               {{ currentQuestionIndex + 1 }} / {{ followUpQuestions.length }}
             </span>
           </div>
         </div>
         
         <!-- Question Display -->
-        <div v-if="currentQuestion" class="bg-white p-4 rounded-lg border border-purple-200">
-          <p class="text-gray-700 font-medium mb-2">
+        <div v-if="currentQuestion" class="bg-white p-5 rounded-xl border border-gray-200">
+          <p class="text-gray-700 font-medium mb-4">
             {{ currentQuestion?.question }}
           </p>
           
           <!-- Multiple Choice -->
-          <div v-if="currentQuestion?.type === 'multiple_choice' && currentQuestion?.options" class="space-y-2">
+          <div v-if="currentQuestion?.type === 'multiple_choice' && currentQuestion?.options" class="space-y-3">
             <label 
               v-for="option in currentQuestion?.options" 
               :key="option"
-              class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all"
               :class="{
-                'border-purple-500 bg-purple-50': form.value.followUpAnswers?.[currentQuestion?.id] === option
+                'border-gray-900 bg-gray-50': form.followUpAnswers?.[currentQuestion?.id] === option
               }"
             >
               <input
                 type="radio"
                 :name="'q-' + currentQuestion?.id"
                 :value="option"
-                v-model="form.value.followUpAnswers[currentQuestion?.id]"
-                class="mr-3 h-4 w-4 text-purple-600"
+                v-model="form.followUpAnswers[currentQuestion?.id]"
+                class="mr-3 h-4 w-4 text-gray-900"
               />
               <span class="text-gray-700">{{ option }}</span>
             </label>
@@ -355,10 +387,10 @@ const resetForm = () => {
           <!-- Text Input -->
           <div v-else-if="currentQuestion?.type === 'text'" class="mt-2">
             <textarea
-              v-model="form.value.followUpAnswers[currentQuestion?.id]"
+              v-model="form.followUpAnswers[currentQuestion?.id]"
               :placeholder="currentQuestion?.placeholder || t('enterYourAnswer')"
               rows="3"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all bg-white"
             />
           </div>
           
@@ -369,8 +401,8 @@ const resetForm = () => {
                 type="radio"
                 :name="'q-' + currentQuestion?.id"
                 :value="true"
-                v-model="form.value.followUpAnswers[currentQuestion?.id]"
-                class="mr-2 h-4 w-4 text-purple-600"
+                v-model="form.followUpAnswers[currentQuestion?.id]"
+                class="mr-2 h-4 w-4 text-gray-900"
               />
               <span class="text-gray-700">{{ t('yes') }}</span>
             </label>
@@ -379,8 +411,8 @@ const resetForm = () => {
                 type="radio"
                 :name="'q-' + currentQuestion?.id"
                 :value="false"
-                v-model="form.value.followUpAnswers[currentQuestion?.id]"
-                class="mr-2 h-4 w-4 text-purple-600"
+                v-model="form.followUpAnswers[currentQuestion?.id]"
+                class="mr-2 h-4 w-4 text-gray-900"
               />
               <span class="text-gray-700">{{ t('no') }}</span>
             </label>
@@ -388,16 +420,16 @@ const resetForm = () => {
         </div>
         
         <!-- Loading state -->
-        <div v-if="isLoadingQuestions" class="flex items-center justify-center py-4">
-          <svg class="animate-spin h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24">
+        <div v-if="isLoadingQuestions" class="flex items-center justify-center py-6">
+          <svg class="animate-spin h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <span class="ml-2 text-purple-600">{{ t('generatingQuestions') }}...</span>
+          <span class="ml-2 text-gray-600">{{ t('generatingQuestions') }}...</span>
         </div>
         
         <!-- Error state -->
-        <div v-if="questionsError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div v-if="questionsError" class="p-4 bg-red-50 border border-red-200 rounded-xl">
           <p class="text-red-700 text-sm">{{ questionsError }}</p>
         </div>
         
@@ -407,7 +439,7 @@ const resetForm = () => {
             type="button"
             @click="prevQuestion"
             :disabled="currentQuestionIndex === 0"
-            class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ t('previous') }}
           </button>
@@ -415,7 +447,7 @@ const resetForm = () => {
             type="button"
             @click="nextQuestion"
             :disabled="currentQuestionIndex >= followUpQuestions.length - 1"
-            class="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-5 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ t('next') }}
           </button>
@@ -423,7 +455,7 @@ const resetForm = () => {
       </div>
       
       <!-- Offline Access -->
-      <div class="space-y-2">
+      <div class="space-y-3 pt-4 border-t border-gray-200">
         <label class="block text-sm font-medium text-gray-700">
           {{ t('offlineAccessLabel') }}
         </label>
@@ -433,7 +465,7 @@ const resetForm = () => {
               type="radio"
               v-model="form.offlineAccess"
               :value="true"
-              class="mr-3 h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
+              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
             />
             <span class="text-sm text-gray-700">{{ t('yes') }}</span>
           </label>
@@ -442,49 +474,55 @@ const resetForm = () => {
               type="radio"
               v-model="form.offlineAccess"
               :value="false"
-              class="mr-3 h-4 w-4 border-gray-300 text-green-600 focus:ring-green-500"
+              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
             />
             <span class="text-sm text-gray-700">{{ t('no') }}</span>
           </label>
         </div>
-        <p class="text-gray-500 text-sm">
+        <p class="text-gray-400 text-sm">
           {{ t('offlineAccessHint') }}
         </p>
       </div>
 
       <!-- Submit and Reset Buttons -->
-      <div class="flex space-x-4 pt-4">
-        <button
-          type="submit"
-          :disabled="isSubmitting"
-          class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-        >
-          <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          <span v-if="!isSubmitting">{{ t('generatePrompts') }}</span>
-          <span v-else>{{ t('generating') }}</span>
-        </button>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 pt-6">
+        <div class="flex items-center gap-4">
+          <button
+            type="submit"
+            :disabled="isSubmitting || (showQuestionsWizard && !allQuestionsAnswered)"
+            class="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm"
+          >
+            <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <span v-if="!isSubmitting">{{ t('generatePrompts') }}</span>
+            <span v-else>{{ t('generating') }}</span>
+          </button>
+          
+          <button
+            type="button"
+            @click="resetForm"
+            class="px-6 py-3 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all"
+          >
+            {{ t('reset') }}
+          </button>
+        </div>
         
-        <button
-          type="button"
-          @click="resetForm"
-          class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
-        >
-          {{ t('reset') }}
-        </button>
+        <p v-if="showQuestionsWizard && !allQuestionsAnswered" class="text-orange-500 text-sm">
+          {{ t('pleaseAnswerAllQuestions') }}
+        </p>
       </div>
     </form>
 
     <!-- Error Display -->
-    <div v-if="errorMessage" class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div v-if="errorMessage" class="mt-6 p-5 bg-red-50 border border-red-200 rounded-xl">
       <div class="flex items-center">
-        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="text-red-700">{{ errorMessage }}</p>
-        <button @click="errorMessage = null" class="ml-auto text-red-500 hover:text-red-700">
+        <button @click="errorMessage = null" class="ml-auto text-red-400 hover:text-red-600 p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -502,13 +540,13 @@ const resetForm = () => {
     />
     
     <!-- Success Message (falls back to old display if needed) -->
-    <div v-if="isSuccess && !showResults && generatedData" class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+    <div v-if="isSuccess && !showResults && generatedData" class="mt-6 p-5 bg-green-50 border border-green-200 rounded-xl">
       <div class="flex items-center">
-        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <p class="text-green-700">{{ generatedData.message || 'Prompts generated successfully!' }}</p>
-        <button @click="showResults = true" class="ml-auto px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700">
+        <p class="text-green-700">{{ generatedData.message || t('promptsGenerated') }}</p>
+        <button @click="showResults = true" class="ml-auto px-4 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors">
           Show Results
         </button>
       </div>

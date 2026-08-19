@@ -1,7 +1,7 @@
-# Africa Prompt Generator - Full Implementation Guide for Vibe Code
+# Prompt Generator - Full Implementation Guide for Vibe Code
 
 **Objective**:  
-Build a **Vue.js + Laravel** web app where users answer a questionnaire to generate tailored prompts, roles, agents, and skills for their African-focused app ideas. The system uses **Mistral AI** to dynamically generate outputs.
+Build a **Vue.js + Laravel** web app where users answer a questionnaire to generate tailored prompts, roles, agents, and skills for their app ideas. The system uses **Mistral AI** to dynamically generate outputs.
 
 ---
 
@@ -26,8 +26,7 @@ This guide provides **10 iterations** to build the app step-by-step. Each iterat
 1. Initialize a **Vue 3 + Vite** project with **Tailwind CSS** for styling.
 2. Create a **single-page questionnaire** with the following fields:
   - **App Idea**: Textarea (required).
-  - **Target Countries**: Multi-select dropdown with African countries (e.g., Nigeria, Kenya, Ghana, South Africa, Uganda, Rwanda, Tanzania, etc.).
-  - **Primary User Types**: Multi-select checkboxes (e.g., Farmers, Teachers, Healthcare Workers, Small Business Owners, Students, Government Officials, etc.).
+  - **AI-generated follow-up questions**: Dynamic questions based on the app idea (wizard format).
   - **Offline Access**: Yes/No radio buttons.
 3. Add **basic validation** (e.g., `idea` is required).
 4. Add a **"Generate Prompts"** button that logs the form data to the console.
@@ -43,8 +42,8 @@ This guide provides **10 iterations** to build the app step-by-step. Each iterat
 ### **Dependencies**
 
 ```bash
-npm create vue@latest africa-prompt-generator
-cd africa-prompt-generator
+npm create vue@latest prompt-generator
+cd prompt-generator
 npm install tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 npm install
@@ -61,7 +60,7 @@ npm run dev
 1. User opens the app.
 2. User fills out the questionnaire.
 3. User clicks **"Generate Prompts"**.
-4. The app logs the form data to the console (e.g., `{ idea: "A Nigerian fintech app", countries: ["Nigeria"], userTypes: ["Farmers"], ... }`).
+4. The app logs the form data to the console (e.g., `{ idea: "A Nigerian fintech app", followUpAnswers: {}, offlineAccess: true }`).
 
 ---
 
@@ -87,8 +86,8 @@ npm run dev
 ### **Dependencies**
 
 ```bash
-composer create-project laravel/laravel africa-prompt-generator-backend
-cd africa-prompt-generator-backend
+composer create-project laravel/laravel prompt-generator-backend
+cd prompt-generator-backend
 composer require fruitcake/laravel-cors
 php artisan serve
 ```
@@ -139,8 +138,9 @@ npm install axios
   - Add a **new method** to call the Mistral API with the questionnaire data.
   - Use the **structured prompt** to generate roles, agents, and technical prompts.
   - Parse the **JSON response** from Mistral and return it to the frontend.
-3. Update the `/api/generate-prompts` endpoint to use this method.
-4. Test with a **sample idea** (e.g., "A Nigerian fintech app for savings groups").
+3. Add a `/api/generate-questions` endpoint to generate AI follow-up questions.
+4. Update the `/api/generate-prompts` endpoint to use this method.
+5. Test with a **sample idea** (e.g., "A Nigerian fintech app for savings groups").
 
 ### **Technical Requirements**
 
@@ -157,10 +157,8 @@ public function generatePrompts(Request $request)
 {
     $data = $request->validate([
         'idea' => 'required|string',
-        'countries' => 'required|array',
-        'userTypes' => 'required|array',
+        'followUpAnswers' => 'nullable|array',
         'offlineAccess' => 'required|boolean',
-        'features' => 'required|array',
     ]);
 
     $mistralResponse = Http::withHeaders([
@@ -185,24 +183,29 @@ public function generatePrompts(Request $request)
 
 protected function buildMistralPrompt(array $data): string
 {
+    $offlineAccess = ($data['offlineAccess'] ?? false) ? 'Yes' : 'No';
+    
+    $followUpInfo = '';
+    if (!empty($data['followUpAnswers']) && is_array($data['followUpAnswers'])) {
+        $followUpInfo = "\n\n**Follow-up Answers:**\n";
+        foreach ($data['followUpAnswers'] as $id => $answer) {
+            $followUpInfo .= "- Q{$id}: " . (is_bool($answer) ? ($answer ? 'Yes' : 'No') : $answer) . "\n";
+        }
+    }
+    
     return sprintf(
         "Given the following app idea and context, generate:
         1. A list of user roles (with permissions and actions) as JSON.
         2. A list of AI agents (with skills and tools) as JSON.
         3. Technical prompts for Laravel (backend) and Vue.js (frontend) as JSON.
 
-        **Idea**: %s
-        **Countries**: %s
-        **User Types**: %s
+        **Idea**: %s%s
         **Offline Access**: %s
-        **Features**: %s
 
         Format the output as a single JSON object with keys: `roles`, `agents`, `backend_prompts`, `frontend_prompts`.",
         $data['idea'],
-        implode(', ', $data['countries']),
-        implode(', ', $data['userTypes']),
-        $data['offlineAccess'] ? 'Yes' : 'No',
-        implode(', ', $data['features'])
+        $followUpInfo,
+        $offlineAccess
     );
 }
 ```
@@ -247,29 +250,33 @@ npm install vue-clipboard3
 
 ---
 
-## **📝 Iteration 6: Add Africa-Specific Templates**
+## **📝 Iteration 6: Add AI-Generated Follow-up Questions**
 
-**Goal**: Pre-load **templates** for common African use cases (e.g., AgriTech, FinTech, EdTech).
+**Goal**: Generate dynamic follow-up questions based on the app idea using Mistral AI.
 
 ### **Tasks**
 
-1. In the Laravel backend, create a **templates table** in the database to store:
-  - Template name (e.g., "AgriTech Marketplace").
-  - Predefined **roles, agents, and prompts** for that template.
-2. Add a **new endpoint** `/api/templates` to fetch available templates.
-3. In the Vue.js frontend:
-  - Add a **"Start from Template"** option at the beginning of the questionnaire.
-  - Let users **select a template** and pre-fill the questionnaire with its data.
-4. Allow users to **customize the template** before generating prompts.
+1. In the Laravel backend, add a **new endpoint** `/api/generate-questions` that:
+  - Accepts the app idea as input.
+  - Calls Mistral AI to generate 3-5 relevant follow-up questions.
+  - Returns the questions in a structured format (ID, question text, type, options).
+2. In the Vue.js frontend:
+  - Add a **wizard interface** that displays questions one at a time.
+  - Support multiple question types: multiple_choice, text, boolean.
+  - Allow users to navigate between questions (Previous/Next).
+  - Collect answers and submit them with the form.
+3. Update the prompt generation to include follow-up answers for better context.
 
 ### **Technical Requirements**
 
-- Use **Laravel migrations** to create the `templates` table.
-- Seed the database with **3-5 Africa-specific templates**.
+- Use **MistralService** to generate questions with a dedicated prompt.
+- Question types: multiple_choice (with options), text (with placeholder), boolean (yes/no).
+- Store answers in a structured object (question ID as key).
 
 ### **Deliverables**
 
-- Users can start from a template and customize it.
+- Users answer AI-generated questions before seeing results.
+- Questions adapt to the app idea for better context.
 
 ---
 

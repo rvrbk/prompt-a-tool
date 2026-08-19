@@ -144,7 +144,7 @@ const { callMistralDirect } = useMistralClient()
 // In production, always use the Laravel backend proxy
 const response = await callMistralDirect(
   'your_test_api_key',
-  'Generate 5 African fintech app ideas in JSON format'
+  'Generate 5 fintech app ideas in JSON format'
 )
 
 console.log(response.choices[0].message.content)
