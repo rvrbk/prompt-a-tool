@@ -36,6 +36,7 @@ class PromptController extends Controller
         // Validate the request data
         $validated = $request->validate([
             'idea' => 'required|string|max:1000',
+            'followUpAnswers' => 'nullable|array',
             'offlineAccess' => 'required|boolean',
         ]);
 

@@ -189,6 +189,7 @@ const copyAllAsJson = async () => {
       frontend_prompts: getFrontendPrompts.value,
       metadata: {
         idea: editedData.value?.data?.idea || editedData.value?.idea || '',
+        followUpAnswers: editedData.value?.data?.followUpAnswers || editedData.value?.followUpAnswers || {},
         offlineAccess: editedData.value?.data?.offlineAccess || editedData.value?.offlineAccess || false,
         generated_at: editedData.value?.generated_at || new Date().toISOString()
       }

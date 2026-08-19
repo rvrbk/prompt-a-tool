@@ -42,6 +42,7 @@ const exportData = computed(() => {
   return {
     metadata: {
       app_idea: props.questionnaireData?.idea || props.generatedData?.data?.idea || '',
+      followUpAnswers: props.questionnaireData?.followUpAnswers || props.generatedData?.data?.followUpAnswers || {},
       offlineAccess: props.questionnaireData?.offlineAccess || props.generatedData?.data?.offlineAccess || false,
       generated_at: props.generatedData?.generated_at || new Date().toISOString()
     },
@@ -136,6 +137,7 @@ const exportAsMarkdown = () => {
   // Metadata section
   markdown += `## Project Overview\n\n`
   markdown += `**App Idea:** ${metadata.app_idea}\n\n`
+  markdown += `**Follow-up Answers:** ${JSON.stringify(metadata.followUpAnswers, null, 2)}\n\n`
   markdown += `**Offline Access:** ${metadata.offlineAccess ? 'Yes' : 'No'}\n\n`
   markdown += `**Generated:** ${new Date(metadata.generated_at).toLocaleString()}\n\n`
   markdown += `---\n\n`

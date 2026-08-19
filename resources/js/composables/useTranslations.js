@@ -54,6 +54,8 @@ const translations = {
     generating: 'Generating...',
     reset: 'Reset',
     close: 'Close',
+    previous: 'Previous',
+    next: 'Next',
     copy: 'Copy',
     copied: 'Copied!',
     copyAll: 'Copy All',
@@ -78,6 +80,12 @@ const translations = {
     
     // Validation
     ideaRequired: 'App idea is required',
+    
+    // Follow-up Questions
+    followUpQuestions: 'AI Follow-up Questions',
+    generatingQuestions: 'Generating questions',
+    failedToGenerateQuestions: 'Failed to generate questions. Please try again.',
+    enterYourAnswer: 'Enter your answer',
     
     // Success/Error messages
     promptsGenerated: 'Prompts generated successfully!',

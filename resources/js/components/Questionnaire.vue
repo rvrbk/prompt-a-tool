@@ -43,8 +43,16 @@ const currentLangDisplay = computed(() => {
 // Form state
 const form = ref({
   idea: '',
+  followUpAnswers: {},
   offlineAccess: false
 })
+
+// Follow-up questions state
+const followUpQuestions = ref([])
+const currentQuestionIndex = ref(0)
+const isLoadingQuestions = ref(false)
+const questionsError = ref(null)
+const showQuestionsWizard = ref(false)
 
 // Validation state
 const errors = ref({
@@ -76,6 +84,79 @@ const validateForm = () => {
   return isValid
 }
 
+// Generate follow-up questions from AI
+const generateFollowUpQuestions = async () => {
+  if (!form.value.idea.trim()) {
+    followUpQuestions.value = []
+    showQuestionsWizard.value = false
+    return
+  }
+  
+  isLoadingQuestions.value = true
+  questionsError.value = null
+  
+  try {
+    const response = await axios.post('/api/generate-questions', {
+      idea: form.value.idea
+    })
+    
+    if (response.data.status === 'success' && response.data.questions) {
+      followUpQuestions.value = response.data.questions
+      currentQuestionIndex.value = 0
+      form.value.followUpAnswers = {}
+      showQuestionsWizard.value = true
+    } else {
+      followUpQuestions.value = []
+      showQuestionsWizard.value = false
+    }
+  } catch (error) {
+    console.error('Failed to generate follow-up questions:', error)
+    questionsError.value = t('failedToGenerateQuestions')
+    followUpQuestions.value = []
+    showQuestionsWizard.value = false
+  } finally {
+    isLoadingQuestions.value = false
+  }
+}
+
+// Watch idea changes to generate questions
+watch(() => form.value.idea, (newIdea) => {
+  if (newIdea.trim()) {
+    // Debounce the call
+    const timer = setTimeout(() => {
+      generateFollowUpQuestions()
+      clearTimeout(timer)
+    }, 1000)
+  } else {
+    followUpQuestions.value = []
+    showQuestionsWizard.value = false
+  }
+})
+
+// Navigate between wizard questions
+const nextQuestion = () => {
+  if (currentQuestionIndex.value < followUpQuestions.value.length - 1) {
+    currentQuestionIndex.value++
+  }
+}
+
+const prevQuestion = () => {
+  if (currentQuestionIndex.value > 0) {
+    currentQuestionIndex.value--
+  }
+}
+
+// Get current question
+const currentQuestion = computed(() => {
+  return followUpQuestions.value[currentQuestionIndex.value] || null
+})
+
+// Check if all questions are answered
+const allQuestionsAnswered = computed(() => {
+  return followUpQuestions.value.length === 0 || 
+         followUpQuestions.value.every(q => form.value.followUpAnswers[q.id] !== undefined)
+})
+
 // Close all dropdowns
 const closeAllDropdowns = () => {
   showLanguageDropdown.value = false
@@ -98,6 +179,7 @@ const handleSubmit = async () => {
     // Make API call to Laravel backend
     const response = await axios.post('/api/generate-prompts', {
       idea: form.value.idea,
+      followUpAnswers: form.value.followUpAnswers,
       offlineAccess: form.value.offlineAccess
     })
     
@@ -107,6 +189,7 @@ const handleSubmit = async () => {
     // Log form data to console (Iteration 1 requirement maintained)
     console.log('Form Data Submitted:', {
       idea: form.value.idea,
+      followUpAnswers: form.value.followUpAnswers,
       offlineAccess: form.value.offlineAccess
     })
     
@@ -145,6 +228,7 @@ const handleSubmit = async () => {
 const resetForm = () => {
   form.value = {
     idea: '',
+    followUpAnswers: {},
     offlineAccess: false
   }
   errors.value = { idea: '' }
@@ -152,6 +236,10 @@ const resetForm = () => {
   generatedData.value = null
   errorMessage.value = null
   showResults.value = false
+  followUpQuestions.value = []
+  currentQuestionIndex.value = 0
+  showQuestionsWizard.value = false
+  questionsError.value = null
 }
 </script>
 
@@ -224,6 +312,116 @@ const resetForm = () => {
         </p>
       </div>
 
+      <!-- AI Follow-up Questions Wizard -->
+      <div v-if="showQuestionsWizard && followUpQuestions.length > 0" class="space-y-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-semibold text-purple-800">
+            {{ t('followUpQuestions') }}
+          </h4>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-purple-600">
+              {{ currentQuestionIndex + 1 }} / {{ followUpQuestions.length }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Question Display -->
+        <div v-if="currentQuestion" class="bg-white p-4 rounded-lg border border-purple-200">
+          <p class="text-gray-700 font-medium mb-2">
+            {{ currentQuestion.question }}
+          </p>
+          
+          <!-- Multiple Choice -->
+          <div v-if="currentQuestion.type === 'multiple_choice'" class="space-y-2">
+            <label 
+              v-for="option in currentQuestion.options" 
+              :key="option"
+              class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              :class="{
+                'border-purple-500 bg-purple-50': form.value.followUpAnswers[currentQuestion.id] === option
+              }"
+            >
+              <input
+                type="radio"
+                :name="'q-' + currentQuestion.id"
+                :value="option"
+                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                class="mr-3 h-4 w-4 text-purple-600"
+              />
+              <span class="text-gray-700">{{ option }}</span>
+            </label>
+          </div>
+          
+          <!-- Text Input -->
+          <div v-else-if="currentQuestion.type === 'text'" class="mt-2">
+            <textarea
+              v-model="form.value.followUpAnswers[currentQuestion.id]"
+              :placeholder="currentQuestion.placeholder || t('enterYourAnswer')"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+            />
+          </div>
+          
+          <!-- Yes/No -->
+          <div v-else-if="currentQuestion.type === 'boolean'" class="flex gap-4 mt-2">
+            <label class="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                :name="'q-' + currentQuestion.id"
+                :value="true"
+                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                class="mr-2 h-4 w-4 text-purple-600"
+              />
+              <span class="text-gray-700">{{ t('yes') }}</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                :name="'q-' + currentQuestion.id"
+                :value="false"
+                v-model="form.value.followUpAnswers[currentQuestion.id]"
+                class="mr-2 h-4 w-4 text-purple-600"
+              />
+              <span class="text-gray-700">{{ t('no') }}</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Loading state -->
+        <div v-if="isLoadingQuestions" class="flex items-center justify-center py-4">
+          <svg class="animate-spin h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <span class="ml-2 text-purple-600">{{ t('generatingQuestions') }}...</span>
+        </div>
+        
+        <!-- Error state -->
+        <div v-if="questionsError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-red-700 text-sm">{{ questionsError }}</p>
+        </div>
+        
+        <!-- Navigation -->
+        <div v-if="!isLoadingQuestions && !questionsError" class="flex justify-between items-center pt-4">
+          <button
+            type="button"
+            @click="prevQuestion"
+            :disabled="currentQuestionIndex === 0"
+            class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ t('previous') }}
+          </button>
+          <button
+            type="button"
+            @click="nextQuestion"
+            :disabled="currentQuestionIndex >= followUpQuestions.length - 1"
+            class="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ t('next') }}
+          </button>
+        </div>
+      </div>
+      
       <!-- Offline Access -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">

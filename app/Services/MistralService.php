@@ -133,6 +133,15 @@ class MistralService
     protected function buildPrompt(array $data): string
     {
         $offlineAccess = ($data['offlineAccess'] ?? false) ? 'Yes' : 'No';
+        
+        // Format follow-up answers for the prompt
+        $followUpInfo = '';
+        if (!empty($data['followUpAnswers']) && is_array($data['followUpAnswers'])) {
+            $followUpInfo = "\n\n**Follow-up Answers:**\n";
+            foreach ($data['followUpAnswers'] as $id => $answer) {
+                $followUpInfo .= "- Q{$id}: " . (is_bool($answer) ? ($answer ? 'Yes' : 'No') : $answer) . "\n";
+            }
+        }
 
         return <<<PROMPT
 Given the following African-focused app idea and context, generate a comprehensive response with:
@@ -171,7 +180,7 @@ Format the FINAL output as a single JSON object with these exact keys:
 
 DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
 
-**App Idea**: {$data['idea']}
+**App Idea**: {$data['idea']}{$followUpInfo}
 **Offline Access Required**: {$offlineAccess}
 
 Remember: This is for an African context. Consider local languages, connectivity challenges, mobile-first approach, relevant African use cases, and iterative development that allows for gradual feature rollout.
@@ -221,6 +230,140 @@ PROMPT;
     public function getModel(): string
     {
         return $this->model;
+    }
+
+    /**
+     * Generate follow-up questions based on app idea
+     *
+     * @param string $idea The app idea description
+     * @return array Array of follow-up questions
+     * @throws \Exception If the API request fails
+     */
+    public function generateFollowUpQuestions(string $idea): array
+    {
+        if (empty($this->apiKey)) {
+            throw new \Exception('Mistral API key is not configured. Please set MISTRAL_API_KEY in your .env file.');
+        }
+
+        $prompt = $this->buildFollowUpQuestionsPrompt($idea);
+
+        Log::info('Mistral API follow-up questions request', [
+            'model' => $this->model,
+            'prompt_length' => strlen($prompt)
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->withOptions([
+                'timeout' => 30,
+            ])->post($this->apiUrl, [
+                'model' => $this->model,
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $prompt,
+                    ],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 2000,
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Mistral API follow-up questions request failed', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+
+                throw new \Exception('Mistral API request failed: ' . $response->status() . ' - ' . $response->body());
+            }
+
+            $responseData = $response->json();
+
+            if (!isset($responseData['choices'][0]['message']['content'])) {
+                Log::error('Mistral API invalid follow-up questions response format', [
+                    'response' => $responseData,
+                ]);
+
+                throw new \Exception('Invalid response format from Mistral API');
+            }
+
+            $content = $responseData['choices'][0]['message']['content'];
+
+            // Try to parse as JSON first
+            $parsed = $this->tryParseJson($content);
+
+            if ($parsed !== null && isset($parsed['questions']) && is_array($parsed['questions'])) {
+                return $parsed['questions'];
+            }
+
+            // If not valid JSON, return empty array
+            return [];
+
+        } catch (\Exception $e) {
+            Log::error('Mistral API follow-up questions exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Build the prompt for generating follow-up questions
+     *
+     * @param string $idea The app idea
+     * @return string The formatted prompt
+     */
+    protected function buildFollowUpQuestionsPrompt(string $idea): string
+    {
+        return <<<PROMPT
+Analyze the following African-focused app idea and generate 3-5 relevant follow-up questions to better understand the requirements.
+
+Each question should help clarify:
+- The target users or context
+- Key features or technical requirements
+- Specific African considerations (languages, connectivity, local challenges)
+
+Format the response as a JSON object with a single "questions" key containing an array of question objects.
+Each question object must have:
+- "id": unique identifier (number)
+- "question": the question text
+- "type": one of "multiple_choice", "text", or "boolean"
+- If type is "multiple_choice", include "options": array of possible answers
+- If type is "text", optionally include "placeholder": hint text
+
+Do NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
+
+Example format:
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the primary target audience for this app?",
+      "type": "multiple_choice",
+      "options": ["Farmers", "Students", "Small Business Owners", "Healthcare Workers", "General Public"]
+    },
+    {
+      "id": 2,
+      "question": "Will this app require offline functionality?",
+      "type": "boolean"
+    },
+    {
+      "id": 3,
+      "question": "Are there any specific local languages that need to be supported?",
+      "type": "text",
+      "placeholder": "e.g., Swahili, Hausa, Amharic"
+    }
+  ]
+}
+
+App Idea: {$idea}
+
+Remember: This is for an African context. Consider local challenges, languages, connectivity, and mobile-first approach.
+PROMPT;
     }
 
 }
