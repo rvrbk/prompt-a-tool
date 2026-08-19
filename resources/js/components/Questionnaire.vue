@@ -6,39 +6,10 @@ import useTranslations from '../composables/useTranslations.js'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
 
 // Initialize translations
-const { t, setLanguage, getLanguageOptions, getCurrentLanguage, getLanguageName, getLanguageFlag } = useTranslations()
+const { t } = useTranslations()
 
 // Initialize Google Analytics
 const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()
-
-// Load saved language from localStorage
-onMounted(() => {
-  const savedLang = localStorage.getItem('prompt-generator-lang')
-  if (savedLang) {
-    setLanguage(savedLang)
-  }
-})
-
-// Language selector state
-const showLanguageDropdown = ref(false)
-const languageOptions = getLanguageOptions()
-
-const toggleLanguageDropdown = () => {
-  showLanguageDropdown.value = !showLanguageDropdown.value
-}
-
-const selectLanguage = (langCode) => {
-  setLanguage(langCode)
-  showLanguageDropdown.value = false
-}
-
-const currentLang = computed(() => getCurrentLanguage())
-const currentLangDisplay = computed(() => {
-  const lang = languageOptions.find(l => l.code === currentLang.value)
-  return lang ? lang.display : 'English'
-})
-
-
 
 // Form state
 const form = ref({
@@ -53,6 +24,7 @@ const currentQuestionIndex = ref(0)
 const isLoadingQuestions = ref(false)
 const questionsError = ref(null)
 const showQuestionsWizard = ref(false)
+const questionsGenerationComplete = ref(false)
 
 // Validation state
 const errors = ref({
@@ -130,6 +102,7 @@ const generateFollowUpQuestions = async () => {
   } finally {
     if (!abortController.signal.aborted) {
       isLoadingQuestions.value = false
+      questionsGenerationComplete.value = true
     }
     abortController = null
   }
@@ -148,6 +121,7 @@ watch(() => form.value.idea, (newIdea) => {
   // Clear existing questions immediately when idea changes
   followUpQuestions.value = []
   showQuestionsWizard.value = false
+  questionsGenerationComplete.value = false
   
   if (newIdea?.trim()) {
     // Debounce with 2000ms delay
@@ -155,6 +129,9 @@ watch(() => form.value.idea, (newIdea) => {
       generateFollowUpQuestions()
       debounceTimer = null
     }, 2000)
+  } else {
+    // No idea, so questions generation is complete (no questions to generate)
+    questionsGenerationComplete.value = true
   }
 })
 
@@ -182,10 +159,13 @@ const allQuestionsAnswered = computed(() => {
          followUpQuestions.value.every(q => q?.id !== undefined && form.value?.followUpAnswers?.[q.id] !== undefined)
 })
 
-// Close all dropdowns
-const closeAllDropdowns = () => {
-  showLanguageDropdown.value = false
-}
+// Check if user can generate prompts
+const canGenerate = computed(() => {
+  return form.value.idea?.trim() &&
+         !isSubmitting.value &&
+         questionsGenerationComplete.value &&
+         (!showQuestionsWizard.value || allQuestionsAnswered.value)
+})
 
 // Handle form submission
 const handleSubmit = async () => {
@@ -265,46 +245,13 @@ const resetForm = () => {
   currentQuestionIndex.value = 0
   showQuestionsWizard.value = false
   questionsError.value = null
+  questionsGenerationComplete.value = false
 }
 </script>
 
 <template>
-  <div class="p-6 lg:p-8" @click="closeAllDropdowns">
+  <div class="p-6 lg:p-8">
     <div v-show="!showResults">
-      <!-- Language Selector -->
-      <div class="mb-6 flex justify-end">
-        <div class="relative">
-          <button
-            @click.stop="toggleLanguageDropdown"
-            class="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
-          >
-            <span>{{ currentLangDisplay }}</span>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          <div
-            v-show="showLanguageDropdown"
-            @click.stop
-            class="absolute z-[100] mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto right-0"
-          >
-            <div class="p-2">
-              <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
-                <button
-                  @click="selectLanguage(lang.code)"
-                  class="flex items-center space-x-2 w-full text-left"
-                >
-                  <span class="text-lg">{{ lang.flag }}</span>
-                  <span class="text-sm text-gray-700">{{ lang.native }}</span>
-                  <span class="text-xs text-gray-400">({{ lang.name }})</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Title and Description -->
       <div class="mb-10">
         <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
@@ -490,7 +437,7 @@ const resetForm = () => {
         <div class="flex items-center gap-4">
           <button
             type="submit"
-            :disabled="isSubmitting || (showQuestionsWizard && !allQuestionsAnswered)"
+            :disabled="!canGenerate"
             class="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm"
           >
             <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

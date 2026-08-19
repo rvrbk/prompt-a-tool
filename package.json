@@ -23,6 +23,7 @@
     "dependencies": {
         "jspdf": "^4.2.1",
         "markdown-it": "^15.0.0",
-        "nanoid": "^6.0.1"
+        "nanoid": "^6.0.1",
+        "vue-router": "^4.6.4"
     }
 }
