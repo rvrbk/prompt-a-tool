@@ -270,51 +270,52 @@ const resetForm = () => {
 
 <template>
   <div class="p-6 lg:p-8" @click="closeAllDropdowns">
-    <!-- Language Selector -->
-    <div class="mb-6 flex justify-end">
-      <div class="relative">
-        <button
-          @click.stop="toggleLanguageDropdown"
-          class="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
-        >
-          <span>{{ currentLangDisplay }}</span>
-          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        
-        <div
-          v-show="showLanguageDropdown"
-          @click.stop
-          class="absolute z-[100] mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto right-0"
-        >
-          <div class="p-2">
-            <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
-              <button
-                @click="selectLanguage(lang.code)"
-                class="flex items-center space-x-2 w-full text-left"
-              >
-                <span class="text-lg">{{ lang.flag }}</span>
-                <span class="text-sm text-gray-700">{{ lang.native }}</span>
-                <span class="text-xs text-gray-400">({{ lang.name }})</span>
-              </button>
+    <div v-show="!showResults">
+      <!-- Language Selector -->
+      <div class="mb-6 flex justify-end">
+        <div class="relative">
+          <button
+            @click.stop="toggleLanguageDropdown"
+            class="flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
+          >
+            <span>{{ currentLangDisplay }}</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div
+            v-show="showLanguageDropdown"
+            @click.stop
+            class="absolute z-[100] mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto right-0"
+          >
+            <div class="p-2">
+              <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
+                <button
+                  @click="selectLanguage(lang.code)"
+                  class="flex items-center space-x-2 w-full text-left"
+                >
+                  <span class="text-lg">{{ lang.flag }}</span>
+                  <span class="text-sm text-gray-700">{{ lang.native }}</span>
+                  <span class="text-xs text-gray-400">({{ lang.name }})</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Title and Description -->
-    <div class="mb-10">
-      <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
-        {{ t('appTitle') }}
-      </h2>
-      <p class="text-gray-500 leading-relaxed">
-        {{ t('appDescription') }}
-      </p>
-    </div>
+      <!-- Title and Description -->
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
+          {{ t('appTitle') }}
+        </h2>
+        <p class="text-gray-500 leading-relaxed">
+          {{ t('appDescription') }}
+        </p>
+      </div>
 
-    <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-8">
+      <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-8">
       <!-- App Idea -->
       <div class="space-y-3">
         <label for="idea" class="block text-sm font-medium text-gray-700">
@@ -551,6 +552,16 @@ const resetForm = () => {
         </button>
       </div>
     </div>
+    </div>
+
+    <!-- Results Display -->
+    <ResultsDisplay 
+      v-if="showResults" 
+      :generatedData="generatedData" 
+      :isVisible="showResults" 
+      :questionnaireData="form"
+      @close="showResults = false"
+    />
   </div>
 </template>
 
