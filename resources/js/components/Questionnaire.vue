@@ -1,12 +1,11 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
-import useTranslations from '../composables/useTranslations.js'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
 
-// Initialize translations
-const { t } = useTranslations()
+// Use translations from App.vue provider
+const { t } = inject('translations')
 
 // Initialize Google Analytics
 const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()

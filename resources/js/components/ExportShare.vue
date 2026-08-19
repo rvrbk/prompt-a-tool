@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
-import useTranslations from '../composables/useTranslations.js'
 
 const props = defineProps({
   generatedData: {
@@ -16,8 +15,8 @@ const props = defineProps({
 
 const emit = defineEmits([])
 
-// Translations
-const { t } = useTranslations()
+// Use translations from App.vue provider
+const { t } = inject('translations')
 
 // Google Analytics tracking
 const { trackExport } = useGoogleAnalytics()

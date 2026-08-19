@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import useTranslations from '../composables/useTranslations.js'
+import { ref, onMounted, inject } from 'vue'
 
-const { t } = useTranslations()
+// Use translations from App.vue provider
+const { t } = inject('translations')
 
 const props = defineProps({
   show: {
@@ -103,6 +103,11 @@ const dismissBanner = () => {
 import { watch } from 'vue'
 watch(() => props.show, (newVal) => {
   showBanner.value = newVal
+})
+
+// Watch for language changes to trigger re-render
+watch(() => props.language, () => {
+  // Language changed, component will re-render with new translations
 })
 </script>
 

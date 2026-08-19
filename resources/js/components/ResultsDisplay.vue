@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, inject } from 'vue'
 import ExportShare from './ExportShare.vue'
-import useTranslations from '../composables/useTranslations.js'
 
-// Initialize translations
-const { t } = useTranslations()
+// Use translations from App.vue provider
+const { t } = inject('translations')
 
 const props = defineProps({
   generatedData: {

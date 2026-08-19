@@ -813,16 +813,50 @@ const translations = {
   }
 }
 
+// Helper function to get cookie by name
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+  return null
+}
+
 // Get translation for current language
-const useTranslations = (language = 'en') => {
+const useTranslations = (language = 'en', options = {}) => {
+  const { useCookies = false, useLocalStorage = true, autoDetect = false } = options
+  
   const currentLanguage = ref(language)
+  
+  // Try to initialize from cookie or localStorage if options enabled
+  if (useCookies) {
+    const cookieLang = getCookie('prompt-generator-lang')
+    if (cookieLang && SUPPORTED_LANGUAGES[cookieLang]) {
+      currentLanguage.value = cookieLang
+    }
+  }
+  
+  if (useLocalStorage) {
+    const storedLang = localStorage.getItem('prompt-generator-lang')
+    if (storedLang && SUPPORTED_LANGUAGES[storedLang]) {
+      currentLanguage.value = storedLang
+    }
+  }
   
   const setLanguage = (langCode) => {
     if (SUPPORTED_LANGUAGES[langCode]) {
       currentLanguage.value = langCode
-      // Save to localStorage for persistence
-      localStorage.setItem('prompt-generator-lang', langCode)
+      if (useLocalStorage) {
+        localStorage.setItem('prompt-generator-lang', langCode)
+      }
+      if (useCookies) {
+        document.cookie = `prompt-generator-lang=${langCode}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+      }
     }
+  }
+  
+  const getLanguageFromCookie = () => {
+    if (!useCookies) return null
+    return getCookie('prompt-generator-lang')
   }
   
   const t = (key, lang = null) => {
@@ -861,6 +895,7 @@ const useTranslations = (language = 'en') => {
     getLanguageName,
     getLanguageFlag,
     getLanguageOptions,
+    getLanguageFromCookie,
     SUPPORTED_LANGUAGES,
     translations
   }

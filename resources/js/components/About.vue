@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-import useTranslations from '../composables/useTranslations.js'
+import { inject } from 'vue'
 
-const { t } = useTranslations()
+// Use translations from App.vue provider
+const { t } = inject('translations')
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import CookieBanner from './components/CookieBanner.vue'
 import useTranslations from './composables/useTranslations.js'
@@ -8,9 +8,9 @@ import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
 // Initialize translations with auto-detection and cookie support
 const { 
   t, 
+  currentLanguage,
   setLanguage, 
   getLanguageOptions, 
-  getCurrentLanguage, 
   getLanguageName, 
   getLanguageFlag, 
   SUPPORTED_LANGUAGES,
@@ -19,6 +19,15 @@ const {
   useCookies: true, 
   useLocalStorage: true,
   autoDetect: true 
+})
+
+// Provide translations to all child components
+provide('translations', { 
+  t, 
+  currentLanguage,
+  setLanguage, 
+  getLanguageName, 
+  getLanguageFlag 
 })
 
 // Language selector state
@@ -67,8 +76,13 @@ const selectLanguage = (langCode) => {
   }
 }
 
-const currentLang = computed(() => getCurrentLanguage())
+// Use computed properties for real-time reactivity
+const currentLang = computed(() => currentLanguage.value)
 const currentLangNative = computed(() => getLanguageName(currentLang.value))
+
+// Compute language display values
+const currentLangFlag = computed(() => SUPPORTED_LANGUAGES[currentLang.value]?.countryCode || 'us')
+const currentLangDisplay = computed(() => (SUPPORTED_LANGUAGES[currentLang.value]?.countryCode || 'EN').toUpperCase())
 
 // Close dropdown when clicking outside
 const closeLanguageDropdown = () => {
@@ -108,11 +122,6 @@ const handleCookieDismiss = () => {
   // but mark that they dismissed the banner
   localStorage.setItem('prompt-generator-cookie-consent', 'dismissed')
 }
-
-// Initialize on mount
-onMounted(() => {
-  checkCookieConsent()
-})
 
 // Watch for language changes to update cookie consent state
 watch(currentLang, () => {
@@ -170,8 +179,8 @@ const closeMobileMenu = () => {
                 @click.stop="toggleLanguageDropdown"
                 class="language-button flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
               >
-                <span :class="'fi fi-' + (SUPPORTED_LANGUAGES[currentLang]?.countryCode || 'us') + ' fis'"></span>
-                <span class="text-sm font-medium">{{ (SUPPORTED_LANGUAGES[currentLang]?.countryCode || 'EN').toUpperCase() }}</span>
+                <span :class="'fi fi-' + currentLangFlag + ' fis'"></span>
+                <span class="text-sm font-medium">{{ currentLangDisplay }}</span>
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -224,17 +233,6 @@ const closeMobileMenu = () => {
       class="md:hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-100 z-50 p-4"
     >
       <nav class="flex flex-col space-y-3">
-        <div class="border-b border-gray-100 pb-3 mb-3">
-          <div v-for="lang in languageOptions" :key="lang.code" class="py-2">
-            <button
-              @click="selectLanguage(lang.code); closeMobileMenu()"
-              class="flex items-center space-x-2 w-full text-left text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-            >
-              <span :class="'fi fi-' + lang.countryCode + ' fis'"></span>
-              <span>{{ lang.native }} ({{ lang.name }})</span>
-            </button>
-          </div>
-        </div>
         <router-link
           to="/"
           class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors py-2"
