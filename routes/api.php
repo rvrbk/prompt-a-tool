@@ -21,16 +21,9 @@ Route::prefix('templates')->group(function () {
     Route::get('/metadata', [\App\Http\Controllers\TemplateController::class, 'metadata']);
     Route::get('/{id}', [\App\Http\Controllers\TemplateController::class, 'show']);
     Route::get('/{id}/apply', [\App\Http\Controllers\TemplateController::class, 'apply']);
+    
+    // Mistral AI templates endpoint
+    Route::get('/mistral', [\App\Http\Controllers\TemplateController::class, 'mistralTemplates']);
 });
 
-// Session endpoints
-Route::prefix('sessions')->group(function () {
-    Route::get('/', [\App\Http\Controllers\SessionController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\SessionController::class, 'store']);
-    Route::get('/{sessionId}', [\App\Http\Controllers\SessionController::class, 'show']);
-    Route::post('/{sessionId}/share', [\App\Http\Controllers\SessionController::class, 'share']);
-    Route::delete('/{sessionId}', [\App\Http\Controllers\SessionController::class, 'destroy']);
-});
 
-// Share endpoints
-Route::get('/share/{shareToken}', [\App\Http\Controllers\SessionController::class, 'getByShareToken']);

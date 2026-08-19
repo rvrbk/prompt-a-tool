@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Template;
+use App\Services\MistralService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -173,5 +174,44 @@ class TemplateController extends Controller
             'data' => $templates,
             'count' => $templates->count(),
         ]);
+    }
+
+    /**
+     * Get templates from Mistral AI
+     *
+     * Fetches templates dynamically from Mistral AI based on optional category filter
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Services\MistralService  $mistralService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function mistralTemplates(Request $request, MistralService $mistralService): JsonResponse
+    {
+        $category = $request->query('category');
+        $context = $request->query('context');
+
+        try {
+            if (!$mistralService->isConfigured()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mistral API is not configured. Please set MISTRAL_API_KEY in your .env file.',
+                ], 500);
+            }
+
+            $templates = $mistralService->fetchTemplates($category, $context);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $templates,
+                'count' => count($templates),
+                'source' => 'mistral',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch templates from Mistral: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

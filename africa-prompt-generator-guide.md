@@ -29,8 +29,6 @@ This guide provides **10 iterations** to build the app step-by-step. Each iterat
   - **Target Countries**: Multi-select dropdown with African countries (e.g., Nigeria, Kenya, Ghana, South Africa, Uganda, Rwanda, Tanzania, etc.).
   - **Primary User Types**: Multi-select checkboxes (e.g., Farmers, Teachers, Healthcare Workers, Small Business Owners, Students, Government Officials, etc.).
   - **Offline Access**: Yes/No radio buttons.
-  - **Core Features**: Checkboxes (e.g., User profiles, Payments, Messaging, Maps, Data analytics, Appointments, Content uploads).
-  - **AI Features**: Checkboxes (e.g., Recommendations, Chatbots, Predictions, Data Analysis, Image Recognition).
 3. Add **basic validation** (e.g., `idea` is required).
 4. Add a **"Generate Prompts"** button that logs the form data to the console.
 5. Style the form with **Tailwind CSS** (clean, mobile-friendly, and professional).

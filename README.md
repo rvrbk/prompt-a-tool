@@ -27,8 +27,6 @@ This is a **single unified project** with:
   - Target Countries (multi-select dropdown with 50+ African countries)
   - Primary User Types (multi-select checkboxes)
   - Offline Access (Yes/No radio buttons)
-  - Core Features (multi-select checkboxes)
-  - AI Features (multi-select checkboxes)
 - Basic validation
 - Clean, mobile-friendly, professional UI
 
@@ -245,9 +243,7 @@ curl -X POST http://localhost:8000/api/generate-prompts \
     "idea": "A Nigerian fintech app for savings groups",
     "countries": ["Nigeria"],
     "userTypes": ["Small Business Owners"],
-    "offlineAccess": true,
-    "features": ["User profiles", "Payments"],
-    "aiFeatures": ["Recommendations"]
+    "offlineAccess": true
   }'
 ```
 

@@ -1,6 +1,6 @@
 <script setup>
 import Questionnaire from './components/Questionnaire.vue'
-import useGoogleAnalytics from './composables/useGoogleAnalytics'
+import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
 
 // Initialize Google Analytics
 useGoogleAnalytics()

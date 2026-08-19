@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import ExportShare from './ExportShare.vue'
-import useTranslations from '../composables/useTranslations'
+import useTranslations from '../composables/useTranslations.js'
 
 // Initialize translations
 const { t } = useTranslations()
@@ -14,10 +14,6 @@ const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false
-  },
-  sessionId: {
-    type: String,
-    default: null
   },
   questionnaireData: {
     type: Object,
@@ -283,7 +279,6 @@ const formatForCopy = (section) => {
         <!-- Export and Share buttons -->
         <ExportShare
           :generatedData="generatedData"
-          :sessionId="sessionId"
           :questionnaireData="questionnaireData"
         />
         

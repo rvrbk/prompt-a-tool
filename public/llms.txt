@@ -1,0 +1,153 @@
+# Africa Prompt Generator - LLM Instructions
+
+## Overview
+This file provides instructions for Large Language Models (LLMs) interacting with the Africa Prompt Generator application.
+
+## Application Purpose
+The Africa Prompt Generator is a tool that helps developers create tailored prompts, roles, agents, and skills for building African-focused applications. Users answer questions about their app idea, target countries, and user types, and the system generates comprehensive development prompts.
+
+## Target Audience
+- African developers and entrepreneurs
+- Startups building solutions for African markets
+- NGOs and organizations creating digital tools for Africa
+- Tech professionals working on African-focused projects
+
+## Key Features
+1. **Questionnaire**: Guided form to capture app requirements
+2. **Prompt Generation**: AI-powered generation of development prompts
+3. **Multi-language Support**: Available in 8 major African languages (English, French, Arabic, Swahili, Hausa, Yoruba, Amharic, Luganda)
+4. **Template System**: Pre-built templates for common African app categories (AgriTech, FinTech, EdTech, HealthTech, Logistics, E-commerce, Social)
+5. **Session Management**: Save, load, and resume user sessions
+6. **Export Capabilities**: Download results as JSON or Markdown
+7. **Share Functionality**: Generate shareable links for sessions
+8. **Offline Support (PWA)**: Progressive Web App capabilities for offline access
+
+## African Context Considerations
+When generating content for this application, consider:
+- Low-bandwidth and offline-capable solutions
+- Mobile-first approaches
+- Local languages and dialects
+- Cultural nuances and local business practices
+- Infrastructure limitations in various African regions
+- Payment methods popular in African markets (Mobile Money, M-Pesa, MTN Mobile Money, Airtel Money, Orange Money, etc.)
+- Local regulations and compliance requirements (data sovereignty, financial regulations)
+- Connectivity patterns (intermittent connectivity, 2G/3G prevalence)
+
+## Common African App Categories
+- **AgriTech**: Agriculture technology for farmers, connecting farmers to buyers, crop advice, market prices
+- **FinTech**: Financial services including mobile money, savings groups, peer-to-peer lending, digital wallets
+- **EdTech**: Educational technology and e-learning, localized content, adaptive learning platforms
+- **HealthTech**: Healthcare access and telemedicine, rural healthcare delivery, appointment scheduling
+- **Logistics**: Delivery and transportation solutions, last-mile delivery, route optimization
+- **E-commerce**: Online marketplaces and trading platforms, classifieds, B2B trading
+- **Social**: Community and networking platforms, local groups, professional networks
+- **Utilities**: Payment utilities, bill splitting, airtime purchase, service discovery
+
+## Technical Stack
+- **Frontend**: Vue.js 3, Vite, Tailwind CSS v4, Pinia for state management
+- **Backend**: Laravel 13 PHP framework
+- **AI**: Mistral AI integration (mistral-medium model)
+- **Database**: MySQL / SQLite for development
+- **PWA**: Service workers, cache API, manifest.json for installability
+
+## Development Principles
+1. Mobile-responsive design for all screen sizes (320px to desktop)
+2. Minimal data usage for low-bandwidth connections (< 1MB initial load)
+3. Progressive enhancement for feature phones and older browsers
+4. Accessibility for diverse user abilities (WCAG 2.1 AA compliance)
+5. Localization-ready architecture with RTL language support
+6. Offline-first approach for unreliable network conditions
+
+## Iteration Roadmap
+- **Iteration 1**: Vue.js frontend questionnaire
+- **Iteration 2**: Laravel backend API
+- **Iteration 3**: Frontend-Backend Connection
+- **Iteration 4**: Mistral AI Integration
+- **Iteration 5**: Display Generated Output in UI (Enhanced)
+- **Iteration 6**: Add Africa-specific templates
+- **Iteration 7**: Save & Load User Sessions
+- **Iteration 8**: Export & Share Prompts
+- **Iteration 9**: Complete Multi-language Support (8 languages) and ExportShare translations
+- **Iteration 10**: Add Offline Support (PWA) - Current
+
+## API Endpoints
+
+### Core Generation
+- POST /api/generate-prompts - Generate prompts from questionnaire data
+- GET /api/mistral/status - Check Mistral AI configuration
+
+### Templates
+- GET /api/templates - List available templates
+- GET /api/templates/{id} - Get template details
+- GET /api/templates/{id}/apply - Apply template to questionnaire
+
+### Sessions
+- POST /api/sessions - Save a user session
+- GET /api/sessions - List user sessions
+- GET /api/sessions/{id} - Load a specific session
+- DELETE /api/sessions/{id} - Delete a session
+- POST /api/sessions/{id}/share - Generate a shareable link for a session
+
+### Sharing
+- GET /api/share/{shareToken} - Retrieve a shared session by token
+
+### System
+- GET /health - Health check endpoint
+
+## PWA (Progressive Web App) Specifications
+- **Service Worker**: Caches API responses, templates, and static assets for offline use
+- **Cache Strategy**: Network-first with offline fallback for critical assets
+- **Manifest**: Includes app name, icons (192x192, 512x512), theme colors
+- **Install Prompt**: Automatic on repeat visits, manual install option
+- **Offline Page**: Custom offline page guiding users to reconnect
+- **Background Sync**: Queue prompt generation requests when offline, sync when online
+- **Asset Pre-caching**: Templates, country lists, and common resources cached on first load
+
+## Security Considerations
+- All API requests should be validated with Laravel form request classes
+- Rate limiting applied to generate-prompts endpoint (60 requests/minute)
+- User data handled according to privacy best practices
+- CORS configured for web access with allowed origins
+- Share tokens are unique, random, and expire after 30 days
+- Sessions use unique IDs for anonymous users
+
+## Error Handling
+The application provides user-friendly error messages. When errors occur:
+- Network errors: Show offline/connectivity messages with retry option
+- Validation errors: Highlight form fields with specific error messages
+- Server errors: Display generic error with option to retry
+- Empty states: Guide users on next steps
+- Rate limit errors: Inform user and show countdown
+- Offline errors: Queue request for background sync when online
+
+## Performance Optimization
+- Code splitting for Vue.js components
+- Lazy loading for non-critical routes
+- Image optimization and WebP format
+- Compression enabled for all API responses
+- Minimal third-party dependencies
+
+## Multi-language Support Details
+- **Languages**: English, French, Arabic (RTL), Portuguese, Swahili, Hausa, Yoruba, Amharic, Luganda (9 languages total, 8 primary)
+- **Translation Files**: JSON-based, loaded dynamically via useTranslations composable
+- **RTL Support**: Direction detection for Arabic, automatic layout adjustment
+- **Fallback**: English as fallback language
+- **Language Switcher**: Persistent user preference stored in localStorage
+- **Component Coverage**: All major components translated (Questionnaire, ResultsDisplay, SessionManager, TemplateSelector, ExportShare)
+
+## Data Format Specifications
+- **Questionnaire Data**: JSON object with idea, countries, userTypes, offlineAccess
+- **Generated Output**: Structured JSON with userRoles, aiAgents, backendPrompts, frontendPrompts
+- **Session Data**: Includes questionnaire state, generated results, metadata (name, created_at, updated_at)
+- **Template Data**: JSON with name, category, description, questionnaire defaults
+- **Export JSON**: Complete session data with version info
+- **Export Markdown**: Formatted documentation with sections for roles, agents, prompts
+
+## Version
+2.1.0
+
+## Last Updated
+2026-08-18
+
+## Contact
+For questions about the Africa Prompt Generator, please refer to the README.md file in the project root.

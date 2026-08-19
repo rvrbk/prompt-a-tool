@@ -134,8 +134,6 @@ class MistralService
     {
         $countries = implode(', ', $data['countries'] ?? []);
         $userTypes = implode(', ', $data['userTypes'] ?? []);
-        $features = implode(', ', $data['features'] ?? []);
-        $aiFeatures = implode(', ', $data['aiFeatures'] ?? []);
         $offlineAccess = ($data['offlineAccess'] ?? false) ? 'Yes' : 'No';
 
         return <<<PROMPT
@@ -178,8 +176,6 @@ DO NOT include any markdown, explanations, or text outside the JSON. Only return
 **App Idea**: {$data['idea']}
 **Target Countries**: {$countries}
 **Primary User Types**: {$userTypes}
-**Core Features**: {$features}
-**AI Features**: {$aiFeatures}
 **Offline Access Required**: {$offlineAccess}
 
 Remember: This is for an African context. Consider local languages, connectivity challenges, mobile-first approach, relevant African use cases, and iterative development that allows for gradual feature rollout.
@@ -229,5 +225,127 @@ PROMPT;
     public function getModel(): string
     {
         return $this->model;
+    }
+
+    /**
+     * Fetch templates from Mistral AI
+     *
+     * Generates or retrieves templates based on category or context
+     *
+     * @param string|null $category Optional category filter
+     * @param string|null $context Optional context for template generation
+     * @return array List of templates
+     * @throws Exception If the API request fails
+     */
+    public function fetchTemplates(?string $category = null, ?string $context = null): array
+    {
+        if (empty($this->apiKey)) {
+            throw new Exception('Mistral API key is not configured. Please set MISTRAL_API_KEY in your .env file.');
+        }
+
+        $prompt = $this->buildTemplatePrompt($category, $context);
+
+        Log::info('Mistral API templates request', [
+            'model' => $this->model,
+            'category' => $category,
+            'context' => $context,
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->withOptions([
+                'timeout' => 30,
+            ])->post($this->apiUrl, [
+                'model' => $this->model,
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $prompt,
+                    ],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 2000,
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Mistral API templates request failed', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+
+                throw new Exception('Mistral API request failed: ' . $response->status() . ' - ' . $response->body());
+            }
+
+            $responseData = $response->json();
+
+            if (!isset($responseData['choices'][0]['message']['content'])) {
+                Log::error('Mistral API invalid templates response format', [
+                    'response' => $responseData,
+                ]);
+
+                throw new Exception('Invalid response format from Mistral API');
+            }
+
+            $content = $responseData['choices'][0]['message']['content'];
+            $parsed = $this->tryParseJson($content);
+
+            if ($parsed !== null && isset($parsed['templates'])) {
+                return $parsed['templates'];
+            }
+
+            // If not valid JSON or no templates key, return empty array
+            return [];
+
+        } catch (Exception $e) {
+            Log::error('Mistral API templates exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Build the prompt for fetching templates from Mistral AI
+     *
+     * @param string|null $category
+     * @param string|null $context
+     * @return string
+     */
+    protected function buildTemplatePrompt(?string $category = null, ?string $context = null): string
+    {
+        $categoryText = $category ? " for the category: $category" : '';
+        $contextText = $context ? " with context: $context" : '';
+
+        return <<<PROMPT
+Generate a list of 10 Africa-focused app template ideas$categoryText$contextText.
+
+Each template should have:
+- id: unique identifier
+- name: short template name
+- description: brief description
+- category: one of AgriTech, FinTech, EdTech, HealthTech, Logistics, general
+- icon: emoji icon
+- tags: array of relevant tags
+
+Return ONLY a JSON object with a "templates" key containing the array. Do not include any markdown or explanations.
+
+Example format:
+{
+  "templates": [
+    {
+      "id": 1,
+      "name": "Nigeria Fintech Savings",
+      "description": "A savings group app for Nigerian communities",
+      "category": "FinTech",
+      "icon": "💰",
+      "tags": ["savings", "fintech", "nigeria"]
+    }
+  ]
+}
+PROMPT;
     }
 }

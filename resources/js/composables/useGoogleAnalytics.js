@@ -136,18 +136,10 @@ export const useGoogleAnalytics = (measurementId = null, options = {}) => {
     })
   }
 
-  // Track session/export actions
-  const trackExport = (format, sessionId = null) => {
+  // Track export actions
+  const trackExport = (format) => {
     trackEvent('export', {
-      format,
-      session_id: sessionId
-    })
-  }
-
-  const trackShare = (method, sessionId = null) => {
-    trackEvent('share', {
-      method,
-      session_id: sessionId
+      format
     })
   }
 
@@ -163,8 +155,7 @@ export const useGoogleAnalytics = (measurementId = null, options = {}) => {
     trackEvent,
     trackFormSubmission,
     trackButtonClick,
-    trackExport,
-    trackShare
+    trackExport
   }
 }
 

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import axios from 'axios'
-import useTranslations from '../composables/useTranslations'
+import useTranslations from '../composables/useTranslations.js'
 
 // Initialize translations
 const { t } = useTranslations()
@@ -21,6 +21,7 @@ const selectedTemplate = ref(null)
 const selectedCategory = ref('all')
 const isLoading = ref(false)
 const error = ref(null)
+const useMistralApi = ref(false) // Toggle between local DB and Mistral API
 
 // Computed
 const showModal = computed({
@@ -50,17 +51,39 @@ const categoryIcons = {
   general: '📄'
 }
 
-// Fetch templates
+// Fetch templates - can use local DB or Mistral API
 const fetchTemplates = async () => {
   isLoading.value = true
   error.value = null
   
   try {
-    const response = await axios.get('/api/templates/metadata')
+    let endpoint = '/api/templates/metadata'
+    
+    // Use Mistral API if enabled
+    if (useMistralApi.value) {
+      endpoint = '/api/templates/mistral'
+      
+      // Optionally pass category filter to Mistral
+      const params = new URLSearchParams()
+      if (selectedCategory.value !== 'all') {
+        params.append('category', selectedCategory.value)
+      }
+      endpoint += '?' + params.toString()
+    }
+    
+    const response = await axios.get(endpoint)
     templates.value = response.data.data || []
+    
+    // Mistral API returns templates directly, local API returns them under data
+    if (useMistralApi.value && response.data.templates) {
+      templates.value = response.data.templates
+    }
+    
   } catch (err) {
     console.error('Failed to fetch templates:', err)
-    error.value = 'Failed to load templates. Please try again.'
+    error.value = useMistralApi.value 
+      ? 'Failed to load templates from Mistral. Check your API key.'
+      : 'Failed to load templates. Please try again.'
     emit('error', err)
   } finally {
     isLoading.value = false
@@ -132,10 +155,10 @@ defineExpose({
     >
       <div
         @click.stop
-        class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+        class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden relative z-[60] flex flex-col"
       >
         <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
           <div class="flex items-center">
             <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -145,33 +168,58 @@ defineExpose({
               <p class="text-sm text-gray-500">{{ t('selectTemplate') }}</p>
             </div>
           </div>
-          <button
-            @click="showModal = false"
-            class="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div class="flex items-center gap-2">
+            <!-- API Source Toggle -->
+            <div class="flex items-center bg-gray-100 rounded-lg p-1 text-sm">
+              <button
+                @click="useMistralApi = false; fetchTemplates()"
+                class="px-3 py-1 rounded-md transition-all"
+                :class="{
+                  'bg-white text-purple-600 shadow': !useMistralApi,
+                  'text-gray-600': useMistralApi
+                }"
+              >
+                Local DB
+              </button>
+              <button
+                @click="useMistralApi = true; fetchTemplates()"
+                class="px-3 py-1 rounded-md transition-all"
+                :class="{
+                  'bg-white text-purple-600 shadow': useMistralApi,
+                  'text-gray-600': !useMistralApi
+                }"
+              >
+                Mistral AI
+              </button>
+            </div>
+            <button
+              @click="showModal = false"
+              class="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Content -->
-        <div class="p-6">
+        <div class="p-6 overflow-y-auto flex-1 min-h-0">
           <!-- Category Filter -->
-          <div class="mb-6">
-            <div class="flex flex-wrap gap-2">
+          <div class="mb-6 min-h-[50px]">
+            <div class="flex flex-wrap gap-2 z-10">
               <button
                 v-for="category in categories"
                 :key="category"
                 @click="selectedCategory = category"
-                class="px-3 py-1.5 text-sm font-medium rounded-full transition-all"
+                class="px-3 py-1.5 text-sm font-medium rounded-full transition-all relative z-10"
                 :class="{
                   'bg-purple-600 text-white': selectedCategory === category,
                   'bg-gray-100 text-gray-600 hover:bg-gray-200': selectedCategory !== category
                 }"
               >
                 <span v-if="category === 'all'" class="mr-1">🌍</span>
-                <span v-else>{{ category === 'all' ? t('allCategories') : category }}</span>
+                <span v-else>{{ category === 'all' ? t('allCategories') : t(category.toLowerCase()) }}</span>
                 <span class="ml-1">({{ filteredTemplates.filter(t => category === 'all' || t.category === category).length }})</span>
               </button>
             </div>
@@ -240,13 +288,13 @@ defineExpose({
           </div>
         </div>
 
-        <!-- Footer (sticky) -->
-        <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-white sticky bottom-0">
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-white relative z-20 flex-shrink-0">
           <button
             @click="showModal = false"
             class="px-4 py-2 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition-all"
           >
-            Cancel
+            {{ t('cancelButton') }}
           </button>
           <button
             @click="applyTemplate"
@@ -257,7 +305,7 @@ defineExpose({
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <span>Apply Template</span>
+            <span>{{ t('applyTemplate') }}</span>
           </button>
         </div>
       </div>

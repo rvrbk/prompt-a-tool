@@ -41,10 +41,6 @@ class PromptController extends Controller
             'userTypes' => 'required|array',
             'userTypes.*' => 'string',
             'offlineAccess' => 'required|boolean',
-            'features' => 'nullable|array',
-            'features.*' => 'string',
-            'aiFeatures' => 'nullable|array',
-            'aiFeatures.*' => 'string',
         ]);
 
         // Log the received data for debugging
