@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\MistralService;
+use App\Services\MobileMoneyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -15,11 +17,17 @@ class PromptController extends Controller
     protected MistralService $mistralService;
 
     /**
+     * The Mobile Money service instance
+     */
+    protected MobileMoneyService $mobileMoneyService;
+
+    /**
      * Create a new controller instance
      */
-    public function __construct(MistralService $mistralService)
+    public function __construct(MistralService $mistralService, MobileMoneyService $mobileMoneyService)
     {
         $this->mistralService = $mistralService;
+        $this->mobileMoneyService = $mobileMoneyService;
     }
 
     /**
@@ -27,6 +35,11 @@ class PromptController extends Controller
      *
      * This endpoint accepts questionnaire data and uses Mistral AI to generate
      * roles, agents, and prompts for the app idea.
+     *
+     * It also enforces the Mobile Money payment requirement:
+     * - Visitors from African countries get 1 free generation
+     * - After that, they need to make a Mobile Money payment
+     * - Payment status is tracked via cookies
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -46,6 +59,35 @@ class PromptController extends Controller
             'data' => $validated,
             'language' => $validated['language'] ?? 'en'
         ]);
+
+        // Check payment status and free trial
+        $trialStatus = $this->mobileMoneyService->checkFreeTrial($request);
+        $countryCode = $this->mobileMoneyService->detectCountryFromIP($request);
+        $isAfricanCountry = $countryCode && $this->mobileMoneyService->isAfricanCountry($countryCode);
+
+        // If Mobile Money is configured, enforce payment requirement for African visitors
+        if ($this->mobileMoneyService->isConfigured()) {
+            if (!$trialStatus['has_free'] && $isAfricanCountry) {
+                // User has no free generations left and is from an African country
+                $providers = $this->mobileMoneyService->getProvidersForCountry($countryCode);
+                $defaultPhone = $this->mobileMoneyService->getDefaultPhoneNumber();
+
+                return response()->json([
+                    'status' => 'payment_required',
+                    'message' => 'Mobile Money payment required for more generations.',
+                    'requires_payment' => true,
+                    'country' => $countryCode,
+                    'country_name' => $this->mobileMoneyService->getCountryName($countryCode),
+                    'providers' => $providers,
+                    'default_phone' => $defaultPhone,
+                    'payment_instructions' => $this->mobileMoneyService->getPaymentInstructions(
+                        $countryCode,
+                        $providers,
+                        $defaultPhone
+                    ),
+                ], 402);
+            }
+        }
 
         try {
             // Check if Mistral is configured
@@ -67,6 +109,8 @@ class PromptController extends Controller
                 'message' => 'Prompts generated successfully',
                 'data' => $validated,
                 'generated_at' => now()->toISOString(),
+                'free_generations_remaining' => max(0, $trialStatus['remaining'] - 1),
+                'free_generations_used' => $trialStatus['used'] + 1,
             ];
 
             // Add Mistral-generated content if available
@@ -86,7 +130,19 @@ class PromptController extends Controller
                 $response['raw_response'] = $mistralResponse['raw_response'];
             }
 
-            return response()->json($response);
+            // Increment the free trial counter
+            $newCookieValue = $this->mobileMoneyService->incrementFreeTrial($request, $countryCode);
+            $cookie = Cookie::make(
+                'prompt_generator_free_trial',
+                $newCookieValue,
+                60 * 24 * 30, // 30 days
+                null,
+                null,
+                false,
+                true // HttpOnly
+            );
+
+            return response()->json($response)->withCookie($cookie);
 
         } catch (Exception $e) {
             Log::error('Prompt generation failed', [

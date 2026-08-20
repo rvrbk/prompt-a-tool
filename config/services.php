@@ -40,4 +40,21 @@ return [
         'model' => env('MISTRAL_MODEL', 'mistral-medium'),
     ],
 
+    'mobile_money' => [
+        'default_phone' => env('MOBILE_MONEY_PHONE_NUMBER', ''),
+        'enabled_countries' => [
+            'NG', 'GH', 'KE', 'TZ', 'UG', 'RW', 'CM', 'SN', 'CI', 'BF',
+            'ML', 'NE', 'BJ', 'TG', 'GA', 'CG', 'CD', 'AO', 'MZ', 'ZM',
+            'ZW', 'MW', 'LS', 'BW', 'NA', 'SW', 'SS', 'LR', 'SL', 'GN',
+            'GW', 'MR', 'SH', 'KM', 'CV', 'ST', 'SC', 'DJ', 'ER', 'ET',
+        ],
+        'providers' => [
+            'NG' => ['MTN', 'Glo', 'Airtel', '9Mobile'],
+            'GH' => ['MTN', 'Vodafone', 'AirtelTigo'],
+            'KE' => ['M-Pesa', 'Airtel Money', 'T-Kash'],
+            'TZ' => ['M-Pesa', 'Tigo Pesa', 'Airtel Money', 'HaloPesa'],
+            'UG' => ['MTN Mobile Money', 'Airtel Money', 'AfraMobile Money'],
+        ],
+    ],
+
 ];

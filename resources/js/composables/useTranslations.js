@@ -153,6 +153,22 @@ const translations = {
     backToGenerator: 'Back to Generator',
     
     // Category names
+    
+    // Mobile Money Payment Translations
+    mobileMoneyPaymentRequired: 'Mobile Money Payment Required',
+    mobileMoneyPaymentInstructionsGeneric: 'Send Mobile Money payment to the provided number to access more generations.',
+    mobileMoneyPaymentInstructionsWithProvider: 'Send Mobile Money payment via {providers} to {phone} to access more generations.',
+    howToPay: 'How to Pay',
+    paymentPhoneNumber: 'Payment Phone Number',
+    supportedProviders: 'Supported Mobile Money Providers',
+    yourCountry: 'Your Country',
+    noFreeGenerationsRemaining: 'No free generations remaining',
+    mobileMoneyNotConfigured: 'Mobile Money payment is not yet configured.',
+    failedToCheckPaymentStatus: 'Failed to check payment status. Please try again.',
+    paymentSimulationFailed: 'Payment simulation failed.',
+    countryOverrideSet: 'Country override set successfully.',
+    
+    // PWA Translations (existing)
   },
   
   ar: {
@@ -231,8 +247,22 @@ const translations = {
     aboutFrontendPrompts: 'مطالبات Frontend (مع تعليمات)',
     aboutFrontendPromptsDesc: 'إرشادات وتعليمات لبناء واجهة المستخدم لتطبيقك',
     aboutWhyUseful: 'لماذا هي مفيدة؟',
-    aboutWhyUsefulDesc: 'بدلاً من البدء من الصفر ومحاولة اكتشاف كل شيء بنفسك، فإن هذه الأداة تعطيك أساسًا متينًا. يمكنك استخدام النتائج المولدة كنقطة بداية وتعديلها حسب الحاجة وتوفير الوقت في مرحلة التخطيط.',
+    aboutWhyUsefulDesc: 'بدلاً من البدء من صفر ومحاولة اكتشاف كل شيء بنفسك، فإن هذه الأداة تعطيك أساسًا متينًا. يمكنك استخدام النتائج المولدة كنقطة بداية وتعديلها حسب الحاجة وتوفير الوقت في مرحلة التخطيط.',
     backToGenerator: 'العودة إلى المولد',
+    
+    // Mobile Money Payment Translations
+    mobileMoneyPaymentRequired: 'مطلوب دفع عبر المحفظة الجوال',
+    mobileMoneyPaymentInstructionsGeneric: 'قم بدفع عبر المحفظة الجوال إلى الرقم المخصص للحصول على مزايا أكثر.',
+    mobileMoneyPaymentInstructionsWithProvider: 'قم بدفع عبر المحفظة الجوال من خلال {providers} إلى {phone} للحصول على مزايا أكثر.',
+    howToPay: 'كيف تدفع',
+    paymentPhoneNumber: 'رقم الهاتف للدفع',
+    supportedProviders: 'مزودي خدمة المحفظة الجوال المدعومة',
+    yourCountry: 'بلدك',
+    noFreeGenerationsRemaining: 'لم يتبق أي توليدات مجانية',
+    mobileMoneyNotConfigured: 'لم يتم تهيئة دفع المحفظة الجوال بعد.',
+    failedToCheckPaymentStatus: 'فشل في فحص حالة الدفع. حاول مرة أخرى.',
+    paymentSimulationFailed: 'فشل محاكاة الدفع.',
+    countryOverrideSet: 'تم تعين استبدال البلد بنجاح.',
     
     // Category names
   },
@@ -339,6 +369,20 @@ const translations = {
     aboutWhyUseful: 'Pourquoi est-ce utile ?',
     aboutWhyUsefulDesc: 'Au lieu de partir de zéro et d\'essayer de tout comprendre par vous-même, cet outil vous donne une base solide. Vous pouvez utiliser les résultats générés comme point de départ, les modifier selon vos besoins et gagner du temps sur la phase de planification.',
     backToGenerator: 'Retour au Générateur',
+    
+    // Mobile Money Payment Translations
+    mobileMoneyPaymentRequired: 'Paiement Mobile Money Requis',
+    mobileMoneyPaymentInstructionsGeneric: 'Envoyez un paiement Mobile Money au numéro fourni pour accéder à plus de générations.',
+    mobileMoneyPaymentInstructionsWithProvider: 'Envoyez un paiement Mobile Money via {providers} à {phone} pour accéder à plus de générations.',
+    howToPay: 'Comment payer',
+    paymentPhoneNumber: 'Numéro de téléphone de paiement',
+    supportedProviders: 'Fournisseurs Mobile Money pris en charge',
+    yourCountry: 'Votre pays',
+    noFreeGenerationsRemaining: 'Aucune génération gratuite restante',
+    mobileMoneyNotConfigured: 'Le paiement Mobile Money n\'est pas encore configuré.',
+    failedToCheckPaymentStatus: 'Échec de la vérification du statut de paiement. Veuillez réessayer.',
+    paymentSimulationFailed: 'La simulation de paiement a échoué.',
+    countryOverrideSet: 'Remplacement du pays défini avec succès.',
     
     // Category names
   },

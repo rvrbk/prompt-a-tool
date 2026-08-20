@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, inject } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
+import MobileMoneyPayment from './MobileMoneyPayment.vue'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
 
 // Use translations from App.vue provider
@@ -40,6 +41,16 @@ const showResults = ref(false)
 
 // Error state
 const errorMessage = ref(null)
+
+// Payment state
+const showPaymentModal = ref(false)
+const paymentCountry = ref(null)
+const paymentCountryName = ref(null)
+const paymentProviders = ref([])
+const paymentDefaultPhone = ref('')
+const requiresPayment = ref(false)
+const freeGenerationsRemaining = ref(0)
+const paymentError = ref(null)
 
 // Validation
 const validateForm = () => {
@@ -176,8 +187,19 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   isSuccess.value = false
   errorMessage.value = null
+  paymentError.value = null
   
   try {
+    // Check payment status first
+    const paymentData = await checkPaymentStatus()
+    
+    // If payment is required, show payment modal instead
+    if (paymentData && paymentData.requires_payment) {
+      isSubmitting.value = false
+      showPaymentModal.value = true
+      return
+    }
+    
     // Track form submission attempt
     trackFormSubmission('questionnaire')
     
@@ -204,10 +226,37 @@ const handleSubmit = async () => {
     // Store the response data for display
     generatedData.value = response.data
     
+    // Update free generations remaining from response
+    if (response.data.free_generations_remaining !== undefined) {
+      freeGenerationsRemaining.value = response.data.free_generations_remaining
+    }
+    
     isSuccess.value = true
     showResults.value = true
+    
+    // Track free generations
+    trackEvent('generation_success', {
+      free_generations_remaining: freeGenerationsRemaining.value
+    })
+    
   } catch (error) {
     console.error('API Error:', error)
+    
+    // Check if it's a payment required error (HTTP 402)
+    if (error.response && error.response.status === 402) {
+      // Show payment modal for payment required
+      if (error.response.data.requires_payment) {
+        paymentCountry.value = error.response.data.country
+        paymentCountryName.value = error.response.data.country_name
+        paymentProviders.value = error.response.data.providers || []
+        paymentDefaultPhone.value = error.response.data.default_phone || ''
+        requiresPayment.value = true
+        
+        isSubmitting.value = false
+        showPaymentModal.value = true
+        return
+      }
+    }
     
     // Track failed form submission
     trackFormSubmission('questionnaire', false, {
@@ -247,6 +296,45 @@ const resetForm = () => {
   showQuestionsWizard.value = false
   questionsError.value = null
   questionsGenerationComplete.value = false
+  
+  // Reset payment state
+  showPaymentModal.value = false
+  paymentError.value = null
+}
+
+// Check payment status before submission
+const checkPaymentStatus = async () => {
+  try {
+    const response = await axios.get('/api/payments/status')
+    const data = response.data
+    
+    paymentCountry.value = data.country
+    paymentCountryName.value = data.country_name
+    paymentProviders.value = data.providers || []
+    paymentDefaultPhone.value = data.default_phone || ''
+    requiresPayment.value = data.requires_payment || false
+    freeGenerationsRemaining.value = data.free_generations_remaining || 0
+    
+    trackEvent('payment_status_pre_submit', {
+      has_free: data.has_free_generation,
+      requires_payment: data.requires_payment,
+      country: data.country
+    })
+    
+    return data
+  } catch (error) {
+    console.error('Failed to check payment status:', error)
+    paymentError.value = t('failedToCheckPaymentStatus') || 'Failed to check payment status'
+    // Continue without blocking - payment check is optional
+    return null
+  }
+}
+
+// Retry after payment
+const handleRetryAfterPayment = () => {
+  showPaymentModal.value = false
+  paymentError.value = null
+  // The form submission will be retried
 }
 </script>
 
@@ -511,6 +599,19 @@ const resetForm = () => {
       :questionnaireData="form"
       :followUpQuestions="followUpQuestions"
       @close="showResults = false"
+    />
+
+    <!-- Mobile Money Payment Modal -->
+    <MobileMoneyPayment
+      :show="showPaymentModal"
+      :country="paymentCountry"
+      :countryName="paymentCountryName"
+      :providers="paymentProviders"
+      :defaultPhone="paymentDefaultPhone"
+      :requiresPayment="requiresPayment"
+      :freeGenerationsRemaining="freeGenerationsRemaining"
+      @close="showPaymentModal = false"
+      @retry="handleSubmit"
     />
   </div>
 </template>
