@@ -346,7 +346,7 @@ const handleRetryAfterPayment = () => {
         <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
           {{ t('appTitle') }}
         </h2>
-        <p class="text-gray-500 leading-relaxed text-xs">
+        <p class="text-gray-500 leading-relaxed text-sm">
           {{ t('appDescription') }}
         </p>
       </div>
