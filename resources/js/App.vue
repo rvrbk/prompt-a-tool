@@ -2,8 +2,10 @@
 import { ref, computed, onMounted, onUnmounted, watch, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import CookieBanner from './components/CookieBanner.vue'
+import PWAInstallPrompt from './components/PWAInstallPrompt.vue'
 import useTranslations from './composables/useTranslations.js'
 import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
+import usePWA from './composables/usePWA.js'
 
 // Initialize translations with auto-detection and cookie support
 const { 
@@ -138,6 +140,75 @@ watch(currentLang, () => {
 // Initialize Google Analytics
 useGoogleAnalytics()
 
+// Initialize PWA
+const {
+  isPWAInstalled,
+  canInstallPWA,
+  showInstallPrompt,
+  isOffline,
+  hasUpdates,
+  newVersionAvailable,
+  showInstallationPrompt,
+  checkPWAInstalled,
+  updateServiceWorker,
+  requestNotificationPermission,
+} = usePWA();
+
+// PWA state for UI
+const showPWAInstallPrompt = ref(false);
+const showUpdatePrompt = ref(false);
+const showOfflineToast = ref(false);
+
+// Watch for PWA installation prompt
+watch(showInstallPrompt, (newVal) => {
+  if (newVal) {
+    showPWAInstallPrompt.value = true;
+  }
+});
+
+// Watch for updates
+watch(newVersionAvailable, (newVal) => {
+  if (newVal) {
+    showUpdatePrompt.value = true;
+  }
+});
+
+// Watch for offline/online status
+watch(isOffline, (newVal) => {
+  if (newVal) {
+    showOfflineToast.value = true;
+    setTimeout(() => {
+      showOfflineToast.value = false;
+    }, 3000);
+  }
+});
+
+// Handle PWA install
+const handlePWAInstall = () => {
+  showInstallationPrompt();
+  showPWAInstallPrompt.value = false;
+};
+
+// Handle PWA dismiss
+const handlePWADismiss = () => {
+  showPWAInstallPrompt.value = false;
+};
+
+// Handle update now
+const handleUpdateNow = async () => {
+  const success = await updateServiceWorker();
+  if (!success) {
+    // Fallback: just reload
+    window.location.reload();
+  }
+  showUpdatePrompt.value = false;
+};
+
+// Dismiss update prompt
+const handleUpdateDismiss = () => {
+  showUpdatePrompt.value = false;
+};
+
 const route = useRoute()
 
 // Mobile menu state
@@ -166,6 +237,14 @@ const closeMobileMenu = () => {
               <h1 :class="[titleClass, 'font-semibold text-gray-900 tracking-tight']">{{ t('appTitle') }}</h1>
             </router-link>
             <nav class="hidden md:flex items-center space-x-6">
+              <router-link
+                to="/"
+                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                :class="{ 'text-gray-900': route.path === '/' }"
+                @click.stop
+              >
+                {{ t('navHome') }}
+              </router-link>
               <router-link
                 to="/about"
                 class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
@@ -273,6 +352,77 @@ const closeMobileMenu = () => {
       @accept="handleCookieAccept"
       @dismiss="handleCookieDismiss"
     />
+
+    <!-- PWA Install Prompt -->
+    <PWAInstallPrompt
+      :show="showPWAInstallPrompt"
+      :language="currentLang"
+      @install="handlePWAInstall"
+      @dismiss="handlePWADismiss"
+    />
+
+    <!-- Update Available Toast -->
+    <div
+      v-if="showUpdatePrompt"
+      class="fixed bottom-6 right-6 bg-white border border-gray-200 rounded-xl shadow-lg p-4 max-w-xs z-[1000]"
+    >
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-900">{{ t('pwaUpdateAvailable') || 'Update Available' }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ t('pwaUpdateDescription') || 'A new version is available' }}</p>
+          <div class="flex gap-2 mt-3">
+            <button
+              @click="handleUpdateNow"
+              class="px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              {{ t('pwaUpdateButton') || 'Update Now' }}
+            </button>
+            <button
+              @click="handleUpdateDismiss"
+              class="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            >
+              {{ t('pwaDismissButton') || 'Later' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offline Toast -->
+    <div
+      v-if="showOfflineToast"
+      class="fixed bottom-6 left-6 bg-white border border-gray-200 rounded-xl shadow-lg p-4 max-w-xs z-[1000]"
+    >
+      <div class="flex items-center gap-3">
+        <div class="flex-shrink-0">
+          <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-900">{{ t('pwaOfflineMessage') || 'You are offline' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PWA Installation Badge (for browsers that support it) -->
+    <div
+      v-if="canInstallPWA && !isPWAInstalled"
+      class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-[999] cursor-pointer hover:bg-gray-800 transition-colors"
+      @click="showPWAInstallPrompt = true"
+    >
+      <span class="flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+        {{ t('pwaInstallButton') || 'Install App' }}
+      </span>
+    </div>
   </div>
 </template>
 

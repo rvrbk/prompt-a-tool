@@ -4,7 +4,41 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Prompt A Tool') }}</title>
+        <meta name="description" content="A powerful prompt generation tool for AI applications">
+
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#1B1B18">
+        <meta name="background-color" content="#FDFDFC">
+        <meta name="application-name" content="Prompt A Tool">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Prompt A Tool">
+        <meta name="msapplication-TileColor" content="#1B1B18">
+        <meta name="msapplication-tap-highlight" content="no">
+
+        <!-- Web App Manifest -->
+        <link rel="manifest" href="/manifest.json">
+
+        <!-- PWA Icons -->
+        <link rel="apple-touch-icon" href="/favicon.ico">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+        <!-- Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(function(registration) {
+                            console.log('[PWA] ServiceWorker registration successful');
+                        })
+                        .catch(function(err) {
+                            console.log('[PWA] ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+        </script>
 
         @fonts
 
