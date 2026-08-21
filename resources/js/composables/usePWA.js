@@ -132,7 +132,6 @@ export default function usePWA() {
           console.log('[PWA] Service worker controller changed');
           // Re-register periodic sync after controller change
           registerPeriodicSync(registration.value);
-          window.location.reload();
         });
 
         return registration.value;

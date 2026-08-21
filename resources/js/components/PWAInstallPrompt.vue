@@ -180,11 +180,11 @@ const pwaTranslations = {
     pwaInstallDescription: 'Pata uzoefu kamili kwa kuweka app hii kwenye kifaa chako.',
     pwaInstallButton: 'Sakinisha',
     pwaDismissButton: 'Sio Sasa',
-    pwaOfflineReady: 'App imetengenezwa kwa kutumia nchini!',
-    pwaUpdateAvailable: 'Upopo wa Sasa',
-    pwaUpdateDescription: 'Toleo jipya la app limew passed.',
-    pwaUpdateButton: 'Sasa Sasa',
-    pwaOfflineMessage: 'Uko nchini. Baadhi ya utendaji unaweza kuwa na kipimo.',
+    pwaOfflineReady: 'App imetengenezwa kwa kutumia offline!',
+    pwaUpdateAvailable: 'Sasa Upopo',
+    pwaUpdateDescription: 'Toleo jipya la app limewashi.',
+    pwaUpdateButton: 'Sasa',
+    pwaOfflineMessage: 'Uko offline. Baadhi ya utendaji unaweza kuwa na kipimo.',
     pwaBackOnline: 'Umerudi mtandao!',
   },
   am: {
@@ -201,12 +201,12 @@ const pwaTranslations = {
   },
   or: {
     pwaInstallTitle: 'App Fudhatuu',
-    pwaInstallDescription: 'Dhaabbata guutuu ta\'eef ta\'uun isaa akka barbaachisuuf gaafii app kun akka alaa liqee qaba.',
+    pwaInstallDescription: 'Dhaabbata guutuu taeef taaun isaa akka barbaachisuuf gaafii app kun akka alaa liqee qaba.',
     pwaInstallButton: 'Fudhatuu',
     pwaDismissButton: 'Eessatu',
-    pwaOfflineReady: 'App tiin ofiinii ta\'uuf waggaa kanneen yookaa!',
+    pwaOfflineReady: 'App tiin ofiinii taauuf waggaa kanneen yookaa!',
     pwaUpdateAvailable: 'Dhihoo Dhaabbataa',
-    pwaUpdateDescription: 'Dhihoo app dhaabbataa ta\'eef ta\'ee jira.',
+    pwaUpdateDescription: 'Dhihoo app dhaabbataa taeef taee jira.',
     pwaUpdateButton: 'Dhiibbaa Eessaa',
     pwaOfflineMessage: 'Ofiin jirtu. Qaamolee qajeelama haalaa irra jirru ni dabaru.',
     pwaBackOnline: 'Yeroo ofiin jireenyi ofii jirtu!',
@@ -217,10 +217,9 @@ const pwaTranslations = {
 const getTranslation = (key) => {
   const lang = props.language || 'en';
   
-  // First try the main translations
+  // First try the main translations (using the already-imported t function)
   try {
-    const mainTranslations = useTranslations(lang).t;
-    const value = mainTranslations(key);
+    const value = t(key);
     if (value && value !== key) return value;
   } catch {
     // Fallback to PWA translations
