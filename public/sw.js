@@ -9,7 +9,7 @@ const API_CACHE_NAME = 'prompt-a-tool-api-v1';
 const CORE_ASSETS = [
   '/',
   '/index.php',
-  '/manifest.json',
+  '/manifest.webmanifest',
   '/favicon.ico',
   '/favicon.svg',
 ];
@@ -287,17 +287,6 @@ async function syncPromptData() {
   } catch (error) {
     console.error('[SW] Sync error:', error);
   }
-}
-
-// Periodic sync (if supported)
-if ('periodicSync' in self.registration) {
-  self.registration.periodicSync.register('sync-prompt-data', {
-    minInterval: 1000 * 60 * 15, // 15 minutes
-  }).then(() => {
-    console.log('[SW] Periodic sync registered');
-  }).catch((error) => {
-    console.error('[SW] Periodic sync registration failed:', error);
-  });
 }
 
 // Message handler for communication with the app

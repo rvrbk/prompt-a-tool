@@ -39,7 +39,9 @@ export const useGoogleAnalytics = (measurementId = null, options = {}) => {
 
   // Inject the Google Analytics script
   const injectScript = (src, id, onloadCallback = null) => {
-    if (document.getElementById(id)) return
+    if (document.getElementById(id)) {
+      return Promise.resolve()
+    }
     
     return new Promise((resolve) => {
       const script = document.createElement('script')

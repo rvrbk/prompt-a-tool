@@ -18,7 +18,7 @@
         <meta name="msapplication-tap-highlight" content="no">
 
         <!-- Web App Manifest -->
-        <link rel="manifest" href="/manifest.json">
+        <link rel="manifest" href="/manifest.webmanifest">
 
         <!-- PWA Icons -->
         <link rel="apple-touch-icon" href="/favicon.ico">

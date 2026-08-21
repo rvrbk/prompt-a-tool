@@ -43,6 +43,59 @@ export default function usePWA() {
     return false;
   };
 
+  // Register periodic sync
+  const registerPeriodicSync = async (reg) => {
+    if (!('periodicSync' in reg)) {
+      console.log('[PWA] Periodic sync not supported');
+      return;
+    }
+
+    // Check if we're on HTTPS or localhost (required for periodic sync)
+    const isSecureContext = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isSecureContext) {
+      console.warn('[PWA] Periodic sync requires HTTPS or localhost');
+      return;
+    }
+
+    try {
+      const isActive = reg.active?.state === 'activated';
+      const isControlling = navigator.serviceWorker.controller?.state === 'activated';
+
+      if (!isActive && !isControlling) {
+        console.log('[PWA] Waiting for service worker to be active before registering periodic sync');
+        await new Promise((resolve) => {
+          const checkActive = () => {
+            if (reg.active?.state === 'activated' || navigator.serviceWorker.controller?.state === 'activated') {
+              resolve();
+            } else {
+              setTimeout(checkActive, 100);
+            }
+          };
+          checkActive();
+        });
+      }
+
+      // Check if already registered
+      const existingSync = await reg.periodicSync.getTags();
+      if (existingSync.includes('sync-prompt-data')) {
+        console.log('[PWA] Periodic sync already registered');
+        return;
+      }
+
+      await reg.periodicSync.register('sync-prompt-data', {
+        minInterval: 1000 * 60 * 15, // 15 minutes
+      });
+      console.log('[PWA] Periodic sync registered');
+    } catch (error) {
+      // Handle permission errors gracefully
+      if (error.name === 'NotAllowedError') {
+        console.warn('[PWA] Periodic sync permission denied. This may require user interaction or HTTPS.');
+      } else {
+        console.error('[PWA] Periodic sync registration failed:', error);
+      }
+    }
+  };
+
   // Register service worker
   const registerServiceWorker = async () => {
     if ('serviceWorker' in navigator) {
@@ -62,6 +115,9 @@ export default function usePWA() {
 
         console.log('[PWA] Service Worker registered');
 
+        // Register periodic sync after service worker is active
+        await registerPeriodicSync(registration.value);
+
         // Check for updates
         checkForUpdates();
 
@@ -74,6 +130,8 @@ export default function usePWA() {
         // Listen for controller changes (new SW activated)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           console.log('[PWA] Service worker controller changed');
+          // Re-register periodic sync after controller change
+          registerPeriodicSync(registration.value);
           window.location.reload();
         });
 
@@ -364,6 +422,7 @@ export default function usePWA() {
     // Methods
     checkPWAInstalled,
     registerServiceWorker,
+    registerPeriodicSync,
     checkForUpdates,
     updateServiceWorker,
     showInstallationPrompt,
