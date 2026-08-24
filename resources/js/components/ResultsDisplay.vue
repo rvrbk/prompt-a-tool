@@ -26,6 +26,30 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'edit'])
 
+// Platform-specific labels
+const platformLabels = computed(() => {
+  const platform = props.questionnaireData?.targetPlatform || 'web'
+  
+  const backendLabels = {
+    web: t('backendPromptsLaravel'),
+    ios: t('backendPrompts'),
+    android: t('backendPrompts'),
+    both: t('backendPrompts')
+  }
+  
+  const frontendLabels = {
+    web: t('frontendPromptsVue'),
+    ios: t('frontendPromptsSwift'),
+    android: t('frontendPromptsKotlin'),
+    both: t('frontendPromptsCrossPlatform')
+  }
+  
+  return {
+    backend: backendLabels[platform] || t('backendPrompts'),
+    frontend: frontendLabels[platform] || t('frontendPrompts')
+  }
+})
+
 // Native clipboard functionality
 const copyToClipboard = async (text) => {
   try {
@@ -68,7 +92,8 @@ const copyStates = ref({
   roles: false,
   agents: false,
   backendPrompts: false,
-  frontendPrompts: false
+  frontendPrompts: false,
+  all: false
 })
 
 // Initialize edited data when generated data changes
@@ -199,9 +224,8 @@ const copyAllAsJson = async () => {
     }
     const success = await copyToClipboard(JSON.stringify(jsonData, null, 2))
     if (success) {
-      // Show a temporary notification
-      const allCopied = ref(true)
-      setTimeout(() => { allCopied.value = false }, 2000)
+      copyStates.value.all = true
+      setTimeout(() => { copyStates.value.all = false }, 2000)
     }
   } catch (error) {
     console.error('Failed to copy all:', error)
@@ -293,7 +317,8 @@ const formatForCopy = (section) => {
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
-          {{ t('copyAll') }}
+          <span v-if="!copyStates.all">{{ t('copyAll') }}</span>
+          <span v-else class="text-gray-300">{{ t('copied') }}</span>
         </button>
         <button
           @click="$emit('close')"
@@ -504,7 +529,7 @@ const formatForCopy = (section) => {
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-            <h4 class="text-base font-medium text-gray-900">{{ t('backendPrompts') }}</h4>
+            <h4 class="text-base font-medium text-gray-900">{{ platformLabels.backend }}</h4>
             <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getBackendPrompts.length }}</span>
           </div>
           <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
@@ -592,7 +617,7 @@ const formatForCopy = (section) => {
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <h4 class="text-base font-medium text-gray-900">{{ t('frontendPrompts') }}</h4>
+            <h4 class="text-base font-medium text-gray-900">{{ platformLabels.frontend }}</h4>
             <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{{ getFrontendPrompts.length }}</span>
           </div>
           <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">

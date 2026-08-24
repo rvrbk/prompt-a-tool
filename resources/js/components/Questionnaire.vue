@@ -14,7 +14,7 @@ const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics
 const form = ref({
   idea: '',
   followUpAnswers: {},
-  offlineAccess: false
+  targetPlatform: 'web'
 })
 
 // Follow-up questions state
@@ -185,7 +185,7 @@ const handleSubmit = async () => {
     const response = await axios.post('/api/generate-prompts', {
       idea: form.value?.idea,
       followUpAnswers: form.value?.followUpAnswers,
-      offlineAccess: form.value?.offlineAccess,
+      targetPlatform: form.value?.targetPlatform,
       language: currentLanguage.value
     })
     
@@ -196,7 +196,7 @@ const handleSubmit = async () => {
     console.log('Form Data Submitted:', {
       idea: form.value?.idea,
       followUpAnswers: form.value?.followUpAnswers,
-      offlineAccess: form.value?.offlineAccess
+      targetPlatform: form.value?.targetPlatform
     })
     
     console.log('API Response:', response.data)
@@ -235,7 +235,7 @@ const resetForm = () => {
   form.value = {
     idea: '',
     followUpAnswers: {},
-    offlineAccess: false
+    targetPlatform: 'web'
   }
   errors.value = { idea: '' }
   isSuccess.value = false
@@ -403,33 +403,51 @@ const resetForm = () => {
         </div>
       </div>
       
-      <!-- Offline Access -->
+      <!-- Target Platform -->
       <div class="space-y-3 pt-4 border-t border-gray-200">
         <label class="block text-sm font-medium text-gray-700">
-          {{ t('offlineAccessLabel') }}
+          {{ t('targetPlatformLabel') }}
         </label>
-        <div class="flex space-x-6">
+        <div class="flex flex-wrap gap-4">
           <label class="flex items-center cursor-pointer">
             <input
               type="radio"
-              v-model="form.offlineAccess"
-              :value="true"
+              v-model="form.targetPlatform"
+              value="web"
               class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
             />
-            <span class="text-sm text-gray-700">{{ t('yes') }}</span>
+            <span class="text-sm text-gray-700">{{ t('webApp') }}</span>
           </label>
           <label class="flex items-center cursor-pointer">
             <input
               type="radio"
-              v-model="form.offlineAccess"
-              :value="false"
+              v-model="form.targetPlatform"
+              value="ios"
               class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
             />
-            <span class="text-sm text-gray-700">{{ t('no') }}</span>
+            <span class="text-sm text-gray-700">{{ t('iosApp') }}</span>
+          </label>
+          <label class="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              v-model="form.targetPlatform"
+              value="android"
+              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+            />
+            <span class="text-sm text-gray-700">{{ t('androidApp') }}</span>
+          </label>
+          <label class="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              v-model="form.targetPlatform"
+              value="both"
+              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+            />
+            <span class="text-sm text-gray-700">{{ t('bothMobile') }}</span>
           </label>
         </div>
         <p class="text-gray-400 text-sm">
-          {{ t('offlineAccessHint') }}
+          {{ t('targetPlatformHint') }}
         </p>
       </div>
 

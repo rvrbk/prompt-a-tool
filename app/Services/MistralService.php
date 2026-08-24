@@ -134,7 +134,8 @@ class MistralService
      */
     protected function buildPrompt(array $data, ?string $language = null): string
     {
-        $offlineAccess = ($data['offlineAccess'] ?? false) ? 'Yes' : 'No';
+        $targetPlatform = $this->getPlatformLabel($data['targetPlatform'] ?? 'web');
+        $pwaInfo = ($data['targetPlatform'] ?? 'web') === 'web' ? 'Yes (PWA enabled)' : 'No';
         
         // Format follow-up answers for the prompt
         $followUpInfo = '';
@@ -155,7 +156,7 @@ class MistralService
         }
 
         if ($language && $language !== 'en') {
-            return $this->buildLocalizedPrompt($data, $language, $offlineAccess, $followUpInfo);
+            return $this->buildLocalizedPrompt($data, $language, $followUpInfo);
         }
 
         return <<<PROMPT
@@ -163,29 +164,36 @@ Given the following app idea and context, generate a comprehensive response with
 
 1. A list of user roles (with permissions and actions) as JSON array
 2. A list of AI agents (with skills, tools, and responsibilities) as JSON array  
-3. Technical prompts for Laravel backend development as JSON array - ORGANIZED BY ITERATIONS
-4. Technical prompts for Vue.js frontend development as JSON array - ORGANIZED BY ITERATIONS
+3. Technical prompts for backend development as JSON array - ORGANIZED BY ITERATIONS
+4. Technical prompts for frontend development as JSON array - ORGANIZED BY ITERATIONS
 
 IMPORTANT: Structure the backend_prompts and frontend_prompts as ITERATIVE DEVELOPMENT PLANS.
 Each iteration should build upon the previous one, following a logical development progression.
 
+IMPORTANT PLATFORM CONSIDERATION: The target platform is **{$targetPlatform}**. PWA support: **{$pwaInfo}**.
+Adapt all technical prompts accordingly:
+- For Web: Use Laravel backend + Vue.js frontend with PWA support (service workers, manifest, offline caching)
+- For iOS: Use Swift/SwiftUI for frontend, suggest appropriate backend (Node.js, Laravel, or Firebase)
+- For Android: Use Kotlin/Java for frontend, suggest appropriate backend
+- For Both (iOS & Android): Suggest cross-platform solutions like Flutter or React Native, with appropriate backend
+
 For backend_prompts, structure as:
-- Iteration 1: Project Setup (Laravel installation, basic structure)
-- Iteration 2: Core Models & Migrations (Database schema, models)
-- Iteration 3: API Endpoints (RESTful routes, controllers)
-- Iteration 4: Authentication & Authorization (User auth, permissions)
-- Iteration 5: Business Logic (Service classes, business rules)
-- Iteration 6: Data Validation & Testing (Requests, tests)
-- Iteration 7: Deployment & Optimization (Production setup, performance)
+- Iteration 1: Project Setup
+- Iteration 2: Core Models & Migrations
+- Iteration 3: API Endpoints
+- Iteration 4: Authentication & Authorization
+- Iteration 5: Business Logic
+- Iteration 6: Data Validation & Testing
+- Iteration 7: Deployment & Optimization
 
 For frontend_prompts, structure as:
-- Iteration 1: Project Setup (Vue.js, Vite, Tailwind)
-- Iteration 2: Core Components (Main layout, routing)
-- Iteration 3: UI Forms & Inputs (User input components)
-- Iteration 4: API Integration (Axios, API calls)
-- Iteration 5: State Management (Pinia/Vuex, reactivity)
-- Iteration 6: Enhanced UX (Animations, transitions, accessibility)
-- Iteration 7: Testing & Build (Unit tests, production build)
+- Iteration 1: Project Setup
+- Iteration 2: Core Components
+- Iteration 3: UI Forms & Inputs
+- Iteration 4: API Integration
+- Iteration 5: State Management
+- Iteration 6: Enhanced UX
+- Iteration 7: Testing & Build
 
 Format the FINAL output as a single JSON object with these exact keys:
 - "roles": array of role objects with name, description, permissions, and actions
@@ -196,7 +204,8 @@ Format the FINAL output as a single JSON object with these exact keys:
 DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
 
 **App Idea**: {$data['idea']}{$followUpInfo}
-**Offline Access Required**: {$offlineAccess}
+**Target Platform**: {$targetPlatform}
+**PWA Support**: {$pwaInfo}
 PROMPT;
     }
 
@@ -205,13 +214,14 @@ PROMPT;
      *
      * @param array $data The questionnaire data
      * @param string $language The language code
-     * @param string $offlineAccess Offline access text
      * @param string $followUpInfo Follow-up answers text
      * @return string The localized prompt
      */
-    protected function buildLocalizedPrompt(array $data, string $language, string $offlineAccess, string $followUpInfo): string
+    protected function buildLocalizedPrompt(array $data, string $language, string $followUpInfo): string
     {
         $languageName = $this->getLanguageName($language);
+        $targetPlatform = $this->getPlatformLabel($data['targetPlatform'] ?? 'web');
+        $pwaInfo = ($data['targetPlatform'] ?? 'web') === 'web' ? 'Yes (PWA enabled)' : 'No';
         
         // Get localized prompt parts
         $localized = $this->getLocalizedPromptParts($language);
@@ -235,6 +245,13 @@ CRITICAL INSTRUCTION: ALL output must be in {$languageName} language. This inclu
 IMPORTANT: {$localized['iteration_structure']}
 {$localized['iteration_explanation']}
 
+IMPORTANT PLATFORM CONSIDERATION: The target platform is **{$targetPlatform}**. PWA support: **{$pwaInfo}**.
+Adapt all technical prompts accordingly:
+- For Web: Use Laravel backend + Vue.js frontend with PWA support (service workers, manifest, offline caching)
+- For iOS: Use Swift/SwiftUI for frontend, suggest appropriate backend (Node.js, Laravel, or Firebase)
+- For Android: Use Kotlin/Java for frontend, suggest appropriate backend
+- For Both (iOS & Android): Suggest cross-platform solutions like Flutter or React Native, with appropriate backend
+
 {$localized['backend_structure']}
 
 {$localized['frontend_structure']}
@@ -250,7 +267,8 @@ DO NOT include any markdown, explanations, or text outside the JSON. Only return
 REMEMBER: ALL content MUST be in {$languageName} language. NO English words allowed in the output.
 
 **App Idea**: {$data['idea']}{$followUpInfo}
-**Offline Access Required**: {$offlineAccess}
+**Target Platform**: {$targetPlatform}
+**PWA Support**: {$pwaInfo}
 PROMPT;
     }
 
@@ -441,9 +459,11 @@ PROMPT;
         return <<<PROMPT
 Analyze the following app idea and generate 3-5 relevant follow-up questions to better understand the requirements.
 
+IMPORTANT: DO NOT ask about target platform (Web, iOS, Android, mobile, etc.) or technology stack (Laravel, Vue.js, React, Flutter, etc.) - these have already been determined.
+
 Each question should help clarify:
 - The target users or context
-- Key features or technical requirements
+- Key features or functional requirements (NOT technical platform)
 
 Format the response as a JSON object with a single "questions" key containing an array of question objects.
 Each question object must have:
@@ -466,14 +486,14 @@ Example format:
     },
     {
       "id": 2,
-      "question": "Will this app require offline functionality?",
+      "question": "Will this app require user authentication?",
       "type": "boolean"
     },
     {
       "id": 3,
-      "question": "Are there any specific technical requirements?",
+      "question": "Are there any specific feature requirements?",
       "type": "text",
-      "placeholder": "e.g., real-time sync, large file handling"
+      "placeholder": "e.g., real-time updates, file uploads, search functionality"
     }
   ]
 }
@@ -498,9 +518,11 @@ Analysez l'idée d'application suivante et générez 3 à 5 questions de suivi p
 
 CRITICAL: ALL questions and options MUST be in {$languageName} language. Use ONLY {$languageName} words.
 
+IMPORTANT: NE PAS demander la plateforme cible (Web, iOS, Android, mobile, etc.) ou la stack technique (Laravel, Vue.js, React, Flutter, etc.) - ceux-ci ont déjà été déterminés.
+
 Chaque question doit aider à clarifier:
 - Les utilisateurs cibles ou le contexte
-- Les fonctionnalités ou exigences techniques clés
+- Les fonctionnalités ou exigences fonctionnelles clés (PAS la plateforme technique)
 
 Formatez la réponse sous forme d'objet JSON avec une seule clé "questions" contenant un tableau d'objets question.
 Chaque objet question doit avoir:
@@ -523,14 +545,14 @@ Format d'exemple:
     },
     {
       "id": 2,
-      "question": "Cette application nécessitera-t-elle des fonctionnalités hors ligne?",
+      "question": "Cette application nécessitera-t-elle une authentification utilisateur?",
       "type": "boolean"
     },
     {
       "id": 3,
-      "question": "Y a-t-il des exigences techniques spécifiques?",
+      "question": "Y a-t-il des exigences fonctionnelles spécifiques?",
       "type": "text",
-      "placeholder": "ex. synchronisation en temps réel, gestion de grands fichiers"
+      "placeholder": "ex. mises à jour en temps réel, téléchargements de fichiers, fonctionnalité de recherche"
     }
   ]
 }
@@ -567,6 +589,24 @@ PROMPT;
         ];
 
         return $languages[$code] ?? $code;
+    }
+
+    /**
+     * Get the platform label from a platform code
+     *
+     * @param string $code The platform code
+     * @return string The platform label
+     */
+    protected function getPlatformLabel(string $code): string
+    {
+        $platforms = [
+            'web' => 'Web-based Application',
+            'ios' => 'iOS Mobile Application',
+            'android' => 'Android Mobile Application',
+            'both' => 'Cross-platform Mobile Application (iOS & Android)',
+        ];
+
+        return $platforms[$code] ?? 'Web-based Application';
     }
 
 }
