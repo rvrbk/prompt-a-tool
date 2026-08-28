@@ -950,6 +950,35 @@ const translations = {
     yes: 'Yee',
     no: 'Ate',
     
+    // Role/Agent detail labels
+    permissions: 'Ebikuwumya',
+    actions: 'Ebikolwa',
+    responsibilities: 'Ebikwatibwa',
+    skills: 'Obulimi',
+    tools: 'Ebifaananyizo',
+    tasks: 'Ebikola',
+    dependencies: 'Ebifanana',
+    standard: 'Ekitundibwa kya kiwumulo',
+    na: 'Tekiwumulo',
+    answer: 'Ekitundu',
+    notAnswered: 'Tekyawulibwa',
+    
+    // Export/Markdown labels
+    projectOverview: 'Ekitundu ekya ekikole',
+    appIdeaExport: 'Ekirobyo eky olwino',
+    followUpAnswers: 'Ebyawulibwa eby AI',
+    generated: 'Byagattibwa',
+    description: 'Ekibuga',
+    type: 'Ekitundi',
+    promptLabel: 'Ekirobyo',
+    
+    // Backend/Frontend prompts
+    backendPromptsLaravel: 'Ebifanana ebya System (Laravel)',
+    frontendPromptsVue: 'Ebifanana ebya Olwino (Vue.js)',
+    frontendPromptsSwift: 'Ebifanana ebya Olwino (Swift)',
+    frontendPromptsKotlin: 'Ebifanana ebya Olwino (Kotlin)',
+    frontendPromptsCrossPlatform: 'Ebifanana ebya Olwino (Ebyuna)',
+    
     // About page
     aboutTitle: 'Ebyo bya Ebifaananyizo',
     aboutSubtitle: 'Ekizikiza ekigenderera okuwasa ku kyokola olwino lwawe',
