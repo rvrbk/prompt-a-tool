@@ -107,13 +107,26 @@ class MistralService
                 return $parsed;
             }
 
-            // If not valid JSON, wrap it in a response
+            // If not valid JSON, try to extract JSON from the content
+            // Sometimes the AI wraps JSON in markdown code blocks or adds explanations
+            $extractedJson = $this->extractJsonFromContent($content);
+            if ($extractedJson !== null) {
+                $parsed = $this->tryParseJson($extractedJson);
+                if ($parsed !== null) {
+                    return $parsed;
+                }
+            }
+
+            // If still not valid JSON, this is an error - return empty arrays
+            // The frontend should handle this by showing a loading state or retrying
             return [
                 'raw_response' => $content,
                 'roles' => [],
                 'agents' => [],
                 'backend_prompts' => [],
                 'frontend_prompts' => [],
+                'status' => 'incomplete',
+                'message' => 'AI response could not be parsed as JSON. Please try again.'
             ];
 
         } catch (Exception $e) {
@@ -340,6 +353,44 @@ PROMPT;
             return $decoded;
         }
 
+        return null;
+    }
+
+    /**
+     * Try to extract JSON from content that might contain markdown or other formatting
+     *
+     * @param string $content The content to extract JSON from
+     * @return string|null The extracted JSON string or null if not found
+     */
+    protected function extractJsonFromContent(string $content): ?string
+    {
+        // Look for content between ```json and ``` markers
+        if (preg_match('/```json(.*?)```/s', $content, $matches)) {
+            return trim($matches[1]);
+        }
+        
+        // Look for content between ``` and ``` markers (might be just ```)
+        if (preg_match('/```(.*?)```/s', $content, $matches)) {
+            return trim($matches[1]);
+        }
+        
+        // Look for JSON object starting with {
+        if (preg_match('/\{(.*?)\}/s', $content, $matches)) {
+            $potentialJson = '{' . $matches[1] . '}';
+            // Quick validation - check if it starts and ends with braces
+            if (str_starts_with($potentialJson, '{') && str_ends_with($potentialJson, '}')) {
+                return $potentialJson;
+            }
+        }
+        
+        // Look for JSON object starting with [
+        if (preg_match('/\[(.*?)\]/s', $content, $matches)) {
+            $potentialJson = '[' . $matches[1] . ']';
+            if (str_starts_with($potentialJson, '[') && str_ends_with($potentialJson, ']')) {
+                return $potentialJson;
+            }
+        }
+        
         return null;
     }
 

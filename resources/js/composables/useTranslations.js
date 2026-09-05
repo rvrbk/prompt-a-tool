@@ -82,6 +82,9 @@ const translations = {
     rawResponse: 'Raw AI Response',
     noResults: 'No Results Yet',
     noResultsHint: 'Fill the questionnaire and click Generate to see results.',
+    noValidResponse: 'No valid response received',
+    incompleteResponse: 'AI response was incomplete. Please try again.',
+    retryFailed: 'Retry failed',
     
     // Role/Agent detail labels
     permissions: 'Permissions',

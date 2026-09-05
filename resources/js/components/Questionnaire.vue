@@ -167,6 +167,63 @@ const canGenerate = computed(() => {
          (!showQuestionsWizard.value || allQuestionsAnswered.value)
 })
 
+// Function to regenerate prompts with retry logic for incomplete responses
+const regenerateWithRetry = async (previousResponse, retryCount) => {
+  const maxRetries = 2
+  const retryDelay = 3000 // 3 seconds
+  
+  if (retryCount >= maxRetries) {
+    // Max retries reached - at this point we need to show something to the user
+    // But since they want to wait for the pretty response, let's show an error with retry option
+    isSuccess.value = false
+    errorMessage.value = t('incompleteResponse') || 'AI response was incomplete after multiple attempts. Please try again.'
+    generatedData.value = null
+    isSubmitting.value = false // Make sure to turn off loading state
+    return
+  }
+  
+  try {
+    console.log(`Retry attempt ${retryCount + 1} of ${maxRetries}`)
+    
+    // Wait a bit before retrying
+    await new Promise(resolve => setTimeout(resolve, retryDelay))
+    
+    const response = await axios.post('/api/generate-prompts', {
+      idea: form.value?.idea,
+      followUpAnswers: form.value?.followUpAnswers,
+      targetPlatform: form.value?.targetPlatform,
+      language: currentLanguage.value
+    })
+    
+    const hasValidData = (response.data.roles && response.data.roles.length > 0) ||
+                       (response.data.agents && response.data.agents.length > 0) ||
+                       (response.data.backend_prompts && response.data.backend_prompts.length > 0) ||
+                       (response.data.frontend_prompts && response.data.frontend_prompts.length > 0)
+    
+    if (hasValidData) {
+      // Success - store the valid response
+      generatedData.value = response.data
+      isSuccess.value = true
+      showResults.value = true
+      isSubmitting.value = false // Turn off loading state on success
+    } else if (response.data.raw_response || response.data.message) {
+      // Still incomplete, retry again
+      await regenerateWithRetry(response.data, retryCount + 1)
+    } else {
+      // No data at all - show error
+      isSuccess.value = false
+      errorMessage.value = t('noValidResponse') || 'No valid response received'
+      isSubmitting.value = false // Turn off loading state on error
+    }
+  } catch (error) {
+    console.error('Retry failed:', error)
+    isSuccess.value = false
+    errorMessage.value = `${t('retryFailed')}: ${error.message}`
+    generatedData.value = null
+    isSubmitting.value = false // Turn off loading state on failure
+  }
+}
+
 // Handle form submission
 const handleSubmit = async () => {
   if (!validateForm()) {
@@ -201,11 +258,30 @@ const handleSubmit = async () => {
     
     console.log('API Response:', response.data)
     
-    // Store the response data for display
-    generatedData.value = response.data
+    // Check if we have valid structured data
+    const hasValidData = (response.data.roles && response.data.roles.length > 0) ||
+                       (response.data.agents && response.data.agents.length > 0) ||
+                       (response.data.backend_prompts && response.data.backend_prompts.length > 0) ||
+                       (response.data.frontend_prompts && response.data.frontend_prompts.length > 0)
     
-    isSuccess.value = true
-    showResults.value = true
+    if (hasValidData) {
+      // Store the response data for display
+      generatedData.value = response.data
+      isSuccess.value = true
+      showResults.value = true
+    } else if (response.data.raw_response || response.data.message) {
+      // We got a response but it couldn't be parsed as structured data
+      // This might be a partial response from the AI - try to regenerate automatically
+      console.log('Incomplete response received, retrying...')
+      
+      // Keep loading state active while we retry (don't set to false yet)
+      await regenerateWithRetry(response.data, 0) // Start retry with max 2 retries
+      return // Don't fall through to the final finally block
+    } else {
+      // No data at all - show error
+      isSuccess.value = false
+      errorMessage.value = t('noValidResponse') || 'No valid response received'
+    }
   } catch (error) {
     console.error('API Error:', error)
     
