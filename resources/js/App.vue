@@ -232,7 +232,7 @@ const closeMobileMenu = () => {
           <div class="flex items-center space-x-4 sm:space-x-6 flex-wrap">
             <router-link to="/" class="flex items-center space-x-3" @click.stop="closeMobileMenu">
               <svg class="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" class="animate-lightning-strike origin-center" />
               </svg>
               <h1 :class="[titleClass, 'font-semibold text-gray-900 tracking-tight']">{{ t('appTitle') }}</h1>
             </router-link>
