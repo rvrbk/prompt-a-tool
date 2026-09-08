@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, inject } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
+import { setLightningLoading } from '../utils/axiosLightningInterceptor.js'
 
 // Use translations from App.vue provider
 const { t, currentLanguage } = inject('translations')
@@ -74,6 +75,7 @@ const generateFollowUpQuestions = async () => {
   abortController = new AbortController()
   isLoadingQuestions.value = true
   questionsError.value = null
+  setLightningLoading(true)
   
   try {
     const response = await axios.post('/api/generate-questions', {
@@ -103,6 +105,7 @@ const generateFollowUpQuestions = async () => {
     if (!abortController.signal.aborted) {
       isLoadingQuestions.value = false
       questionsGenerationComplete.value = true
+      setLightningLoading(false)
     }
     abortController = null
   }
@@ -179,6 +182,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
     errorMessage.value = t('incompleteResponse') || 'AI response was incomplete after multiple attempts. Please try again.'
     generatedData.value = null
     isSubmitting.value = false // Make sure to turn off loading state
+    setLightningLoading(false)
     return
   }
   
@@ -206,6 +210,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
       isSuccess.value = true
       showResults.value = true
       isSubmitting.value = false // Turn off loading state on success
+      setLightningLoading(false)
     } else if (response.data.raw_response || response.data.message) {
       // Still incomplete, retry again
       await regenerateWithRetry(response.data, retryCount + 1)
@@ -214,6 +219,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
       isSuccess.value = false
       errorMessage.value = t('noValidResponse') || 'No valid response received'
       isSubmitting.value = false // Turn off loading state on error
+      setLightningLoading(false)
     }
   } catch (error) {
     console.error('Retry failed:', error)
@@ -221,6 +227,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
     errorMessage.value = `${t('retryFailed')}: ${error.message}`
     generatedData.value = null
     isSubmitting.value = false // Turn off loading state on failure
+    setLightningLoading(false)
   }
 }
 
@@ -233,6 +240,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   isSuccess.value = false
   errorMessage.value = null
+  setLightningLoading(true)
   
   try {
     // Track form submission attempt
@@ -303,6 +311,7 @@ const handleSubmit = async () => {
     }
   } finally {
     isSubmitting.value = false
+    setLightningLoading(false)
   }
 }
 

@@ -8,27 +8,14 @@
     }
 }
 
-@keyframes lightningStrike {
-    0% {
-        opacity: 0;
-        transform: scale(0.8) translateY(10px);
-        color: currentColor;
+@keyframes lightningPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1.2) drop-shadow(0 0 6px #F8B803);
     }
-    30% {
-        opacity: 1;
-        transform: scale(1.1) translateY(-5px);
-        color: #F8B803;
-        filter: brightness(1.5) drop-shadow(0 0 8px currentColor);
-    }
-    70% {
-        opacity: 1;
-        transform: scale(0.95) translateY(2px);
-        color: #F8B803;
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        color: currentColor;
+    50% {
+        transform: scale(1.05);
+        filter: brightness(1.5) drop-shadow(0 0 10px #F8B803);
     }
 }
 
@@ -36,7 +23,8 @@
     .text-balance {
         text-wrap: balance;
     }
-    .animate-lightning-strike {
-        animation: lightningStrike 0.6s ease-out 0.8s 1;
+    .lightning-pulse {
+        stroke: #F8B803 !important;
+        animation: lightningPulse 0.8s ease-in-out infinite;
     }
 }
