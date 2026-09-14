@@ -5,7 +5,7 @@ import CookieBanner from './components/CookieBanner.vue'
 import BuyMeACoffee from './components/BuyMeACoffee.vue'
 import useTranslations from './composables/useTranslations.js'
 import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
-import { setupLightningInterceptor } from './utils/axiosLightningInterceptor.js'
+import { setupLightningInterceptor, triggerInitialLightning } from './utils/axiosLightningInterceptor.js'
 
 // Initialize translations with auto-detection and cookie support
 const { 
@@ -43,6 +43,7 @@ const cookieConsentGiven = ref(false)
 // Set up lightning animation interceptor for AI requests
 onMounted(() => {
     setupLightningInterceptor()
+    triggerInitialLightning()
 })
 
 // Check if cookie was just set by auto-detection

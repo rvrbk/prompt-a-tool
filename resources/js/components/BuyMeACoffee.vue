@@ -85,6 +85,22 @@ const handleBuyMeACoffeeClick = () => {
         class="w-full text-white font-medium text-sm flex items-center justify-center hover:bg-yellow-600 transition-all duration-200 py-2"
         :aria-label="getTranslation('buyMeACoffee')"
       >
+        <svg
+          class="w-4 h-4 mr-2"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path class="steam steam-1" d="M6 1.5v3" />
+          <path class="steam steam-2" d="M10 1.5v3" />
+          <path class="steam steam-3" d="M14 1.5v3" />
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+        </svg>
         <span>{{ getTranslation('buyMeACoffee') }}</span>
       </button>
     </div>
@@ -92,26 +108,39 @@ const handleBuyMeACoffeeClick = () => {
 </template>
 
 <style scoped>
-/* Custom animation for the button */
-button {
-  animation: pulse 2s infinite;
-}
-
 button:hover {
-  animation: none;
   transform: scale(1.05);
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 12px rgba(255, 85, 0, 0.3);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 6px 16px rgba(255, 85, 0, 0.4);
-  }
+.steam {
+  transform-origin: center bottom;
+  animation: steamRise 2s ease-in-out infinite;
+  opacity: 0;
 }
 
+.steam-1 {
+  animation-delay: 0s;
+}
 
+.steam-2 {
+  animation-delay: 0.4s;
+}
+
+.steam-3 {
+  animation-delay: 0.8s;
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+}
 </style>

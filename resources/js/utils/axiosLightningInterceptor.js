@@ -92,7 +92,6 @@ export function setLightningLoading(isLoading) {
 // Trigger initial page load animation
 export function triggerInitialLightning() {
     const element = getLightningElement()
-    console.log(element)
     if (!element) return
     
     // Add animation class for initial strike

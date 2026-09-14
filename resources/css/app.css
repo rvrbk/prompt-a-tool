@@ -27,4 +27,8 @@
         stroke: #F8B803 !important;
         animation: lightningPulse 0.8s ease-in-out infinite;
     }
+    .lightning-initial-strike {
+        stroke: #F8B803 !important;
+        animation: lightningPulse 0.6s ease-in-out;
+    }
 }
