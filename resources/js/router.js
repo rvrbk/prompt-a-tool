@@ -54,6 +54,18 @@ const routes = [
     name: 'about',
     component: About,
     meta: { title: 'aboutTitleWithApp' }
+  },
+  {
+    path: '/account/prompts',
+    name: 'my-prompts',
+    component: () => import('./components/account/MyPrompts.vue'),
+    meta: { title: 'myPrompts' }
+  },
+  {
+    path: '/account/prompts/:id(\\d+)',
+    name: 'prompt-detail',
+    component: () => import('./components/account/PromptDetail.vue'),
+    meta: { title: 'myPrompts' }
   }
 ]
 
