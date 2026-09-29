@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, inject } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
+import useAuth from '../composables/useAuth.js'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
 import { setLightningLoading } from '../utils/axiosLightningInterceptor.js'
 
@@ -38,6 +39,9 @@ const isSubmitting = ref(false)
 const isSuccess = ref(false)
 const generatedData = ref(null)
 const showResults = ref(false)
+
+// Signed-in users get their results saved automatically (see PromptController)
+const { user, openSignIn } = useAuth()
 
 // Error state
 const errorMessage = ref(null)
@@ -604,6 +608,30 @@ const resetForm = () => {
         </button>
       </div>
     </div>
+    </div>
+
+    <!-- Saved-to-account note -->
+    <div
+      v-if="showResults && generatedData && (generatedData.saved_id || !user)"
+      class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border px-4 py-3 text-sm"
+      :class="generatedData.saved_id ? 'border-green-100 bg-green-50 text-green-800' : 'border-gray-100 bg-gray-50 text-gray-600'"
+      role="status"
+    >
+      <template v-if="generatedData.saved_id">
+        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>{{ t('myPromptsSaved') }}</span>
+        <router-link :to="`/account/prompts/${generatedData.saved_id}`" class="ml-auto font-medium underline hover:no-underline">
+          {{ t('myPromptsView') }}
+        </router-link>
+      </template>
+      <template v-else>
+        <span>{{ t('myPromptsSignInToSave') }}</span>
+        <button type="button" @click.stop="openSignIn" class="ml-auto font-medium text-gray-900 underline hover:no-underline">
+          {{ t('authSignIn') }}
+        </button>
+      </template>
     </div>
 
     <!-- Results Display -->

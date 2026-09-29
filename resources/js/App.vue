@@ -3,6 +3,8 @@ import { ref, computed, onMounted, onUnmounted, watch, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import CookieBanner from './components/CookieBanner.vue'
 import BuyMeACoffee from './components/BuyMeACoffee.vue'
+import UserMenu from './components/UserMenu.vue'
+import useAuth from './composables/useAuth.js'
 import useTranslations from './composables/useTranslations.js'
 import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
 import { setupLightningInterceptor, triggerInitialLightning } from './utils/axiosLightningInterceptor.js'
@@ -147,6 +149,7 @@ watch(currentLang, () => {
 useGoogleAnalytics()
 
 const route = useRoute()
+const { user } = useAuth()
 
 // Mobile menu state
 const showMobileMenu = ref(false)
@@ -158,6 +161,20 @@ const toggleMobileMenu = () => {
 const closeMobileMenu = () => {
   showMobileMenu.value = false
 }
+
+// Sign-in failure notice (OAuth callbacks redirect to /?auth=failed or /?auth=no_email)
+const AUTH_NOTICES = { failed: 'authFailed', no_email: 'authNoEmail' }
+const authNotice = ref(null)
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  const notice = AUTH_NOTICES[params.get('auth')]
+  if (notice) {
+    authNotice.value = notice
+    params.delete('auth')
+    const query = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (query ? `?${query}` : ''))
+  }
+})
 </script>
 
 <template>
@@ -165,13 +182,13 @@ const closeMobileMenu = () => {
     <!-- Header -->
     <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 flex-wrap gap-2">
-          <div class="flex items-center space-x-4 sm:space-x-6 flex-wrap">
-            <router-link to="/" class="flex items-center space-x-3" @click.stop="closeMobileMenu">
-              <svg class="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center justify-between h-16 gap-2">
+          <div class="flex items-center min-w-0 space-x-4 sm:space-x-6">
+            <router-link to="/" class="flex items-center min-w-0 space-x-2 sm:space-x-3" @click.stop="closeMobileMenu">
+              <svg class="w-7 h-7 shrink-0 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" class="lightning-bolt origin-center" />
               </svg>
-              <h1 :class="[titleClass, 'font-semibold text-gray-900 tracking-tight']">{{ t('appTitle') }}</h1>
+              <h1 :class="[titleClass, 'font-semibold text-gray-900 tracking-tight truncate']">{{ t('appTitle') }}</h1>
             </router-link>
             <nav class="hidden md:flex items-center space-x-6">
               <router-link
@@ -190,19 +207,28 @@ const closeMobileMenu = () => {
               >
                 {{ t('navAbout') }}
               </router-link>
+              <router-link
+                v-if="user"
+                to="/account/prompts"
+                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                :class="{ 'text-gray-900': route.path.startsWith('/account/prompts') }"
+                @click.stop
+              >
+                {{ t('myPrompts') }}
+              </router-link>
             </nav>
           </div>
 
-          <div class="flex items-center space-x-2 ml-auto">
+          <div class="flex items-center shrink-0 space-x-1.5 sm:space-x-2 ml-auto">
             <!-- Language Selector -->
             <div class="relative">
               <button
                 @click.stop="toggleLanguageDropdown"
-                class="language-button flex items-center space-x-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
+                class="language-button flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm font-medium hover:bg-gray-50 transition-all shadow-sm"
               >
                 <span :class="'fi fi-' + currentLangFlag + ' fis'"></span>
                 <span class="text-sm font-medium">{{ currentLangDisplay }}</span>
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="hidden sm:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -210,7 +236,7 @@ const closeMobileMenu = () => {
               <div
                 v-show="showLanguageDropdown"
                 @click.stop
-                class="language-dropdown absolute z-[100] mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto right-0"
+                class="language-dropdown fixed inset-x-4 top-16 z-[100] bg-white border border-gray-100 rounded-xl shadow-lg max-h-80 overflow-y-auto sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-64"
               >
                 <div class="p-2">
                   <div v-for="lang in languageOptions" :key="lang.code" class="px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
@@ -227,10 +253,12 @@ const closeMobileMenu = () => {
                 </div>
               </div>
             </div>
+            <!-- Account -->
+            <UserMenu />
             <!-- Menu button -->
             <button
               @click.stop="toggleMobileMenu"
-              class="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+              class="p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
             >
               <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -270,11 +298,27 @@ const closeMobileMenu = () => {
         >
           {{ t('navAbout') }}
         </router-link>
+        <router-link
+          v-if="user"
+          to="/account/prompts"
+          class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors py-2"
+          @click="closeMobileMenu"
+        >
+          {{ t('myPrompts') }}
+        </router-link>
       </nav>
     </div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div
+        v-if="authNotice"
+        role="alert"
+        class="mb-4 flex items-start justify-between gap-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+      >
+        <span>{{ t(authNotice) }}</span>
+        <button type="button" @click="authNotice = null" class="text-red-400 hover:text-red-600" aria-label="Close">&times;</button>
+      </div>
       <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden min-h-[60vh]">
         <router-view />
       </div>

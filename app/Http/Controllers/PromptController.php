@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PromptGeneration;
 use App\Services\MistralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -86,6 +87,12 @@ class PromptController extends Controller
                 $response['raw_response'] = $mistralResponse['raw_response'];
             }
 
+            // Save complete results to the signed-in user's account
+            $saved = $this->saveForUser($request, $validated, $mistralResponse);
+            if ($saved) {
+                $response['saved_id'] = $saved->id;
+            }
+
             return response()->json($response);
 
         } catch (Exception $e) {
@@ -113,5 +120,42 @@ class PromptController extends Controller
             'configured' => $this->mistralService->isConfigured(),
             'model' => $this->mistralService->getModel(),
         ]);
+    }
+
+    /**
+     * Store a generation for the signed-in user
+     *
+     * Guests are skipped, and so are incomplete AI responses: the frontend
+     * retries those, and only the final complete result should be kept.
+     */
+    protected function saveForUser(Request $request, array $validated, array $mistralResponse): ?PromptGeneration
+    {
+        $user = $request->user();
+        if (! $user) {
+            return null;
+        }
+
+        $result = array_filter(
+            array_intersect_key($mistralResponse, array_flip(PromptGeneration::RESULT_KEYS)),
+            fn ($section) => is_array($section) && count($section) > 0,
+        );
+        if ($result === []) {
+            return null;
+        }
+
+        try {
+            return $user->promptGenerations()->create([
+                'idea' => $validated['idea'],
+                'target_platform' => $validated['targetPlatform'],
+                'language' => $validated['language'] ?? null,
+                'follow_up_answers' => $validated['followUpAnswers'] ?? [],
+                'result' => $result,
+            ]);
+        } catch (Exception $e) {
+            // Saving is a bonus; never fail the generation because of it
+            Log::error('Saving prompt generation failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 }
