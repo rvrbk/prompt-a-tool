@@ -14,6 +14,12 @@ Route::post('/generate-prompts', [\App\Http\Controllers\PromptController::class,
 // Follow-up questions generation
 Route::post('/generate-questions', [\App\Http\Controllers\QuestionController::class, 'generateQuestions']);
 
+// Fun extras: roast an idea, or get a random one (AI calls, so throttled)
+Route::middleware('throttle:20,1')->group(function () {
+    Route::post('/roast-idea', [\App\Http\Controllers\IdeaController::class, 'roast']);
+    Route::post('/surprise-idea', [\App\Http\Controllers\IdeaController::class, 'surprise']);
+});
+
 // Mistral AI service status
 Route::get('/mistral/status', [\App\Http\Controllers\PromptController::class, 'status']);
 

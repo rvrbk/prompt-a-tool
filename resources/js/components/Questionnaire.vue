@@ -4,6 +4,7 @@ import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
 import useAuth from '../composables/useAuth.js'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
+import useAchievements from '../composables/useAchievements.js'
 import { setLightningLoading } from '../utils/axiosLightningInterceptor.js'
 
 // Use translations from App.vue provider
@@ -12,12 +13,32 @@ const { t, currentLanguage } = inject('translations')
 // Initialize Google Analytics
 const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()
 
+// Streaks and badges
+const { record } = useAchievements()
+
+// Writing personalities for the generated text (keys map to translations)
+const PERSONALITIES = [
+  { value: 'default', label: 'personalityDefault' },
+  { value: 'architect', label: 'personalityArchitect' },
+  { value: 'startup', label: 'personalityStartup' },
+  { value: 'pirate', label: 'personalityPirate' },
+  { value: 'zen', label: 'personalityZen' }
+]
+
 // Form state
 const form = ref({
   idea: '',
   followUpAnswers: {},
-  targetPlatform: 'web'
+  targetPlatform: 'web',
+  personality: 'default'
 })
+
+// Surprise me / roast my idea state
+const isSurprising = ref(false)
+const surpriseError = ref(null)
+const roast = ref(null)
+const isRoasting = ref(false)
+const roastError = ref(null)
 
 // Follow-up questions state
 const followUpQuestions = ref([])
@@ -125,6 +146,11 @@ watch(() => form.value.idea, (newIdea) => {
     debounceTimer = null
   }
   
+  // A roast belongs to the idea it was made for
+  roast.value = null
+  roastError.value = null
+  surpriseError.value = null
+
   // Clear existing questions immediately when idea changes
   followUpQuestions.value = []
   showQuestionsWizard.value = false
@@ -141,6 +167,68 @@ watch(() => form.value.idea, (newIdea) => {
     questionsGenerationComplete.value = true
   }
 })
+
+// Fill the idea box with a random AI-generated idea
+const surpriseMe = async () => {
+  if (isSurprising.value) return
+
+  isSurprising.value = true
+  surpriseError.value = null
+  setLightningLoading(true)
+
+  try {
+    const response = await axios.post('/api/surprise-idea', { language: currentLanguage.value })
+    if (response.data.status === 'success' && response.data.idea) {
+      form.value.idea = response.data.idea
+      errors.value.idea = ''
+      record('surprise')
+      trackButtonClick('surprise_me')
+    } else {
+      surpriseError.value = t('surpriseFailed')
+    }
+  } catch (error) {
+    console.error('Failed to get a surprise idea:', error)
+    surpriseError.value = t('surpriseFailed')
+  } finally {
+    isSurprising.value = false
+    setLightningLoading(false)
+  }
+}
+
+// Ask the AI to roast the current idea
+const roastMyIdea = async () => {
+  if (isRoasting.value) return
+
+  if (!form.value.idea?.trim()) {
+    roastError.value = t('roastNeedsIdea')
+    return
+  }
+
+  isRoasting.value = true
+  roastError.value = null
+  roast.value = null
+  setLightningLoading(true)
+
+  try {
+    const response = await axios.post('/api/roast-idea', {
+      idea: form.value.idea,
+      language: currentLanguage.value
+    })
+    if (response.data.status === 'success' && response.data.roast) {
+      roast.value = response.data.roast
+      record('roast')
+      trackButtonClick('roast_idea')
+    } else {
+      roastError.value = t('roastFailed')
+    }
+  } catch (error) {
+    console.error('Failed to roast the idea:', error)
+    roastError.value = t('roastFailed')
+  } finally {
+    isRoasting.value = false
+    setLightningLoading(false)
+  }
+}
 
 // Navigate between wizard questions
 const nextQuestion = () => {
@@ -174,6 +262,11 @@ const canGenerate = computed(() => {
          (!showQuestionsWizard.value || allQuestionsAnswered.value)
 })
 
+// Count a finished generation towards streaks and badges
+const recordGeneration = () => {
+  record('generation', { language: currentLanguage.value, personality: form.value?.personality })
+}
+
 // Function to regenerate prompts with retry logic for incomplete responses
 const regenerateWithRetry = async (previousResponse, retryCount) => {
   const maxRetries = 2
@@ -200,6 +293,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
       idea: form.value?.idea,
       followUpAnswers: form.value?.followUpAnswers,
       targetPlatform: form.value?.targetPlatform,
+      personality: form.value?.personality,
       language: currentLanguage.value
     })
     
@@ -213,6 +307,7 @@ const regenerateWithRetry = async (previousResponse, retryCount) => {
       generatedData.value = response.data
       isSuccess.value = true
       showResults.value = true
+      recordGeneration()
       isSubmitting.value = false // Turn off loading state on success
       setLightningLoading(false)
     } else if (response.data.raw_response || response.data.message) {
@@ -255,6 +350,7 @@ const handleSubmit = async () => {
       idea: form.value?.idea,
       followUpAnswers: form.value?.followUpAnswers,
       targetPlatform: form.value?.targetPlatform,
+      personality: form.value?.personality,
       language: currentLanguage.value
     })
     
@@ -281,6 +377,7 @@ const handleSubmit = async () => {
       generatedData.value = response.data
       isSuccess.value = true
       showResults.value = true
+      recordGeneration()
     } else if (response.data.raw_response || response.data.message) {
       // We got a response but it couldn't be parsed as structured data
       // This might be a partial response from the AI - try to regenerate automatically
@@ -324,9 +421,13 @@ const resetForm = () => {
   form.value = {
     idea: '',
     followUpAnswers: {},
-    targetPlatform: 'web'
+    targetPlatform: 'web',
+    personality: 'default'
   }
   errors.value = { idea: '' }
+  roast.value = null
+  roastError.value = null
+  surpriseError.value = null
   isSuccess.value = false
   generatedData.value = null
   errorMessage.value = null
@@ -355,9 +456,21 @@ const resetForm = () => {
       <form id="questionnaire-form" @submit.prevent="handleSubmit" class="space-y-8">
       <!-- App Idea -->
       <div class="space-y-3">
-        <label for="idea" class="block text-sm font-medium text-gray-700">
-          {{ t('appIdeaLabel') }} <span class="text-red-500">*</span>
-        </label>
+        <div class="flex items-center justify-between gap-3">
+          <label for="idea" class="block text-sm font-medium text-gray-700">
+            {{ t('appIdeaLabel') }} <span class="text-red-500">*</span>
+          </label>
+          <button
+            type="button"
+            @click="surpriseMe"
+            :disabled="isSurprising"
+            :title="t('surpriseMeHint')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-wait"
+          >
+            <span aria-hidden="true" :class="{ 'dice-roll': isSurprising }">🎲</span>
+            {{ isSurprising ? t('surpriseLoading') : t('surpriseMe') }}
+          </button>
+        </div>
         <textarea
           id="idea"
           v-model="form.idea"
@@ -373,6 +486,45 @@ const resetForm = () => {
         <p class="text-gray-400 text-sm">
           {{ t('appIdeaHint') }}
         </p>
+        <p v-if="surpriseError" class="text-red-500 text-sm" role="alert">{{ surpriseError }}</p>
+
+        <!-- Roast my idea -->
+        <div>
+          <button
+            type="button"
+            @click="roastMyIdea"
+            :disabled="isRoasting"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-100 rounded-lg hover:bg-orange-100 transition-all disabled:opacity-50 disabled:cursor-wait"
+          >
+            <span aria-hidden="true">🔥</span>
+            {{ isRoasting ? t('roastLoading') : t('roastButton') }}
+          </button>
+          <p v-if="roastError" class="mt-2 text-red-500 text-sm" role="alert">{{ roastError }}</p>
+        </div>
+
+        <section v-if="roast" class="p-5 bg-orange-50 border border-orange-100 rounded-2xl space-y-4" aria-live="polite">
+          <div class="flex items-start justify-between gap-3">
+            <h4 class="text-base font-semibold text-orange-900">🔥 {{ t('roastTitle') }}</h4>
+            <button type="button" @click="roast = null" class="text-orange-400 hover:text-orange-600 text-lg leading-none" :aria-label="t('authClose')">&times;</button>
+          </div>
+          <p v-if="roast.verdict" class="text-orange-900 font-medium">{{ roast.verdict }}</p>
+          <div v-if="roast.risks?.length">
+            <h5 class="text-xs font-medium text-orange-700 uppercase tracking-wider mb-2">{{ t('roastRisks') }}</h5>
+            <ul class="space-y-1.5 text-sm text-gray-700 list-disc ps-5">
+              <li v-for="(risk, i) in roast.risks" :key="i">{{ risk }}</li>
+            </ul>
+          </div>
+          <div v-if="roast.competitors?.length">
+            <h5 class="text-xs font-medium text-orange-700 uppercase tracking-wider mb-2">{{ t('roastCompetitors') }}</h5>
+            <ul class="space-y-1.5 text-sm text-gray-700 list-disc ps-5">
+              <li v-for="(competitor, i) in roast.competitors" :key="i">{{ competitor }}</li>
+            </ul>
+          </div>
+          <p v-if="roast.silver_lining" class="text-sm text-green-800 bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+            ✨ <span class="font-medium">{{ t('roastSilverLining') }}:</span> {{ roast.silver_lining }}
+          </p>
+        </section>
+
         <p v-if="isLoadingQuestions" class="text-gray-600 text-sm flex items-center">
           <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -540,6 +692,29 @@ const resetForm = () => {
         </p>
       </div>
 
+      <!-- Prompt personality -->
+      <fieldset class="space-y-3 pt-4 border-t border-gray-200">
+        <legend class="block text-sm font-medium text-gray-700">
+          {{ t('personalityLabel') }}
+        </legend>
+        <div class="flex flex-wrap gap-2">
+          <label v-for="option in PERSONALITIES" :key="option.value" class="cursor-pointer">
+            <input
+              type="radio"
+              v-model="form.personality"
+              :value="option.value"
+              class="peer sr-only"
+            />
+            <span class="inline-block px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full transition-all hover:bg-gray-50 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900 peer-focus-visible:ring-offset-2">
+              {{ t(option.label) }}
+            </span>
+          </label>
+        </div>
+        <p class="text-gray-400 text-sm">
+          {{ t('personalityHint') }}
+        </p>
+      </fieldset>
+
       <!-- Submit and Reset Buttons -->
       <div class="flex flex-col sm:flex-row sm:items-center gap-4 pt-6">
         <div class="flex items-center gap-4">
@@ -647,6 +822,19 @@ const resetForm = () => {
 </template>
 
 <style scoped>
+.dice-roll {
+  display: inline-block;
+  animation: dice-roll 0.6s linear infinite;
+}
+
+@keyframes dice-roll {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dice-roll { animation: none; }
+}
+
 /* Custom scrollbar for dropdowns */
 ::-webkit-scrollbar {
   width: 8px;

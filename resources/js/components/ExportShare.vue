@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, inject } from 'vue'
 import useGoogleAnalytics from '../composables/useGoogleAnalytics.js'
+import useAchievements from '../composables/useAchievements.js'
+import { buildAgentsMd } from '../utils/agentsMd.js'
 
 const props = defineProps({
   generatedData: {
@@ -22,6 +24,9 @@ const emit = defineEmits([])
 // Use translations from App.vue provider
 const { t } = inject('translations')
 
+// Streaks and badges
+const { record } = useAchievements()
+
 // Google Analytics tracking
 const { trackExport } = useGoogleAnalytics()
 
@@ -31,6 +36,7 @@ const { trackExport } = useGoogleAnalytics()
 const jsonExported = ref(false)
 const markdownExported = ref(false)
 const pdfExported = ref(false)
+const agentsMdExported = ref(false)
 
 // Compute the data for export
 const exportData = computed(() => {
@@ -263,6 +269,38 @@ const exportAsMarkdown = () => {
   setTimeout(() => { markdownExported.value = false }, 2000)
 }
 
+// Export as AGENTS.md, ready to drop into a repo for AI coding agents
+const exportAsAgentsMd = () => {
+  if (!exportData.value) return
+
+  const markdown = buildAgentsMd({
+    idea: exportData.value.metadata.app_idea,
+    platform: props.questionnaireData?.targetPlatform || props.generatedData?.data?.targetPlatform || 'web',
+    roles: getRolesForExport.value,
+    agents: getAgentsForExport.value,
+    backendPrompts: getBackendPromptsForExport.value,
+    frontendPrompts: getFrontendPromptsForExport.value,
+    t
+  })
+
+  const blob = new Blob([markdown], { type: 'text/markdown' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'AGENTS.md'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+
+  trackExport('agents_md')
+  record('agentsExport')
+
+  agentsMdExported.value = true
+  setTimeout(() => { agentsMdExported.value = false }, 2000)
+}
+
 // Check if we have data to export
 const hasExportableData = computed(() => {
   return getRolesForExport.value.length > 0 ||
@@ -273,7 +311,7 @@ const hasExportableData = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-3">
+  <div class="flex flex-wrap items-center gap-3">
     <!-- Export as JSON button - Modern Minimal -->
     <button
       @click="exportAsJson"
@@ -298,6 +336,19 @@ const hasExportableData = computed(() => {
       </svg>
       <span v-if="!markdownExported">{{ t('exportMarkdown') }}</span>
       <span v-else class="text-gray-300">{{ t('markdownDownloaded') }}</span>
+    </button>
+
+    <!-- Export as AGENTS.md button -->
+    <button
+      @click="exportAsAgentsMd"
+      :disabled="!hasExportableData"
+      class="px-4 py-2.5 bg-gray-900 text-white text-xs font-medium rounded-xl hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span v-if="!agentsMdExported">{{ t('exportAgentsMd') }}</span>
+      <span v-else class="text-gray-300">{{ t('agentsMdDownloaded') }}</span>
     </button>
   </div>
 </template>

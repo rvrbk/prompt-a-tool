@@ -6,6 +6,7 @@ use App\Models\PromptGeneration;
 use App\Services\MistralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Exception;
 
 class PromptController extends Controller
@@ -40,6 +41,7 @@ class PromptController extends Controller
             'followUpAnswers' => 'nullable|array',
             'targetPlatform' => 'required|string|in:web,ios,android,both',
             'language' => 'sometimes|string|max:10',
+            'personality' => ['sometimes', 'string', Rule::in(MistralService::PERSONALITIES)],
         ]);
 
         // Log the received data for debugging

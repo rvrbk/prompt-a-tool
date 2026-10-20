@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import CookieBanner from './components/CookieBanner.vue'
 import BuyMeACoffee from './components/BuyMeACoffee.vue'
 import UserMenu from './components/UserMenu.vue'
+import BadgeToast from './components/BadgeToast.vue'
+import useAchievements from './composables/useAchievements.js'
 import useAuth from './composables/useAuth.js'
 import useTranslations from './composables/useTranslations.js'
 import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
@@ -150,6 +152,7 @@ useGoogleAnalytics()
 
 const route = useRoute()
 const { user } = useAuth()
+const { streak } = useAchievements()
 
 // Mobile menu state
 const showMobileMenu = ref(false)
@@ -216,10 +219,29 @@ onMounted(() => {
               >
                 {{ t('myPrompts') }}
               </router-link>
+              <router-link
+                to="/achievements"
+                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+                :class="{ 'text-gray-900': route.path === '/achievements' }"
+                @click.stop
+              >
+                {{ t('navAchievements') }}
+              </router-link>
             </nav>
           </div>
 
           <div class="flex items-center shrink-0 space-x-1.5 sm:space-x-2 ml-auto">
+            <!-- Streak -->
+            <router-link
+              v-if="streak > 0"
+              to="/achievements"
+              class="flex items-center space-x-1 px-2 sm:px-3 py-2 border border-orange-100 rounded-lg bg-orange-50 text-sm font-medium text-orange-700 hover:bg-orange-100 transition-all"
+              :title="`${streak} ${t('streakDaysLabel')}`"
+              :aria-label="`${streak} ${t('streakDaysLabel')}`"
+            >
+              <span aria-hidden="true">🔥</span>
+              <span>{{ streak }}</span>
+            </router-link>
             <!-- Language Selector -->
             <div class="relative">
               <button
@@ -306,6 +328,13 @@ onMounted(() => {
         >
           {{ t('myPrompts') }}
         </router-link>
+        <router-link
+          to="/achievements"
+          class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors py-2"
+          @click="closeMobileMenu"
+        >
+          {{ t('navAchievements') }}
+        </router-link>
       </nav>
     </div>
 
@@ -328,6 +357,9 @@ onMounted(() => {
     <footer class="mt-16 py-6 text-center text-gray-400 text-sm">
       <p>a <a href="https://verbeek.ug/" target="_blank" rel="noopener noreferrer">verbeek.ug</a> platform</p>
     </footer>
+
+    <!-- Badge unlocked toasts -->
+    <BadgeToast />
 
     <!-- Cookie Banner -->
     <CookieBanner
