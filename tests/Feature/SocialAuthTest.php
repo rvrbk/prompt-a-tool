@@ -38,7 +38,7 @@ class SocialAuthTest extends TestCase
 
     public function test_unknown_providers_are_not_routed(): void
     {
-        $this->get('/auth/twitter/redirect')->assertOk()->assertViewIs('app');
+        $this->get('/auth/twitter/redirect')->assertNotFound();
     }
 
     public function test_github_callback_creates_and_signs_in_a_new_user(): void

@@ -20,7 +20,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.webmanifest">
-    <title>{{ config('app.name', 'Prompt a Tool') }}</title>
+    @include('partials.seo')
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +30,24 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        {{-- Static fallback for crawlers and LLM fetchers that do not run JavaScript. Replaced when Vue mounts. --}}
+        <main style="max-width:42rem;margin:2rem auto;padding:0 1rem;font-family:sans-serif">
+            <h1>Prompt a Tool – free AI prompt generator for your app idea</h1>
+            <p>{{ config('seo.description') }}</p>
+            <h2>How it works</h2>
+            <ol>
+                <li>Describe your app idea in plain language.</li>
+                <li>Answer a few AI-generated follow-up questions.</li>
+                <li>Get user roles, AI agents, backend prompts and frontend prompts tailored to your project.</li>
+            </ol>
+            <h2>Frequently asked questions</h2>
+            @foreach(config('seo.faq') as $item)
+                <h3>{{ $item['q'] }}</h3>
+                <p>{{ $item['a'] }}</p>
+            @endforeach
+            <noscript><p>Prompt a Tool needs JavaScript enabled to run.</p></noscript>
+        </main>
+    </div>
 </body>
 </html>

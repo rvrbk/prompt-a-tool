@@ -1,0 +1,43 @@
+# Prompt a Tool – full content
+
+> Prompt a Tool is a free web app that turns an app idea into tailored development prompts, user roles, AI agents and skills. URL: https://prompt-a-tool.com/
+
+## How it works
+
+1. Describe your app idea in plain language.
+2. Answer a few AI-generated follow-up questions so the tool understands your needs.
+3. Get a complete set of user roles, AI agents, backend prompts and frontend prompts tailored to your project.
+
+## What you get
+
+- User roles: the types of users and what they can do in your app
+- AI agents: smart helpers that perform tasks and use tools in your app
+- Backend prompts: instructions for building the server and database
+- Frontend prompts: instructions for building the user interface
+
+## Features
+
+- AI-generated follow-up questions
+- Export as Markdown, JSON or AGENTS.md
+- Shareable links
+- Save and revisit prompts when signed in
+- Nine languages: English, French, Arabic (right-to-left), Portuguese, Swahili, Hausa, Yoruba, Amharic, Luganda
+- Installable PWA with offline support
+
+## FAQ
+
+### What is Prompt a Tool?
+Prompt a Tool is a free web app that turns an app idea into a complete set of user roles, AI agents, backend prompts and frontend prompts, so you can start building with an AI coding assistant faster.
+
+### How does Prompt a Tool work?
+You describe your app idea in plain language, answer a few AI-generated follow-up questions, and receive tailored prompts for your project. You can then export them as Markdown, JSON or an AGENTS.md file.
+
+### Is Prompt a Tool free?
+Yes. Prompt a Tool is free to use and does not require an account to generate prompts. Signing in lets you save and revisit your prompts.
+
+### Which languages does Prompt a Tool support?
+English, French, Arabic (right-to-left), Portuguese, Swahili, Hausa, Yoruba, Amharic and Luganda.
+
+### Does Prompt a Tool work offline?
+Yes. It is a Progressive Web App that can be installed and opened offline. Generating new prompts needs a connection because the AI runs on the server.
+

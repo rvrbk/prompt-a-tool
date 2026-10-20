@@ -2,12 +2,16 @@
 
 use App\Http\Controllers\Auth\EmailAuthController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
 // Main app page
 Route::get('/', function () {
     return view('app');
 })->name('app');
+
+// Sitemap for search engines
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 
 // Health check
 Route::get('/health', function () {
@@ -30,7 +34,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [SocialAuthController::class, 'logout'])->middleware('auth')->name('auth.logout');
 });
 
-// Catch-all route for SPA - must be last
+// SPA routes (keep in sync with resources/js/router.js). Anything else is a real 404.
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '.*');
+})->where('any', 'about|achievements|account/prompts(/\\d+)?');

@@ -1,6 +1,6 @@
 {
-  "name": "Prompt A Tool",
-  "short_name": "PromptTool",
+  "name": "Prompt a Tool",
+  "short_name": "Prompt a Tool",
   "description": "A powerful prompt generation tool for AI applications",
   "start_url": "/",
   "display": "standalone",
