@@ -149,6 +149,7 @@ class MistralService
     {
         $targetPlatform = $this->getPlatformLabel($data['targetPlatform'] ?? 'web');
         $pwaInfo = ($data['targetPlatform'] ?? 'web') === 'web' ? 'Yes (PWA enabled)' : 'No';
+        $styleDirective = $this->getPersonalityDirective($data['personality'] ?? null);
         
         // Format follow-up answers for the prompt
         $followUpInfo = '';
@@ -215,7 +216,7 @@ Format the FINAL output as a single JSON object with these exact keys:
 - "frontend_prompts": array of frontend development prompts (each with "iteration", "title", "description", "tasks", "dependencies")
 
 DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
-
+{$styleDirective}
 **App Idea**: {$data['idea']}{$followUpInfo}
 **Target Platform**: {$targetPlatform}
 **PWA Support**: {$pwaInfo}
@@ -235,6 +236,7 @@ PROMPT;
         $languageName = $this->getLanguageName($language);
         $targetPlatform = $this->getPlatformLabel($data['targetPlatform'] ?? 'web');
         $pwaInfo = ($data['targetPlatform'] ?? 'web') === 'web' ? 'Yes (PWA enabled)' : 'No';
+        $styleDirective = $this->getPersonalityDirective($data['personality'] ?? null);
         
         // Get localized prompt parts
         $localized = $this->getLocalizedPromptParts($language);
@@ -278,7 +280,7 @@ Adapt all technical prompts accordingly:
 DO NOT include any markdown, explanations, or text outside the JSON. Only return the JSON object.
 
 REMEMBER: ALL content MUST be in {$languageName} language. NO English words allowed in the output.
-
+{$styleDirective}
 **App Idea**: {$data['idea']}{$followUpInfo}
 **Target Platform**: {$targetPlatform}
 **PWA Support**: {$pwaInfo}
@@ -612,6 +614,192 @@ REMEMBER: ALL content MUST be in {$languageName} language. NO English words allo
 
 App Idea: {$idea}
 PROMPT;
+    }
+
+    /**
+     * The writing personalities a user can pick for the generated text
+     */
+    public const PERSONALITIES = ['default', 'architect', 'startup', 'pirate', 'zen'];
+
+    /**
+     * Build the style instruction for a writing personality
+     *
+     * Only the tone of the free text changes. Keys, structure and the
+     * technical content stay exactly the same so the JSON stays parseable.
+     *
+     * @param string|null $personality One of self::PERSONALITIES
+     * @return string Empty for the default personality
+     */
+    protected function getPersonalityDirective(?string $personality): string
+    {
+        $styles = [
+            'architect' => 'a strict, no-nonsense senior software architect: precise, opinionated, demanding about quality, tests and clean boundaries',
+            'startup' => 'an energetic startup founder: fast-moving, enthusiastic, focused on shipping an MVP, momentum and user value',
+            'pirate' => 'a swashbuckling pirate captain: nautical slang and sea metaphors (crew, treasure, ship, voyage), while every technical detail stays accurate',
+            'zen' => 'a calm zen master: serene, minimalist, mindful, favouring simplicity and balance in every decision',
+        ];
+
+        if (! isset($styles[$personality])) {
+            return '';
+        }
+
+        return "\n**Writing style**: Write every description, task and dependency in the voice of {$styles[$personality]}. "
+            . "This only changes the tone of the text. Keep all JSON keys, the iteration structure and the technical accuracy exactly as specified.\n";
+    }
+
+    /**
+     * Roast an app idea: a funny but useful critique
+     *
+     * @param string $idea The app idea
+     * @param string|null $language The language code for the roast
+     * @return array{verdict: string, risks: string[], competitors: string[], silver_lining: string}
+     * @throws Exception If the API request fails or the answer is unusable
+     */
+    public function roastIdea(string $idea, ?string $language = null): array
+    {
+        $languageRule = $this->languageRule($language);
+
+        $prompt = <<<PROMPT
+You are a witty, brutally honest startup critic. Roast the following app idea: be funny, but make every joke carry a real, useful insight. Never be cruel about the person, only the idea.
+
+{$languageRule}
+
+Return a single JSON object with exactly these keys:
+- "verdict": one or two punchy sentences summing up the idea
+- "risks": array of exactly 3 short strings, the biggest risks or weaknesses
+- "competitors": array of 2 to 4 short strings, real or realistic competitors or alternatives (name plus a few words)
+- "silver_lining": one encouraging sentence about what could make the idea work
+
+Do NOT include markdown, explanations, or text outside the JSON. Only return the JSON object.
+
+App Idea: {$idea}
+PROMPT;
+
+        $parsed = $this->completeJson($prompt, maxTokens: 1000, temperature: 0.9);
+
+        $stringList = fn ($value) => array_values(array_filter(
+            is_array($value) ? $value : [],
+            fn ($item) => is_string($item) && trim($item) !== '',
+        ));
+
+        $roast = [
+            'verdict' => is_string($parsed['verdict'] ?? null) ? trim($parsed['verdict']) : '',
+            'risks' => $stringList($parsed['risks'] ?? null),
+            'competitors' => $stringList($parsed['competitors'] ?? null),
+            'silver_lining' => is_string($parsed['silver_lining'] ?? null) ? trim($parsed['silver_lining']) : '',
+        ];
+
+        if ($roast['verdict'] === '' && $roast['risks'] === []) {
+            throw new Exception('The roast could not be parsed. Please try again.');
+        }
+
+        return $roast;
+    }
+
+    /**
+     * Come up with a random, entertaining app idea
+     *
+     * @param string|null $language The language code for the idea
+     * @return string The idea, at most 1000 characters
+     * @throws Exception If the API request fails or the answer is unusable
+     */
+    public function surpriseIdea(?string $language = null): string
+    {
+        // A random theme keeps repeated clicks from returning the same idea
+        $themes = [
+            'food and cooking', 'pets', 'travel', 'fitness', 'music', 'gardening', 'education', 'finance',
+            'farming', 'fashion', 'sports', 'health', 'transport', 'neighbourhoods', 'games', 'art',
+            'books', 'weather', 'sleep', 'parenting', 'local markets', 'public services', 'volunteering', 'DIY repairs',
+        ];
+        $theme = $themes[array_rand($themes)];
+        $languageRule = $this->languageRule($language);
+
+        $prompt = <<<PROMPT
+Invent one original, slightly quirky but genuinely buildable app idea related to: {$theme}.
+Describe it in 2 or 3 sentences: who it is for, the problem it solves and its standout feature.
+
+{$languageRule}
+
+Return a single JSON object with exactly one key, "idea", holding that description.
+Do NOT include markdown, explanations, or text outside the JSON. Only return the JSON object.
+PROMPT;
+
+        $parsed = $this->completeJson($prompt, maxTokens: 400, temperature: 1.0);
+        $idea = is_string($parsed['idea'] ?? null) ? trim($parsed['idea']) : '';
+
+        if ($idea === '') {
+            throw new Exception('No idea came back. Please try again.');
+        }
+
+        return mb_substr($idea, 0, 1000);
+    }
+
+    /**
+     * Instruction that pins the answer to one language
+     */
+    protected function languageRule(?string $language): string
+    {
+        if (! $language || $language === 'en') {
+            return 'Write all text values in English.';
+        }
+
+        $languageName = $this->getLanguageName($language);
+
+        return "CRITICAL: write ALL text values in {$languageName}. Use ONLY {$languageName} words (keep the JSON keys exactly as specified, in English).";
+    }
+
+    /**
+     * Send a single prompt and parse the answer as a JSON object
+     *
+     * @return array<string, mixed>
+     * @throws Exception If the API request fails or the answer is not JSON
+     */
+    protected function completeJson(string $prompt, int $maxTokens, float $temperature): array
+    {
+        if (empty($this->apiKey)) {
+            throw new Exception('Mistral API key is not configured. Please set MISTRAL_API_KEY in your .env file.');
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ])->withOptions([
+            'timeout' => 30,
+        ])->post($this->apiUrl, [
+            'model' => $this->model,
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'temperature' => $temperature,
+            'max_tokens' => $maxTokens,
+        ]);
+
+        if ($response->failed()) {
+            Log::error('Mistral API request failed', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            throw new Exception('Mistral API request failed: ' . $response->status());
+        }
+
+        $content = $response->json('choices.0.message.content');
+        if (! is_string($content)) {
+            throw new Exception('Invalid response format from Mistral API');
+        }
+
+        $parsed = $this->tryParseJson($content);
+        if ($parsed === null) {
+            $extracted = $this->extractJsonFromContent($content);
+            $parsed = $extracted !== null ? $this->tryParseJson($extracted) : null;
+        }
+
+        if ($parsed === null) {
+            throw new Exception('AI response could not be parsed as JSON. Please try again.');
+        }
+
+        return $parsed;
     }
 
     /**
