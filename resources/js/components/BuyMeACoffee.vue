@@ -82,7 +82,7 @@ const handleBuyMeACoffeeClick = () => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <button 
         @click="handleBuyMeACoffeeClick"
-        class="w-full text-white font-medium text-sm flex items-center justify-center hover:bg-yellow-600 transition-all duration-200 py-2"
+        class="w-full text-white font-medium text-sm flex items-center justify-center group py-2"
         :aria-label="getTranslation('buyMeACoffee')"
       >
         <svg
@@ -101,17 +101,13 @@ const handleBuyMeACoffeeClick = () => {
           <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
           <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
         </svg>
-        <span>{{ getTranslation('buyMeACoffee') }}</span>
+        <span class="underline-offset-4 group-hover:underline">{{ getTranslation('buyMeACoffee') }}</span>
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-button:hover {
-  transform: scale(1.05);
-}
-
 .steam {
   transform-origin: center bottom;
   animation: steamRise 2s ease-in-out infinite;
