@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, inject } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, inject } from 'vue'
 import axios from 'axios'
 import ResultsDisplay from './ResultsDisplay.vue'
 import useAuth from '../composables/useAuth.js'
@@ -9,6 +9,24 @@ import { setLightningLoading } from '../utils/axiosLightningInterceptor.js'
 
 // Use translations from App.vue provider
 const { t, currentLanguage } = inject('translations')
+
+// Info balloon explaining what the tool does and who it is for
+const showInfo = ref(false)
+const infoRoot = ref(null)
+const closeInfoOnOutsideClick = (e) => {
+  if (showInfo.value && infoRoot.value && !infoRoot.value.contains(e.target)) showInfo.value = false
+}
+const closeInfoOnEscape = (e) => {
+  if (e.key === 'Escape') showInfo.value = false
+}
+onMounted(() => {
+  document.addEventListener('click', closeInfoOnOutsideClick)
+  document.addEventListener('keydown', closeInfoOnEscape)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeInfoOnOutsideClick)
+  document.removeEventListener('keydown', closeInfoOnEscape)
+})
 
 // Initialize Google Analytics
 const { trackFormSubmission, trackButtonClick, trackEvent } = useGoogleAnalytics()
@@ -445,9 +463,52 @@ const resetForm = () => {
     <div v-show="!showResults">
       <!-- Title and Description -->
       <div class="mb-10">
-        <h2 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
-          {{ t('appTitle') }}
-        </h2>
+        <div ref="infoRoot" class="relative">
+          <div class="flex items-center gap-2 mb-3">
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">
+              {{ t('appTitle') }}
+            </h2>
+            <button
+              type="button"
+              class="shrink-0 rounded-full text-gray-400 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 transition-colors"
+              :aria-expanded="showInfo"
+              aria-controls="app-info-balloon"
+              :aria-label="t('homeLearnMore')"
+              :title="t('homeLearnMore')"
+              @click="showInfo = !showInfo"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Info balloon -->
+          <div
+            v-show="showInfo"
+            id="app-info-balloon"
+            role="dialog"
+            :aria-label="t('homeLearnMore')"
+            class="absolute left-0 top-full z-20 mt-1 w-full max-w-xl rounded-xl border border-gray-200 bg-white p-4 shadow-lg space-y-4"
+          >
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-1">{{ t('aboutWhatIsHeading') }}</h3>
+              <p class="text-xs text-gray-600 leading-relaxed">{{ t('aboutWhatIsDesc') }}</p>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 mb-2">{{ t('aboutForWhomHeading') }}</h3>
+              <ul class="space-y-2">
+                <li v-for="n in 4" :key="n" class="text-xs text-gray-600 leading-relaxed">
+                  <span class="font-medium text-gray-800">{{ t(`aboutAudience${n}Title`) }}</span>
+                  <span class="block">{{ t(`aboutAudience${n}Desc`) }}</span>
+                </li>
+              </ul>
+            </div>
+            <router-link to="/about" class="inline-block text-xs font-medium text-blue-600 hover:text-blue-700 underline">
+              {{ t('navAbout') }}
+            </router-link>
+          </div>
+        </div>
         <p class="text-gray-500 leading-relaxed text-xs">
           {{ t('appDescription') }}
         </p>

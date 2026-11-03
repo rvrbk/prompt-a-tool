@@ -35,6 +35,13 @@
         <main style="max-width:42rem;margin:2rem auto;padding:0 1rem;font-family:sans-serif">
             <h1>Prompt a Tool – free AI prompt generator for your app idea</h1>
             <p>{{ config('seo.description') }}</p>
+            <h2>Who is it for?</h2>
+            <p>Anyone who wants to build a digital product with the help of AI, with or without a technical background.</p>
+            <ul>
+                @foreach(config('seo.audience') as [$who, $why])
+                    <li><strong>{{ $who }}</strong>: {{ $why }}</li>
+                @endforeach
+            </ul>
             <h2>How it works</h2>
             <ol>
                 <li>Describe your app idea in plain language.</li>

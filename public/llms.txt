@@ -2,7 +2,7 @@
 
 > Prompt a Tool is a free web app that turns an app idea into tailored development prompts, user roles, AI agents and skills. Users describe their idea, answer a few AI-generated follow-up questions, and receive ready-to-use prompts for backend and frontend work that they can paste into an AI coding assistant.
 
-Prompt a Tool is available in English, French, Arabic, Portuguese, Swahili, Hausa, Yoruba, Amharic and Luganda. It is an installable Progressive Web App and works offline for everything except generating new prompts. Results can be exported as Markdown, JSON or an AGENTS.md file, or shared via a link.
+Prompt a Tool is available in English, French, Arabic, Swahili, Hausa, Yoruba, Amharic, Oromo, Igbo and Luganda. It is an installable Progressive Web App and works offline for everything except generating new prompts. Results can be exported as Markdown, JSON or an AGENTS.md file, or shared via a link.
 
 ## Pages
 

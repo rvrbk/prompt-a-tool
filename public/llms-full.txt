@@ -2,6 +2,15 @@
 
 > Prompt a Tool is a free web app that turns an app idea into tailored development prompts, user roles, AI agents and skills. URL: https://prompt-a-tool.com/
 
+## Who is it for?
+
+Anyone who wants to build a digital product with the help of AI, with or without a technical background.
+
+- Founders and first-time builders: turn a rough idea into a clear plan and know what to ask an AI assistant or a developer.
+- Developers: skip the blank page and get a structured starting point for roles, architecture and prompts.
+- Students and learners: learn how real apps are broken down into users, features, backend and frontend.
+- Teams, freelancers and agencies: quickly align on scope and share the plan as Markdown, JSON or AGENTS.md.
+
 ## How it works
 
 1. Describe your app idea in plain language.
@@ -21,7 +30,7 @@
 - Export as Markdown, JSON or AGENTS.md
 - Shareable links
 - Save and revisit prompts when signed in
-- Nine languages: English, French, Arabic (right-to-left), Portuguese, Swahili, Hausa, Yoruba, Amharic, Luganda
+- Ten languages: English, French, Arabic (right-to-left), Swahili, Hausa, Yoruba, Amharic, Oromo, Igbo, Luganda
 - Installable PWA with offline support
 
 ## FAQ
@@ -32,11 +41,14 @@ Prompt a Tool is a free web app that turns an app idea into a complete set of us
 ### How does Prompt a Tool work?
 You describe your app idea in plain language, answer a few AI-generated follow-up questions, and receive tailored prompts for your project. You can then export them as Markdown, JSON or an AGENTS.md file.
 
+### Who is Prompt a Tool for?
+Anyone who wants to build a digital product with the help of AI, with or without a technical background: founders and first-time builders, developers, students, and teams, freelancers and agencies.
+
 ### Is Prompt a Tool free?
 Yes. Prompt a Tool is free to use and does not require an account to generate prompts. Signing in lets you save and revisit your prompts.
 
 ### Which languages does Prompt a Tool support?
-English, French, Arabic (right-to-left), Portuguese, Swahili, Hausa, Yoruba, Amharic and Luganda.
+English, French, Arabic (right-to-left), Swahili, Hausa, Yoruba, Amharic, Oromo, Igbo and Luganda.
 
 ### Does Prompt a Tool work offline?
 Yes. It is a Progressive Web App that can be installed and opened offline. Generating new prompts needs a connection because the AI runs on the server.

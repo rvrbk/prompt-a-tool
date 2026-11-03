@@ -15,6 +15,24 @@ const { t } = inject('translations')
 
       <!-- Content -->
       <div class="space-y-6">
+        <!-- What is it -->
+        <section>
+          <h2 class="text-lg font-semibold text-gray-800 mb-3">{{ t('aboutWhatIsHeading') }}</h2>
+          <p class="text-gray-600 leading-relaxed">{{ t('aboutWhatIsDesc') }}</p>
+        </section>
+
+        <!-- Who is it for -->
+        <section>
+          <h2 class="text-lg font-semibold text-gray-800 mb-3">{{ t('aboutForWhomHeading') }}</h2>
+          <p class="text-gray-600 leading-relaxed mb-4">{{ t('aboutForWhomIntro') }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-for="n in 4" :key="n" class="bg-gray-50 rounded-lg p-4">
+              <h3 class="font-medium text-gray-800 mb-2">{{ t(`aboutAudience${n}Title`) }}</h3>
+              <p class="text-gray-600 text-sm">{{ t(`aboutAudience${n}Desc`) }}</p>
+            </div>
+          </div>
+        </section>
+
         <!-- What it does -->
         <section>
           <h2 class="text-lg font-semibold text-gray-800 mb-3">{{ t('aboutWhatItDoes') }}</h2>
