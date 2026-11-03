@@ -35,7 +35,7 @@ class MistralService
     public function __construct()
     {
         $this->apiUrl = config('services.mistral.url', env('MISTRAL_API_URL', 'https://api.mistral.ai/v1/chat/completions'));
-        $this->apiKey = env('MISTRAL_API_KEY');
+        $this->apiKey = (string) config('services.mistral.key');
         $this->model = config('services.mistral.model', env('MISTRAL_MODEL', 'mistral-medium'));
     }
 

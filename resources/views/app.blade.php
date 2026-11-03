@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    @if(env('VITE_GA_MEASUREMENT_ID'))
+    @php($gaId = config('services.google_analytics.measurement_id'))
+    @if($gaId)
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('VITE_GA_MEASUREMENT_ID') }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', '{{ env("VITE_GA_MEASUREMENT_ID") }}');
+      gtag('config', '{{ $gaId }}');
     </script>
     @endif
     <meta charset="UTF-8">

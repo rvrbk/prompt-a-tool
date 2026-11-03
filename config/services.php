@@ -36,8 +36,13 @@ return [
     ],
 
     'mistral' => [
+        'key' => env('MISTRAL_API_KEY'),
         'url' => env('MISTRAL_API_URL', 'https://api.mistral.ai/v1/chat/completions'),
         'model' => env('MISTRAL_MODEL', 'mistral-medium'),
+    ],
+
+    'google_analytics' => [
+        'measurement_id' => env('VITE_GA_MEASUREMENT_ID'),
     ],
 
     'google' => [
