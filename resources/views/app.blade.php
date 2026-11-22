@@ -28,6 +28,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://lore.verbeek.ug/heat.js" data-key="MPJEdQ9WAZaGsWujN4PjZV3UGEdmVN9G" data-lore-heat></script>
 </head>
 <body>
     <div id="app">
