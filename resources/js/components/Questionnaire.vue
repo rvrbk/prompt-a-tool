@@ -465,7 +465,7 @@ const resetForm = () => {
       <div class="mb-10">
         <div ref="infoRoot" class="relative">
           <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
               {{ t('appTitle') }}
             </h2>
             <button
@@ -509,7 +509,7 @@ const resetForm = () => {
             </router-link>
           </div>
         </div>
-        <p class="text-gray-500 leading-relaxed text-xs">
+        <p class="text-gray-600 leading-relaxed text-base max-w-2xl">
           {{ t('appDescription') }}
         </p>
       </div>
@@ -539,9 +539,9 @@ const resetForm = () => {
             'border-red-500': errors.idea,
             'border-gray-300': !errors.idea
           }"
-          rows="4"
+          rows="5"
           :placeholder="t('appIdeaPlaceholder')"
-          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all bg-white"
+          class="w-full px-4 py-3.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all bg-gray-50/60 focus:bg-white shadow-sm"
         />
         <p v-if="errors.idea" class="text-red-500 text-sm">{{ errors.idea }}</p>
         <p class="text-gray-400 text-sm">
@@ -706,46 +706,46 @@ const resetForm = () => {
       </div>
       
       <!-- Target Platform -->
-      <div class="space-y-3 pt-4 border-t border-gray-200">
+      <div class="space-y-3 pt-6 border-t border-gray-100">
         <label class="block text-sm font-medium text-gray-700">
           {{ t('targetPlatformLabel') }}
         </label>
-        <div class="flex flex-wrap gap-4">
-          <label class="flex items-center cursor-pointer">
+        <div class="flex flex-wrap gap-2">
+          <label class="cursor-pointer">
             <input
               type="radio"
               v-model="form.targetPlatform"
               value="web"
-              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+              class="peer sr-only"
             />
-            <span class="text-sm text-gray-700">{{ t('webApp') }}</span>
+            <span class="inline-block px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full transition-all hover:bg-gray-50 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900 peer-focus-visible:ring-offset-2">{{ t('webApp') }}</span>
           </label>
-          <label class="flex items-center cursor-pointer">
+          <label class="cursor-pointer">
             <input
               type="radio"
               v-model="form.targetPlatform"
               value="ios"
-              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+              class="peer sr-only"
             />
-            <span class="text-sm text-gray-700">{{ t('iosApp') }}</span>
+            <span class="inline-block px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full transition-all hover:bg-gray-50 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900 peer-focus-visible:ring-offset-2">{{ t('iosApp') }}</span>
           </label>
-          <label class="flex items-center cursor-pointer">
+          <label class="cursor-pointer">
             <input
               type="radio"
               v-model="form.targetPlatform"
               value="android"
-              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+              class="peer sr-only"
             />
-            <span class="text-sm text-gray-700">{{ t('androidApp') }}</span>
+            <span class="inline-block px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full transition-all hover:bg-gray-50 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900 peer-focus-visible:ring-offset-2">{{ t('androidApp') }}</span>
           </label>
-          <label class="flex items-center cursor-pointer">
+          <label class="cursor-pointer">
             <input
               type="radio"
               v-model="form.targetPlatform"
               value="both"
-              class="mr-3 h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900"
+              class="peer sr-only"
             />
-            <span class="text-sm text-gray-700">{{ t('bothMobile') }}</span>
+            <span class="inline-block px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full transition-all hover:bg-gray-50 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 peer-focus-visible:ring-2 peer-focus-visible:ring-gray-900 peer-focus-visible:ring-offset-2">{{ t('bothMobile') }}</span>
           </label>
         </div>
         <p class="text-gray-400 text-sm">
@@ -754,7 +754,7 @@ const resetForm = () => {
       </div>
 
       <!-- Prompt personality -->
-      <fieldset class="space-y-3 pt-4 border-t border-gray-200">
+      <fieldset class="space-y-3 pt-6 border-t border-gray-100">
         <legend class="block text-sm font-medium text-gray-700">
           {{ t('personalityLabel') }}
         </legend>
@@ -782,7 +782,7 @@ const resetForm = () => {
           <button
             type="submit"
             :disabled="!canGenerate"
-            class="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm"
+            class="px-7 py-3.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 hover:shadow-md hover:-translate-y-px focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center shadow-sm"
           >
             <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -795,7 +795,7 @@ const resetForm = () => {
           <button
             type="button"
             @click="resetForm"
-            class="px-6 py-3 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all"
+            class="px-6 py-3.5 border border-gray-200 text-gray-600 font-medium rounded-full hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all"
           >
             {{ t('reset') }}
           </button>

@@ -160,17 +160,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 bg-[radial-gradient(60rem_22rem_at_50%_-6rem,rgba(248,184,3,0.12),transparent)]">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 gap-2">
           <div class="flex items-center min-w-0 space-x-4 sm:space-x-6">
             <div class="flex items-center min-w-0 space-x-2 sm:space-x-3">
               <router-link to="/" class="shrink-0" aria-hidden="true" tabindex="-1" @click.stop="closeMobileMenu">
-                <svg class="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" class="lightning-bolt origin-center" />
-                </svg>
+                <span class="grid place-items-center w-9 h-9 rounded-xl bg-gray-900 shadow-sm">
+                  <svg class="w-5 h-5 text-[#F8B803]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" class="lightning-bolt origin-center" />
+                  </svg>
+                </span>
               </router-link>
               <div class="min-w-0 leading-tight">
                 <router-link to="/" class="block" @click.stop="closeMobileMenu">
@@ -179,19 +181,19 @@ onMounted(() => {
                 <a href="https://verbeek.ug/" target="_blank" rel="noopener noreferrer" class="block truncate text-[11px] text-gray-400 hover:text-gray-600 transition-colors">a verbeek.ug platform</a>
               </div>
             </div>
-            <nav class="hidden md:flex items-center space-x-6">
+            <nav class="hidden md:flex items-center space-x-1">
               <router-link
                 to="/"
-                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                :class="{ 'text-gray-900': route.path === '/' }"
+                class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-medium transition-colors px-3 py-1.5 rounded-full"
+                :class="{ 'bg-gray-100 text-gray-900': route.path === '/' }"
                 @click.stop
               >
                 {{ t('navHome') }}
               </router-link>
               <router-link
                 to="/about"
-                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                :class="{ 'text-gray-900': route.path === '/about' }"
+                class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-medium transition-colors px-3 py-1.5 rounded-full"
+                :class="{ 'bg-gray-100 text-gray-900': route.path === '/about' }"
                 @click.stop
               >
                 {{ t('navAbout') }}
@@ -199,16 +201,16 @@ onMounted(() => {
               <router-link
                 v-if="user"
                 to="/account/prompts"
-                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                :class="{ 'text-gray-900': route.path.startsWith('/account/prompts') }"
+                class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-medium transition-colors px-3 py-1.5 rounded-full"
+                :class="{ 'bg-gray-100 text-gray-900': route.path.startsWith('/account/prompts') }"
                 @click.stop
               >
                 {{ t('myPrompts') }}
               </router-link>
               <router-link
                 to="/achievements"
-                class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                :class="{ 'text-gray-900': route.path === '/achievements' }"
+                class="text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm font-medium transition-colors px-3 py-1.5 rounded-full"
+                :class="{ 'bg-gray-100 text-gray-900': route.path === '/achievements' }"
                 @click.stop
               >
                 {{ t('navAchievements') }}
@@ -331,7 +333,7 @@ onMounted(() => {
         <span>{{ t(authNotice) }}</span>
         <button type="button" @click="authNotice = null" class="text-red-400 hover:text-red-600" aria-label="Close">&times;</button>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden min-h-[60vh]">
+      <div class="bg-white rounded-3xl border border-gray-200/70 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_16px_40px_-16px_rgba(16,24,40,0.10)] overflow-hidden min-h-[60vh]">
         <router-view />
       </div>
     </main>
