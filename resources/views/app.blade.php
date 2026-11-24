@@ -28,12 +28,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css" />
+    <style>
+        html, body { margin: 0; background: #FDFDFC; }
+        .boot-loader { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .boot-loader span { width: 2rem; height: 2rem; border: 3px solid #e5e5e0; border-top-color: #1B1B18; border-radius: 50%; animation: boot-spin 0.8s linear infinite; }
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://lore.verbeek.ug/heat.js" data-key="MPJEdQ9WAZaGsWujN4PjZV3UGEdmVN9G" data-lore-heat></script>
 </head>
 <body>
     <div id="app">
-        {{-- Static fallback for crawlers and LLM fetchers that do not run JavaScript. Replaced when Vue mounts. --}}
+        <div class="boot-loader" role="status" aria-label="Loading"><span></span></div>
+        {{-- Static text for crawlers and LLM fetchers that do not run JavaScript. In a noscript element, so people never see it flash before Vue mounts, while it stays in the HTML source. --}}
+        <noscript>
         <main style="max-width:42rem;margin:2rem auto;padding:0 1rem;font-family:sans-serif">
             <h1>Prompt a Tool – free AI prompt generator for your app idea</h1>
             <p>{{ config('seo.description') }}</p>
@@ -55,8 +63,9 @@
                 <h3>{{ $item['q'] }}</h3>
                 <p>{{ $item['a'] }}</p>
             @endforeach
-            <noscript><p>Prompt a Tool needs JavaScript enabled to run.</p></noscript>
+            <p>Prompt a Tool needs JavaScript enabled to run.</p>
         </main>
+        </noscript>
     </div>
 </body>
 </html>

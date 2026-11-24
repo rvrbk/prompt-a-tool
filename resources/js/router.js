@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Questionnaire from './components/Questionnaire.vue'
-import About from './components/About.vue'
-import Achievements from './components/Achievements.vue'
 import { SUPPORTED_LANGUAGES, translations } from './composables/useTranslations.js'
 
 // Helper function to get current language from storage
@@ -53,13 +51,13 @@ const routes = [
   {
     path: '/about',
     name: 'about',
-    component: About,
+    component: () => import('./components/About.vue'),
     meta: { title: 'aboutTitleWithApp' }
   },
   {
     path: '/achievements',
     name: 'achievements',
-    component: Achievements,
+    component: () => import('./components/Achievements.vue'),
     meta: { title: 'navAchievements' }
   },
   {
