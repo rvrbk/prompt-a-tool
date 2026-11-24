@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onUnmounted, watch, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import CookieBanner from './components/CookieBanner.vue'
-import BuyMeACoffee from './components/BuyMeACoffee.vue'
 import UserMenu from './components/UserMenu.vue'
 import BadgeToast from './components/BadgeToast.vue'
 import useAchievements from './composables/useAchievements.js'
@@ -277,9 +276,6 @@ onMounted(() => {
         </div>
       </div>
     </header>
-
-    <!-- Buy Me a Coffee Banner -->
-    <BuyMeACoffee :show="true" :language="currentLang" />
 
     <!-- Mobile Menu -->
     <div
