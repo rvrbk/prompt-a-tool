@@ -13,6 +13,18 @@ import { onMounted } from 'vue'
 
 const GA_SCRIPT_ID = 'ga-gtag-script'
 const GA_CONFIG_SCRIPT_ID = 'ga-config-script'
+export const ANALYTICS_CONSENT_KEY = 'prompt-generator-analytics-consent'
+
+/**
+ * Analytics only runs after the visitor accepted it in the cookie banner.
+ */
+export const hasAnalyticsConsent = () => {
+  try {
+    return window.localStorage.getItem(ANALYTICS_CONSENT_KEY) === 'granted'
+  } catch (e) {
+    return false
+  }
+}
 
 /**
  * Initialize Google Analytics tracking
@@ -64,6 +76,10 @@ export const useGoogleAnalytics = (measurementId = null, options = {}) => {
 
   // Initialize GA
   const initGA = () => {
+    if (!hasAnalyticsConsent() || document.getElementById(GA_SCRIPT_ID)) {
+      return
+    }
+
     const measurementId = getMeasurementId()
     if (!measurementId) {
       if (debug) {
@@ -151,6 +167,7 @@ export const useGoogleAnalytics = (measurementId = null, options = {}) => {
   })
 
   return {
+    initGA,
     isConfigured,
     getMeasurementId,
     trackPageView,

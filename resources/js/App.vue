@@ -8,7 +8,7 @@ import BadgeToast from './components/BadgeToast.vue'
 import useAchievements from './composables/useAchievements.js'
 import useAuth from './composables/useAuth.js'
 import useTranslations from './composables/useTranslations.js'
-import useGoogleAnalytics from './composables/useGoogleAnalytics.js'
+import useGoogleAnalytics, { ANALYTICS_CONSENT_KEY } from './composables/useGoogleAnalytics.js'
 import { setupLightningInterceptor, triggerInitialLightning } from './utils/axiosLightningInterceptor.js'
 
 // Initialize translations with auto-detection and cookie support
@@ -50,29 +50,11 @@ onMounted(() => {
     triggerInitialLightning()
 })
 
-// Check if cookie was just set by auto-detection
+// Show the banner until the visitor has answered the analytics question
 const checkCookieConsent = () => {
-  const cookieLang = getLanguageFromCookie()
-  
-  // If a cookie exists and we haven't shown consent yet, don't show banner
-  // Show banner only when we auto-detect and set a new cookie
-  if (cookieLang) {
-    cookieConsentGiven.value = true
-    showCookieBanner.value = false
-  } else {
-    // Check localStorage for consent
-    const consent = localStorage.getItem('prompt-generator-cookie-consent')
-    if (!consent) {
-      // No consent recorded, but we might have set a cookie via auto-detect
-      // Only show banner if language was auto-detected (not from localStorage)
-      const storedLang = localStorage.getItem('prompt-generator-lang')
-      if (!storedLang) {
-        showCookieBanner.value = true
-      }
-    } else {
-      cookieConsentGiven.value = true
-    }
-  }
+  const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY)
+  cookieConsentGiven.value = consent === 'granted'
+  showCookieBanner.value = consent === null
 }
 
 const toggleLanguageDropdown = () => {
@@ -82,10 +64,6 @@ const toggleLanguageDropdown = () => {
 const selectLanguage = (langCode) => {
   setLanguage(langCode)
   showLanguageDropdown.value = false
-  // Update cookie consent when user explicitly changes language
-  if (showCookieBanner.value) {
-    handleCookieAccept()
-  }
 }
 
 // Use computed properties for real-time reactivity
@@ -131,13 +109,15 @@ const handleCookieAccept = () => {
   showCookieBanner.value = false
   cookieConsentGiven.value = true
   localStorage.setItem('prompt-generator-cookie-consent', 'true')
+  localStorage.setItem(ANALYTICS_CONSENT_KEY, 'granted')
+  initGA()
 }
 
+// Declining only turns analytics off; the language cookie stays because the site needs it.
 const handleCookieDismiss = () => {
   showCookieBanner.value = false
-  // User dismissed without accepting - we still keep the cookie for language
-  // but mark that they dismissed the banner
   localStorage.setItem('prompt-generator-cookie-consent', 'dismissed')
+  localStorage.setItem(ANALYTICS_CONSENT_KEY, 'denied')
 }
 
 // Watch for language changes to update cookie consent state
@@ -147,8 +127,8 @@ watch(currentLang, () => {
   }
 })
 
-// Initialize Google Analytics
-useGoogleAnalytics()
+// Google Analytics only starts once the visitor accepted it
+const { initGA } = useGoogleAnalytics()
 
 const route = useRoute()
 const { user } = useAuth()

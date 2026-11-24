@@ -24,8 +24,9 @@ const cookieTranslations = {
   en: {
     title: 'We use cookies',
     message: 'We use cookies to remember your language preference.',
+    analytics: 'With your permission we also use Google Analytics cookies to understand how the site is used.',
     accept: 'Accept',
-    dismiss: 'Dismiss'
+    dismiss: 'Decline'
   },
   am: {
     title: 'ኩኪዎችን አገልግሎት።',
@@ -36,12 +37,14 @@ const cookieTranslations = {
   ar: {
     title: 'نستخدم ملفات تعريف الارتباط',
     message: 'نستخدم ملفات تعريف الارتباط لتذكر تفضيلات اللغة الخاصة بك.',
+    analytics: 'بموافقتك، نستخدم أيضًا ملفات تعريف ارتباط Google Analytics لفهم كيفية استخدام الموقع.',
     accept: 'قبول',
     dismiss: 'رفض'
   },
   fr: {
     title: 'Nous utilisons des cookies',
     message: 'Nous utilisons des cookies pour mémoriser votre préférence de langue.',
+    analytics: 'Avec votre accord, nous utilisons aussi des cookies Google Analytics pour comprendre comment le site est utilisé.',
     accept: 'Accepter',
     dismiss: 'Refuser'
   },
@@ -72,6 +75,7 @@ const cookieTranslations = {
   sw: {
     title: 'Tumia biscuit',
     message: 'Tumia biscuit kumbuka chaguo la lugha yako.',
+    analytics: 'Kwa ruhusa yako, tunatumia pia vidakuzi vya Google Analytics kuelewa jinsi tovuti inavyotumika.',
     accept: 'Kubali',
     dismiss: 'Kataa'
   },
@@ -120,7 +124,7 @@ watch(() => props.language, () => {
     <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-gray-900">{{ getTranslation('title') }}</h3>
-        <p class="text-sm text-gray-600">{{ getTranslation('message') }}</p>
+        <p class="text-sm text-gray-600">{{ getTranslation('message') }} {{ getTranslation('analytics') }}</p>
       </div>
       <div class="flex items-center space-x-3 flex-shrink-0">
         <button
