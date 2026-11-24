@@ -31,6 +31,7 @@ const cookieTranslations = {
   am: {
     title: 'ኩኪዎችን አገልግሎት።',
     message: 'ኩኪዎችን አገልግሎት አድርገን ቋንቋዎች መለወጥ።',
+    analytics: 'በእርስዎ ፈቃድ፣ ጣቢያው እንዴት እንደሚጠቀም ለመረዳት የGoogle Analytics ኩኪዎችንም እንጠቀማለን።',
     accept: 'አቀበል',
     dismiss: 'አጽዳ'
   },
@@ -51,24 +52,28 @@ const cookieTranslations = {
   ha: {
     title: 'Muna amfani da cookies',
     message: 'Muna amfani da cookies don haddwa sabunta harshen da kuka zaɓi.',
+    analytics: 'Da izininku, muna kuma amfani da cookies na Google Analytics don fahimtar yadda ake amfani da shafin.',
     accept: 'Yi amfani',
     dismiss: 'Ḋauki'
   },
   ig: {
     title: 'Anyị na ibe cookie',
     message: 'Anyị na ibe cookie iji cheta asụsụ gị chọrọ.',
+    analytics: 'Site n\'ikike gị, anyị na-ejikwa cookies Google Analytics iji ghọta otú esi eji saịtị a.',
     accept: 'Kwado',
     dismiss: 'Mechịe'
   },
   lg: {
     title: 'Tukyanya ebyokulwa',
     message: 'Tukyanya ebyokulwa okuyita olwino lwo lwanga olwino lwo lwanga.',
+    analytics: 'Bw\'oba otuwadde olukusa, tukozesa ne kuki za Google Analytics okutegeera engeri omukutu gye gukozesebwamu.',
     accept: 'Kweyeta',
     dismiss: 'Ggwa'
   },
   or: {
     title: 'Cookiesii tikuu',
     message: 'Cookiesii afaan qophaawwan kii galmee afaan qophaawwan kii galmeessu.',
+    analytics: 'Hayyama keessan wajjin, kukiiwwan Google Analytics illee fayyadamna akka marsariitiin kun akkamitti fayyadamamu hubachuuf.',
     accept: 'Qabxii',
     dismiss: 'Haala Gaaffii'
   },
@@ -82,6 +87,7 @@ const cookieTranslations = {
   yo: {
     title: 'Àwọn cookies à ń lò',
     message: 'Àwọn cookies à ń lò dàta àtúnṣe àwiọn èdè tí a fẹ́.',
+    analytics: 'Pẹ̀lú ìyọ̀ǹda yín, a tún ń lo àwọn cookies Google Analytics láti mọ bí a ṣe ń lo ojú-òpó yìí.',
     accept: 'Jẹ́wọ́',
     dismiss: 'Dàgbà'
   }
@@ -118,48 +124,52 @@ watch(() => props.language, () => {
 <template>
   <div
     v-if="showBanner"
-    class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-50"
+    role="dialog"
+    :aria-label="getTranslation('title')"
+    :dir="language === 'ar' ? 'rtl' : 'ltr'"
+    class="cookie-banner fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-xl border border-gray-100 border-t-4 border-t-orange-400 bg-white p-4 shadow-lg sm:inset-x-auto sm:bottom-6 sm:right-6 sm:mx-0 rtl:sm:left-6 rtl:sm:right-auto"
     data-testid="cookie-banner"
   >
-    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
-      <div class="flex-1 min-w-0">
-        <h3 class="font-semibold text-gray-900">{{ getTranslation('title') }}</h3>
-        <p class="text-sm text-gray-600">{{ getTranslation('message') }} {{ getTranslation('analytics') }}</p>
-      </div>
-      <div class="flex items-center space-x-3 flex-shrink-0">
-        <button
-          @click="dismissBanner"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors"
-          data-testid="cookie-dismiss"
-        >
-          {{ getTranslation('dismiss') }}
-        </button>
-        <button
-          @click="acceptCookies"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          data-testid="cookie-accept"
-        >
-          {{ getTranslation('accept') }}
-        </button>
-      </div>
+    <h3 class="font-semibold text-gray-900">{{ getTranslation('title') }}</h3>
+    <p class="mt-1 text-sm text-gray-600">{{ getTranslation('message') }} {{ getTranslation('analytics') }}</p>
+    <div class="mt-4 flex gap-2">
+      <button
+        @click="dismissBanner"
+        class="flex-1 rounded-xl border border-gray-900 bg-white px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+        data-testid="cookie-dismiss"
+      >
+        {{ getTranslation('dismiss') }}
+      </button>
+      <button
+        @click="acceptCookies"
+        class="flex-1 rounded-xl border border-gray-900 bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+        data-testid="cookie-accept"
+      >
+        {{ getTranslation('accept') }}
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Banner enters from bottom */
-[data-testid="cookie-banner"] {
-  animation: slideIn 0.3s ease-out;
+.cookie-banner {
+  animation: slideIn 0.25s ease-out;
 }
 
 @keyframes slideIn {
   from {
-    transform: translateY(100%);
+    transform: translateY(0.75rem);
     opacity: 0;
   }
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner {
+    animation: none;
   }
 }
 </style>
