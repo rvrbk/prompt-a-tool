@@ -35,7 +35,6 @@
         @keyframes boot-spin { to { transform: rotate(360deg); } }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://lore.verbeek.ug/heat.js" data-key="MPJEdQ9WAZaGsWujN4PjZV3UGEdmVN9G" data-lore-heat></script>
 </head>
 <body>
     <div id="app">
